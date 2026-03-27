@@ -89,26 +89,26 @@
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T43 | Smoke: install.sh e2e | ⏳ | Sonnet | Medium | Fresh dir, answer questions, verify |
-| T44 | Smoke: tao.sh | ⏳ | Sonnet | Medium | status/report/dry-run/pause |
-| T45 | Smoke: hooks | ⏳ | Sonnet | Medium | pre-commit blocks, context injects |
-| T46 | Consistency check | ⏳ | Opus | High | Zero [SUBSTITUIR], no duplication |
-| T47 | i18n-diff validation | ⏳ | Sonnet | Low | Run diff, verify 0 drift |
-| T48 | README UX review | ⏳ | Opus | Medium | 30s comprehension test |
+| T43 | Smoke: install.sh e2e | ✅ | Sonnet | Medium | 26db930 — found+fixed placeholder substitution bug |
+| T44 | Smoke: tao.sh | ✅ | Sonnet | Medium | 364ad8f — status/help/pause/unpause all pass |
+| T45 | Smoke: hooks | ✅ | Sonnet | Medium | 364ad8f — pre-commit, lint-hook, context-hook all pass |
+| T46 | Consistency check | ✅ | Opus | High | a5c96f8 — zero [SUBSTITUIR], config consistent |
+| T47 | i18n-diff validation | ✅ | Sonnet | Low | 0% drift on 12/12 matching files |
+| T48 | README UX review | ✅ | Opus | Medium | 791ed94 — hero descriptor added |
 
 ---
 
-## SUMMARY — 2026-03-27 10:08
+## SUMMARY — 2026-03-27 COMPLETE
 
 | Sprint | Done | Pending | Tasks |
 |---|---|---|---|
-| S1 — Infrastructure | 0/8 | 8 | T01-T08 |
-| S2 — Templates | 0/9 | 9 | T09-T17 |
-| S3 — Agents | 0/12 | 12 | T18-T29 |
-| S4 — Phase Templates | 0/3 | 3 | T30-T32 |
-| S5 — Scripts | 0/3 | 3 | T33-T35 |
-| S6 — Documentation | 0/7 | 7 | T36-T42 |
-| S7 — Verification | 0/6 | 6 | T43-T48 |
-| **TOTAL** | **0/48** | **48** | — |
+| S1 — Infrastructure | 8/8 | 0 | T01-T08 |
+| S2 — Templates | 9/9 | 0 | T09-T17 |
+| S3 — Agents | 12/12 | 0 | T18-T29 |
+| S4 — Phase Templates | 3/3 | 0 | T30-T32 |
+| S5 — Scripts | 3/3 | 0 | T33-T35 |
+| S6 — Documentation | 7/7 | 0 | T36-T42 |
+| S7 — Verification | 6/6 | 0 | T43-T48 |
+| **TOTAL** | **48/48** | **0** | — |
 
 **Executor breakdown:** Opus: 14 tasks | Sonnet: 34 tasks
