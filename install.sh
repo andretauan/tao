@@ -306,6 +306,22 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════════
+# STEP 8b — Substitute placeholders in all installed files
+# ═══════════════════════════════════════════════════════════════
+step "Substituting placeholders"
+
+# Replace {{PROJECT_NAME}} and {{PROJECT_DESCRIPTION}} in all text files
+PLACEHOLDER_COUNT=0
+while IFS= read -r tgt_file; do
+  if grep -q '{{PROJECT_NAME}}\|{{PROJECT_DESCRIPTION}}' "$tgt_file" 2>/dev/null; then
+    sed -i "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" "$tgt_file"
+    sed -i "s/{{PROJECT_DESCRIPTION}}/$PROJECT_DESC/g" "$tgt_file"
+    PLACEHOLDER_COUNT=$((PLACEHOLDER_COUNT + 1))
+  fi
+done < <(find "$TARGET_DIR" -maxdepth 3 -type f \( -name '*.md' -o -name '*.json' \) -not -path '*/.git/*' 2>/dev/null)
+echo -e "    ${GREEN}✅${NC} Substituted placeholders in $PLACEHOLDER_COUNT files"
+
+# ═══════════════════════════════════════════════════════════════
 # STEP 9 — Summary
 # ═══════════════════════════════════════════════════════════════
 echo ""
@@ -336,7 +352,7 @@ echo -e "  1. Review ${BOLD}tao.config.json${NC} — customize models, paths, li
 echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and stack info"
 echo -e "  3. Edit ${BOLD}CONTEXT.md${NC} — set your first active phase"
 echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
-echo -e "  5. In Copilot Chat: select ${BOLD}@GSD${NC} and say ${BOLD}\"execute\"${NC}"
+echo -e "  5. In Copilot Chat: select ${BOLD}@Tao${NC} and say ${BOLD}\"execute\"${NC}"
 echo ""
 echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
 echo ""
