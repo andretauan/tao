@@ -24,9 +24,9 @@ PROJECT_NAME="Project"
 
 if [ -f "$CONFIG_FILE" ]; then
   _cfg=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     print(c.get('paths',{}).get('phases','docs/phases'))
     print(c.get('paths',{}).get('phase_prefix','phase-'))
     print(c.get('project',{}).get('name','Project'))
@@ -34,7 +34,7 @@ except:
     print('docs/phases')
     print('phase-')
     print('Project')
-" 2>/dev/null) || _cfg=""
+" "$CONFIG_FILE" 2>/dev/null) || _cfg=""
   if [ -n "$_cfg" ]; then
     PHASES_DIR=$(echo "$_cfg" | sed -n '1p')
     PHASES_DIR="${PHASES_DIR%/}"

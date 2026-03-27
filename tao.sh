@@ -33,15 +33,15 @@ read_config() {
     val=$(python3 -c "
 import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
-    keys = '$key'.split('.')
+    c = json.load(open(sys.argv[1]))
+    keys = sys.argv[2].split('.')
     v = c
     for k in keys:
         v = v[k]
     print(v)
 except:
-    print('$default')
-" 2>/dev/null) || val="$default"
+    print(sys.argv[3])
+" "$CONFIG_FILE" "$key" "$default" 2>/dev/null) || val="$default"
     echo "$val"
   else
     echo "$default"

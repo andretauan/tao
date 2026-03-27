@@ -31,14 +31,14 @@ get_lint_command() {
   local ext="$1"
   if [ -f "$CONFIG" ]; then
     python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG'))
+    c = json.load(open(sys.argv[1]))
     cmds = c.get('lint_commands', {})
-    print(cmds.get('$ext', ''))
+    print(cmds.get(sys.argv[2], ''))
 except:
     print('')
-" 2>/dev/null || echo ""
+" "$CONFIG" "$ext" 2>/dev/null || echo ""
   else
     echo ""
   fi

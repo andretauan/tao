@@ -173,22 +173,6 @@ CONFIG_FILE="$TARGET_DIR/tao.config.json"
 if [ -f "$CONFIG_FILE" ]; then
   skipped "tao.config.json"
 else
-  # Build lint_commands based on user selection
-  LINT_COMMANDS=""
-  if [ "$LINT_STACK" != "none" ]; then
-    case "$LINT_STACK" in
-      .php) LINT_COMMANDS="\"$LINT_STACK\": \"php -l {file}\"" ;;
-      .py)  LINT_COMMANDS="\"$LINT_STACK\": \"python3 -m py_compile {file}\"" ;;
-      .ts)  LINT_COMMANDS="\"$LINT_STACK\": \"npx tsc --noEmit\"" ;;
-      .js)  LINT_COMMANDS="\"$LINT_STACK\": \"node --check {file}\"" ;;
-      .rb)  LINT_COMMANDS="\"$LINT_STACK\": \"ruby -c {file}\"" ;;
-      .go)  LINT_COMMANDS="\"$LINT_STACK\": \"go vet {file}\"" ;;
-      .rs)  LINT_COMMANDS="\"$LINT_STACK\": \"cargo check\"" ;;
-      *)    warn "Unknown stack '$LINT_STACK' — lint_commands left empty"
-            LINT_STACK="none" ;;
-    esac
-  fi
-
   # Determine phase prefix based on language
   if [ "$LANG_CHOICE" = "pt-br" ]; then
     PHASE_PREFIX="fase-"
@@ -196,45 +180,65 @@ else
     PHASE_PREFIX="phase-"
   fi
 
-  # Write config
-  cat > "$CONFIG_FILE" <<JSONEOF
-{
-  "project": {
-    "name": "$PROJECT_NAME",
-    "description": "$PROJECT_DESC",
-    "language": "$LANG_CHOICE"
-  },
-  "models": {
-    "orchestrator": "Claude Sonnet 4.6 (copilot)",
-    "complex_worker": "Claude Opus 4.6 (copilot)",
-    "free_tier": "GPT-4.1 (copilot)"
-  },
-  "git": {
-    "dev_branch": "$DEV_BRANCH",
-    "main_branch": "main",
-    "auto_push": true
-  },
-  "paths": {
-    "source": "src/",
-    "docs": "docs/",
-    "phases": "docs/phases/",
-    "phase_prefix": "$PHASE_PREFIX"
-  },
-  "lint_commands": {
-$(if [ "$LINT_STACK" != "none" ]; then echo "    $LINT_COMMANDS"; fi)
-  },
-  "compliance": {
-    "require_skill_check": true,
-    "require_context_read": true,
-    "require_changelog": true,
-    "abex_enabled": true
-  },
-  "doc_sync": {
-    "enabled": false,
-    "script": "scripts/doc-sync.sh"
-  }
+  # Build lint command
+  LINT_CMD_VAL=""
+  if [ "$LINT_STACK" != "none" ]; then
+    case "$LINT_STACK" in
+      .php) LINT_CMD_VAL="php -l {file}" ;;
+      .py)  LINT_CMD_VAL="python3 -m py_compile {file}" ;;
+      .ts)  LINT_CMD_VAL="npx tsc --noEmit" ;;
+      .js)  LINT_CMD_VAL="node --check {file}" ;;
+      .rb)  LINT_CMD_VAL="ruby -c {file}" ;;
+      .go)  LINT_CMD_VAL="go vet {file}" ;;
+      .rs)  LINT_CMD_VAL="cargo check" ;;
+      *)    warn "Unknown stack '$LINT_STACK' — lint_commands left empty"
+            LINT_STACK="none" ;;
+    esac
+  fi
+
+  # Write config using python3 for proper JSON escaping
+  python3 -c "
+import json, sys
+config = {
+    'project': {
+        'name': sys.argv[1],
+        'description': sys.argv[2],
+        'language': sys.argv[3]
+    },
+    'models': {
+        'orchestrator': 'Claude Sonnet 4.6 (copilot)',
+        'complex_worker': 'Claude Opus 4.6 (copilot)',
+        'free_tier': 'GPT-4.1 (copilot)'
+    },
+    'git': {
+        'dev_branch': sys.argv[4],
+        'main_branch': 'main',
+        'auto_push': True
+    },
+    'paths': {
+        'source': 'src/',
+        'docs': 'docs/',
+        'phases': 'docs/phases/',
+        'phase_prefix': sys.argv[5]
+    },
+    'lint_commands': {},
+    'compliance': {
+        'require_skill_check': True,
+        'require_context_read': True,
+        'require_changelog': True,
+        'abex_enabled': True
+    },
+    'doc_sync': {
+        'enabled': False,
+        'script': 'scripts/doc-sync.sh'
+    }
 }
-JSONEOF
+if sys.argv[6] != 'none':
+    config['lint_commands'][sys.argv[6]] = sys.argv[7]
+with open(sys.argv[8], 'w') as f:
+    json.dump(config, f, indent=2, ensure_ascii=False)
+    f.write('\n')
+" "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "$LINT_STACK" "${LINT_CMD_VAL:-}" "$CONFIG_FILE"
   installed "tao.config.json"
 fi
 

@@ -36,9 +36,9 @@ fi
 
 # ── Read models from config (single call, no eval) ──
 _models=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     m = c.get('models',{})
     print(m.get('orchestrator',''))
     print(m.get('complex_worker',''))
@@ -47,7 +47,7 @@ except:
     print('')
     print('')
     print('')
-" 2>/dev/null) || _models=""
+" "$CONFIG_FILE" 2>/dev/null) || _models=""
 if [ -n "$_models" ]; then
   MODEL_ORCHESTRATOR=$(echo "$_models" | sed -n '1p')
   MODEL_COMPLEX=$(echo "$_models" | sed -n '2p')
@@ -117,30 +117,32 @@ update_agent() {
     if [[ "$role" == "orchestrator" ]]; then
       # Replace multi-model block (model: + next 2 lines starting with -)
       python3 -c "
-import re
-with open('$file', 'r') as f:
+import re, sys
+filepath, model_orch, model_free = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(filepath, 'r') as f:
     content = f.read()
-# Replace model block in YAML frontmatter
 pattern = r'model:.*?(?=\n[a-z]|\n---)'
-replacement = 'model:\n  - ${new_model}\n  - ${MODEL_FREE}'
+replacement = 'model:\n  - ' + model_orch + '\n  - ' + model_free
 new_content = re.sub(pattern, replacement, content, count=1, flags=re.DOTALL)
-with open('$file', 'w') as f:
+with open(filepath, 'w') as f:
     f.write(new_content)
-" 2>/dev/null
+" "$file" "$new_model" "$MODEL_FREE" 2>/dev/null
     else
       # Replace single model line
       python3 -c "
-with open('$file', 'r') as f:
+import sys
+filepath, new_model = sys.argv[1], sys.argv[2]
+with open(filepath, 'r') as f:
     lines = f.readlines()
-with open('$file', 'w') as f:
+with open(filepath, 'w') as f:
     for line in lines:
         if line.startswith('model:') and not line.strip().startswith('model:'):
             f.write(line)
         elif line.startswith('model:'):
-            f.write('model: ${new_model}\n')
+            f.write('model: ' + new_model + '\n')
         else:
             f.write(line)
-" 2>/dev/null
+" "$file" "$new_model" 2>/dev/null
     fi
     echo -e "  ${GREEN}UPDATED${NC} $agent_name → $new_model"
   fi

@@ -37,9 +37,9 @@ fi
 
 # ── Read config via python3 (single call, no eval) ──
 _cfg=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     print(c.get('project',{}).get('language','en'))
     print(c.get('paths',{}).get('phases','docs/phases/'))
     print(c.get('paths',{}).get('phase_prefix','phase-'))
@@ -49,7 +49,7 @@ except:
     print('docs/phases/')
     print('phase-')
     print('Project')
-" 2>/dev/null) || _cfg=""
+" "$CONFIG_FILE" 2>/dev/null) || _cfg=""
 if [ -n "$_cfg" ]; then
   LANG=$(echo "$_cfg" | sed -n '1p')
   PHASES_DIR=$(echo "$_cfg" | sed -n '2p')
@@ -122,6 +122,10 @@ mkdir -p "$PHASE_DIR/$TASKS_DIR_NAME"
 # ── Copy and substitute templates ──
 DATE_NOW=$(date '+%Y-%m-%d %H:%M')
 
+# Escape sed special chars in user-provided values (& / \ are special in sed replacements)
+SAFE_PHASE_NAME=$(printf '%s' "$PHASE_NAME" | sed 's/[&/\]/\\&/g')
+SAFE_PROJECT_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\]/\\&/g')
+
 for template in "$TEMPLATE_DIR"/*; do
   if [ -f "$template" ]; then
     filename=$(basename "$template")
@@ -129,12 +133,12 @@ for template in "$TEMPLATE_DIR"/*; do
     target_name="${filename%.template}"
     target_file="$PHASE_DIR/$target_name"
 
-    # Substitute placeholders
+    # Substitute placeholders (using | delimiter to avoid / conflicts)
     sed \
-      -e "s/{{PHASE_NUMBER}}/$PHASE_NUM/g" \
-      -e "s/{{PHASE_NAME}}/$PHASE_NAME/g" \
-      -e "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" \
-      -e "s/{{DATE}}/$DATE_NOW/g" \
+      -e "s|{{PHASE_NUMBER}}|$PHASE_NUM|g" \
+      -e "s|{{PHASE_NAME}}|$SAFE_PHASE_NAME|g" \
+      -e "s|{{PROJECT_NAME}}|$SAFE_PROJECT_NAME|g" \
+      -e "s|{{DATE}}|$DATE_NOW|g" \
       "$template" > "$target_file"
 
     echo -e "  ${GREEN}✓${NC} $target_name"
@@ -150,10 +154,10 @@ if [ -n "$BRAINSTORM_TEMPLATE_DIR" ]; then
       target_file="$PHASE_DIR/brainstorm/$target_name"
 
       sed \
-        -e "s/{{PHASE_NUMBER}}/$PHASE_NUM/g" \
-        -e "s/{{PHASE_NAME}}/$PHASE_NAME/g" \
-        -e "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" \
-        -e "s/{{DATE}}/$DATE_NOW/g" \
+        -e "s|{{PHASE_NUMBER}}|$PHASE_NUM|g" \
+        -e "s|{{PHASE_NAME}}|$SAFE_PHASE_NAME|g" \
+        -e "s|{{PROJECT_NAME}}|$SAFE_PROJECT_NAME|g" \
+        -e "s|{{DATE}}|$DATE_NOW|g" \
         "$template" > "$target_file"
 
       echo -e "  ${GREEN}✓${NC} brainstorm/$target_name"

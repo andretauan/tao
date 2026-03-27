@@ -78,14 +78,14 @@ fi
 LINT_CMD=$(python3 -c "
 import json, sys
 try:
-    with open('$CONFIG_FILE') as f:
+    with open(sys.argv[1]) as f:
         cfg = json.load(f)
     cmds = cfg.get('lint_commands', {})
-    cmd = cmds.get('$EXT', '')
+    cmd = cmds.get(sys.argv[2], '')
     print(cmd)
 except:
     print('')
-" 2>/dev/null)
+" "$CONFIG_FILE" "$EXT" 2>/dev/null)
 
 if [ -z "$LINT_CMD" ]; then
   exit 0
