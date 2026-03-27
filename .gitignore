@@ -1,0 +1,29 @@
+# TAO — Generated files
+tao.config.json
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Runtime
+node_modules/
+vendor/
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Pause file (GSD kill switch)
+.gsd-pause
+.tao-pause
