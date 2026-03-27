@@ -24,6 +24,6 @@ __pycache__/
 .env.local
 .env.*.local
 
-# Pause file (GSD kill switch)
+# Pause file (TAO kill switch — .gsd-pause kept for backward compat)
 .gsd-pause
 .tao-pause

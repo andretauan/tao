@@ -153,7 +153,7 @@ else
     case "$LINT_STACK" in
       .php) LINT_COMMANDS="\"$LINT_STACK\": \"php -l {file}\"" ;;
       .py)  LINT_COMMANDS="\"$LINT_STACK\": \"python3 -m py_compile {file}\"" ;;
-      .ts)  LINT_COMMANDS="\"$LINT_STACK\": \"tsc --noEmit {file}\"" ;;
+      .ts)  LINT_COMMANDS="\"$LINT_STACK\": \"npx tsc --noEmit\"" ;;
       .js)  LINT_COMMANDS="\"$LINT_STACK\": \"node --check {file}\"" ;;
       .rb)  LINT_COMMANDS="\"$LINT_STACK\": \"ruby -c {file}\"" ;;
       .go)  LINT_COMMANDS="\"$LINT_STACK\": \"go vet {file}\"" ;;
