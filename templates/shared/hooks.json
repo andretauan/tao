@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "./scripts/lint-hook.sh",
+        "timeout": 10
+      }
+    ],
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "./scripts/context-hook.sh",
+        "timeout": 5
+      }
+    ]
+  }
+}
