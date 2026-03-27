@@ -17,73 +17,73 @@
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T08 | .gitignore + LICENSE + scaffold | ⏳ | Sonnet | Low | First task — creates directory structure |
-| T01 | tao.config.json schema + example | ⏳ | Sonnet | Medium | Defines ALL configurable values |
-| T02 | install.sh interactive | ⏳ | Opus | High | 5 questions, generates config, copies templates |
-| T03 | tao.sh monitor | ⏳ | Sonnet | Medium | Adapt from gsd.sh (347 lines) |
-| T04 | hooks/install-hooks.sh | ⏳ | Sonnet | Low | Fixes B3 CRITICAL |
-| T05 | hooks/pre-commit.sh orchestrator | ⏳ | Sonnet | Medium | Modular pipeline |
-| T06 | hooks/lint-hook.sh generic | ⏳ | Sonnet | Medium | PostToolUse, reads tao.config.json |
-| T07 | hooks/context-hook.sh generic | ⏳ | Sonnet | Low | SessionStart, reads tao.config.json |
+| T08 | .gitignore + LICENSE + scaffold | ✅ | Sonnet | Low | a2496f5 |
+| T01 | tao.config.json schema + example | ✅ | Sonnet | Medium | 172c78e |
+| T02 | install.sh interactive | ✅ | Opus | High | 86fed73 |
+| T03 | tao.sh monitor | ✅ | Sonnet | Medium | 7a6c518 |
+| T04 | hooks/install-hooks.sh | ✅ | Sonnet | Low | 8cf3eb3 |
+| T05 | hooks/pre-commit.sh orchestrator | ✅ | Sonnet | Medium | 0894fa9 |
+| T06 | hooks/lint-hook.sh generic | ✅ | Sonnet | Medium | 8674e0a |
+| T07 | hooks/context-hook.sh generic | ✅ | Sonnet | Low | 426394f |
 
 ## SPRINT 2 — Core Templates (P0)
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T09 | templates/en/CLAUDE.md | ⏳ | Opus | High | Zero [SUBSTITUIR], ABEX, generic rules |
-| T10 | templates/en/CONTEXT.md | ⏳ | Sonnet | Low | Onboarding mode |
-| T11 | templates/en/CHANGELOG.md | ⏳ | Sonnet | Low | — |
-| T12 | templates/en/copilot-instructions.md | ⏳ | Sonnet | Medium | Minimal pointer to CLAUDE.md |
-| T13 | templates/pt-br/CLAUDE.md | ⏳ | Opus | High | Cultural adaptation of T09 |
-| T14 | templates/pt-br/CONTEXT.md | ⏳ | Sonnet | Low | — |
-| T15 | templates/pt-br/CHANGELOG.md | ⏳ | Sonnet | Low | — |
-| T16 | templates/pt-br/copilot-instructions.md | ⏳ | Sonnet | Medium | — |
-| T17 | templates/shared/hooks.json | ⏳ | Sonnet | Low | Language-neutral |
+| T09 | templates/en/CLAUDE.md | ✅ | Opus | High | 7811876 |
+| T10 | templates/en/CONTEXT.md | ✅ | Sonnet | Low | 2efc7fa |
+| T11 | templates/en/CHANGELOG.md | ✅ | Sonnet | Low | b77c410 |
+| T12 | templates/en/copilot-instructions.md | ✅ | Sonnet | Medium | 8407393 |
+| T13 | templates/pt-br/CLAUDE.md | ✅ | Opus | High | 7b278a0 |
+| T14 | templates/pt-br/CONTEXT.md | ✅ | Sonnet | Low | 5609492 |
+| T15 | templates/pt-br/CHANGELOG.md | ✅ | Sonnet | Low | d2ca4e2 |
+| T16 | templates/pt-br/copilot-instructions.md | ✅ | Sonnet | Medium | 11cf16d |
+| T17 | templates/shared/hooks.json | ✅ | Sonnet | Low | bb7f2d1 |
 
 ## SPRINT 3 — Taoist Agents (P0)
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T18 | agents/en/Tao.agent.md | ⏳ | Opus | High | Orchestrator, loop, routing matrix |
-| T19 | agents/en/Wu.agent.md | ⏳ | Opus | High | NEW — brainstorm, IBIS, 5 modes |
-| T20 | agents/en/Shen.agent.md | ⏳ | Sonnet | Medium | Complex worker subagent |
-| T21 | agents/en/Shen-Architect.agent.md | ⏳ | Sonnet | Medium | User-invocable architect |
-| T22 | agents/en/Di.agent.md | ⏳ | Sonnet | Low | DBA subagent |
-| T23 | agents/en/Qi.agent.md | ⏳ | Sonnet | Low | Deploy subagent |
-| T24 | agents/pt-br/Tao.agent.md | ⏳ | Opus | High | Cultural adaptation of T18 |
-| T25 | agents/pt-br/Wu.agent.md | ⏳ | Opus | High | Cultural adaptation of T19 |
-| T26 | agents/pt-br/Shen.agent.md | ⏳ | Sonnet | Medium | — |
-| T27 | agents/pt-br/Shen-Arquiteto.agent.md | ⏳ | Sonnet | Medium | — |
-| T28 | agents/pt-br/Di.agent.md | ⏳ | Sonnet | Low | — |
-| T29 | agents/pt-br/Qi.agent.md | ⏳ | Sonnet | Low | — |
+| T18 | agents/en/Tao.agent.md | ✅ | Opus | High | 5413f70 |
+| T19 | agents/en/Wu.agent.md | ✅ | Opus | High | 81d8ea3 |
+| T20 | agents/en/Shen.agent.md | ✅ | Sonnet | Medium | 476c584 |
+| T21 | agents/en/Shen-Architect.agent.md | ✅ | Sonnet | Medium | 3296b9a |
+| T22 | agents/en/Di.agent.md | ✅ | Sonnet | Low | cf6f432 |
+| T23 | agents/en/Qi.agent.md | ✅ | Sonnet | Low | 4c28ee6 |
+| T24 | agents/pt-br/Tao.agent.md | ✅ | Opus | High | 0f05604 |
+| T25 | agents/pt-br/Wu.agent.md | ✅ | Opus | High | ecfa3ef |
+| T26 | agents/pt-br/Shen.agent.md | ✅ | Sonnet | Medium | 9aeb10e |
+| T27 | agents/pt-br/Shen-Arquiteto.agent.md | ✅ | Sonnet | Medium | 331f99b |
+| T28 | agents/pt-br/Di.agent.md | ✅ | Sonnet | Low | fec8625 |
+| T29 | agents/pt-br/Qi.agent.md | ✅ | Sonnet | Low | 3c1fb58 |
 
 ## SPRINT 4 — Phase Templates (P1)
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T30 | phases/en/ (4 templates) | ⏳ | Sonnet | Medium | PLAN, STATUS, task, progress |
-| T31 | phases/pt-br/ (4 templates) | ⏳ | Sonnet | Medium | PLAN, STATUS, tarefa, progress |
-| T32 | phases/shared/ (3 brainstorm) | ⏳ | Sonnet | Medium | DISCOVERY, DECISIONS, BRIEF |
+| T30 | phases/en/ (4 templates) | ✅ | Sonnet | Medium | 05171e4 |
+| T31 | phases/pt-br/ (4 templates) | ✅ | Sonnet | Medium | fd2bef2 |
+| T32 | phases/shared/ (3 brainstorm) | ✅ | Sonnet | Medium | 94672dd |
 
 ## SPRINT 5 — Utility Scripts (P1)
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T33 | update-models.sh | ⏳ | Sonnet | Medium | Updates models in .agent.md files |
-| T34 | scripts/i18n-diff.sh | ⏳ | Sonnet | Medium | Anti-drift EN vs PT-BR |
-| T35 | scripts/new-phase.sh | ⏳ | Sonnet | Low | Creates phase dir with templates |
+| T33 | update-models.sh | ✅ | Sonnet | Medium | 8e222be |
+| T34 | scripts/i18n-diff.sh | ✅ | Sonnet | Medium | c085ed9 |
+| T35 | scripts/new-phase.sh | ✅ | Sonnet | Low | 354d963 |
 
 ## SPRINT 6 — Documentation (P1)
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T36 | README.md (EN) | ⏳ | Opus | High | Hero, pitch, quickstart, features |
-| T37 | README.pt-br.md | ⏳ | Opus | High | Cultural adaptation |
-| T38 | docs/GETTING-STARTED.md | ⏳ | Opus | High | Accordion L1→L5 |
-| T39 | docs/ARCHITECTURE.md | ⏳ | Sonnet | Medium | Adapt from GSD (585 lines) |
-| T40 | docs/ECONOMICS.md | ⏳ | Sonnet | Medium | Model costs, routing |
-| T41 | docs/GUARDRAILS.md | ⏳ | Sonnet | Medium | 7 layers, 23 gates |
-| T42 | CONTRIBUTING.md | ⏳ | Sonnet | Low | EN + PT-BR section |
+| T36 | README.md (EN) | ✅ | Opus | High | 7da6b9a |
+| T37 | README.pt-br.md | ✅ | Opus | High | 8a4ff1e |
+| T38 | docs/GETTING-STARTED.md | ✅ | Opus | High | 0ce895a |
+| T39 | docs/ARCHITECTURE.md | ✅ | Sonnet | Medium | 12f142a |
+| T40 | docs/ECONOMICS.md | ✅ | Sonnet | Medium | f545aac |
+| T41 | docs/GUARDRAILS.md | ✅ | Sonnet | Medium | 9ab583b |
+| T42 | CONTRIBUTING.md | ✅ | Sonnet | Low | 374f520 |
 
 ## SPRINT 7 — Verification (P2)
 
