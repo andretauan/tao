@@ -270,6 +270,10 @@ The chat and the file should contain the SAME depth of analysis.
    - Recommended execution order
 6. Create individual task files in `tasks/` directory:
    - Each task file contains: objective, files to read, files to create/edit, acceptance criteria, referenced BRIEF decision
+7. Validate plan coverage (BLOCK gate):
+   - Run: `bash scripts/validate-plan.sh {phases}/{phase_prefix}{XX}`
+   - If exit 1 (BLOCK): read the output, fix identified gaps in PLAN.md → re-run until PASS
+   - If exit 0 (PASS): commit artifacts + notify user
 
 ### PLAN.md Provenance Rule:
 

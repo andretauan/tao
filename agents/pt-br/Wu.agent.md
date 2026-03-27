@@ -269,8 +269,10 @@ O chat e o arquivo devem conter a MESMA profundidade de análise.
    - Tabela de tarefas: ID, nome, status (⏳), complexidade, executor designado
    - Ordem recomendada de execução
 6. Criar arquivos individuais de tarefa no diretório `tasks/`:
-   - Cada arquivo de tarefa contém: objetivo, arquivos a ler, arquivos a criar/editar, critérios de aceitação, decisão do BRIEF referenciada
-
+   - Cada arquivo de tarefa contém: objetivo, arquivos a ler, arquivos a criar/editar, critérios de aceitação, decisão do BRIEF referenciada7. Validar cobertura do plano (gate BLOQUEANTE):
+   - Rodar: `bash scripts/validate-plan.sh {phases}/{phase_prefix}{XX}`
+   - Se exit 1 (BLOCK): ler a saída, corrigir lacunas identificadas no PLAN.md → repetir até PASS
+   - Se exit 0 (PASS): commitar artefatos + notificar usuário
 ### Regra de Proveniência do PLAN.md:
 
 Toda tarefa no PLAN.md DEVE rastrear de volta a uma decisão no BRIEF.md. Se uma tarefa não tem proveniência → não está no escopo → remover. Isso previne scope creep durante o planejamento.

@@ -63,6 +63,12 @@ LOOP {
                     → INVOKE Shen subagent to create STATUS
                   → No PLAN.md = no execution. No BRIEF.md = no planning.
 
+  2c. PLAN_GATE   → IF scripts/validate-plan.sh exists AND no task is ✅ in STATUS yet:
+                    → run: bash scripts/validate-plan.sh {phases}/{phase_prefix}{XX}
+                    → if exit 1 (BLOCK): STOP → show output → do NOT execute any task
+                    → if exit 0 (PASS): continue
+                    (Skip if any task already ✅ — plan was validated in a prior session)
+
   3. PICK_TASK    → select first ⏳ in "Recommended Order"
 
   4. ROUTE_TASK   → IF "Executor: Architect (Opus)" OR High Complexity with trade-offs:
@@ -72,7 +78,10 @@ LOOP {
                   → ELSE:
                     → Execute DIRECTLY (Sonnet)
 
-  5. NO ⏳        → ADVANCE_PHASE (see §Advance Phase below)
+  5. NO ⏳        → EXECUTION_GATE (validate before advancing):
+                    → run: bash scripts/validate-execution.sh {phases}/{phase_prefix}{XX}
+                    → if exit 1 (BLOCK): STOP → show output → fix issues → retry
+                    → if exit 0 (PASS): ADVANCE_PHASE (see §Advance Phase below)
                   → if ADVANCE_PHASE returned STOP → STOP + report
                   → else → GOTO 1 (now executing in the new phase)
 
