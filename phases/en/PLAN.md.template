@@ -1,0 +1,59 @@
+# PLAN.md — Phase [XX]: [Phase Name]
+
+**Date:** [YYYY-MM-DD]
+**Phase:** [XX]
+**Objective:** [What this phase delivers, in 1 sentence]
+
+---
+
+## Overview
+
+[Description of the phase in 3-5 sentences. What will be built, why, and the impact on the project.]
+
+---
+
+## Task Groups
+
+### Group P0 — [Name: e.g., Critical Bugs]
+Tasks that block other work. Maximum priority.
+
+- **T01** — [Name] — [1-line description]
+- **T02** — [Name] — [1-line description]
+
+### Group P1 — [Name: e.g., Core Features]
+Phase core. Delivers the main value.
+
+- **T03** — [Name] — [1-line description]
+- **T04** — [Name] — [1-line description]
+
+### Group P2 — [Name: e.g., Quality]
+Polish and tests.
+
+- **T05** — [Name] — [1-line description]
+
+---
+
+## Recommended Execution Order
+
+```
+P0: T01 → T02
+P1: T03 → T04
+P2: T05
+```
+
+---
+
+## Phase Completion Criteria
+
+- [ ] All P0 completed
+- [ ] All P1 completed
+- [ ] Quality gates passing
+- [ ] CONTEXT.md updated
+- [ ] CHANGELOG.md updated
+
+---
+
+## Dependencies / Prerequisites
+
+- [e.g., Phase 02 completed]
+- [e.g., Database schema updated]

@@ -1,0 +1,39 @@
+# STATUS — Phase [XX]: [Phase Name]
+
+> The Executor reads this file to know which task to run.
+> Mark ✅ when done. Mark ❌ if blocked.
+> **Last updated:** [YYYY-MM-DD HH:MM]
+>
+> **Recommended execution order:**
+> [01 → 02 → 03 → ...]
+
+## GROUP P0 — [Group name: e.g., Critical Bugs]
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 01 | [Task name 1] | ⏳ | — |
+| 02 | [Task name 2] | ⏳ | — |
+
+## GROUP P1 — [Group name: e.g., Core Features]
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 03 | [Task name 3] | ⏳ | — |
+| 04 | [Task name 4] | ⏳ | — |
+
+## GROUP P2 — [Group name: e.g., Quality & Tests]
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 05 | [Task name 5] | ⏳ | — |
+
+---
+
+## SUMMARY — [YYYY-MM-DD HH:MM]
+
+| Group | Done | Partial | Pending |
+|-------|------|---------|---------|
+| P0 | 0/2 | — | 2 |
+| P1 | 0/2 | — | 2 |
+| P2 | 0/1 | — | 1 |
+| **TOTAL** | **0/5** | **—** | **5** |

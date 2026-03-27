@@ -1,0 +1,49 @@
+# Task [NN] — [Descriptive Task Name]
+
+**Phase:** [XX] — [Phase Name]
+**Complexity:** [Low | Medium | High]
+**Executor:** [SONNET | OPUS]
+**Priority:** [P0 | P1 | P2 | P3]
+
+---
+
+## Objective
+
+[What this task must deliver. 2-3 clear sentences. The executor should not need to interpret — just execute.]
+
+## Context
+
+[Why this task exists. What motivated it. Technical context needed.]
+
+## Files to Read (BEFORE editing)
+
+- `path/to/file.ext` — [why to read]
+- `path/to/other.ext` — [why to read]
+
+## Files to Create/Edit
+
+- `path/to/file.ext` — [what to do]
+- `path/to/new.ext` — [create with this content]
+
+## Implementation Steps
+
+1. [Read files listed above]
+2. [Specific action 1 — as detailed as possible]
+3. [Specific action 2]
+4. [Run quality gate: e.g., lint command from tao.config.json]
+5. [Verify with: e.g., `curl -s http://localhost:3000/route | grep "expected"`]
+
+## Acceptance Criteria (Definition of Done)
+
+- [ ] [Criterion 1 — verifiable, not subjective]
+- [ ] [Criterion 2]
+- [ ] [Quality gate passed without errors]
+- [ ] [Commit made with correct message]
+
+## Notes / Gotchas
+
+[Known pitfalls, decisions already made, what NOT to do]
+
+---
+
+**Expected commit:** `type(phase-XX): TNN — [brief description]`

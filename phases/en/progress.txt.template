@@ -1,0 +1,17 @@
+## Codebase Patterns
+# Patterns discovered during execution — update as you learn
+# Example:
+# - Input validation uses Zod on all API routes
+# - No console.log in production — use logger.info/error
+# - SQL queries always via prepared statements
+
+---
+
+## [YYYY-MM-DD HH:MM] — Task 01 (First task name)
+- What was implemented
+- Files: path/file.ext
+- Commit: [hash]
+- **Learnings:**
+  - [Pattern discovered]
+  - [Gotcha encountered]
+---
