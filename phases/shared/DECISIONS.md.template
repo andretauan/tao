@@ -1,0 +1,58 @@
+# DECISIONS.md — Phase [XX] Brainstorm
+
+> **Purpose:** Record decisions using IBIS format (Kunz & Rittel, 1970).
+> **Format:** Issue → Positions → Arguments → Decision + Invalidation condition.
+> **Updated by:** @Wu agent during CONVERGE mode.
+
+**Created:** [YYYY-MM-DD HH:MM]
+**Last updated:** [YYYY-MM-DD HH:MM]
+**Decisions:** 0
+
+---
+
+## Decision Index
+
+| # | Issue | Decision | Status |
+|---|-------|----------|--------|
+| D1 | [Question] | [Chosen option] | ACTIVE |
+
+---
+
+### Issue #1 — [Question to decide]
+
+**Context:** [Why this decision matters]
+
+**Positions:**
+1. [Option A] — [brief description]
+2. [Option B] — [brief description]
+
+**Arguments:**
+- For P1: [argument]
+- Against P1: [argument]
+- For P2: [argument]
+- Against P2: [argument]
+
+**Decision:** P[N] — [chosen option]
+**Rationale:** [Why this won, 1-3 sentences]
+**Would invalidate if:** [Condition that would reverse this decision]
+
+---
+
+### Issue #2 — [Next question]
+
+**Context:** [...]
+
+**Positions:**
+1. [...]
+2. [...]
+
+**Arguments:**
+- [...]
+
+**Decision:** [...]
+**Would invalidate if:** [...]
+
+---
+
+<!-- Add more issues as they arise. Each issue is self-contained. -->
+<!-- Superseded decisions: mark status as "SUPERSEDED by D[N]" -->
