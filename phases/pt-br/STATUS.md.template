@@ -1,0 +1,39 @@
+# STATUS — Fase [XX]: [Nome da Fase]
+
+> O Executor lê este arquivo para saber qual tarefa executar.
+> Marcar com ✅ ao concluir. Marcar com ❌ se travou.
+> **Última atualização:** [YYYY-MM-DD HH:MM]
+>
+> **Ordem de execução recomendada:**
+> [01 → 02 → 03 → ...]
+
+## GRUPO P0 — [Nome do grupo: ex: Bugs Críticos]
+
+| # | Tarefa | Status | Notas |
+|---|--------|--------|-------|
+| 01 | [Nome da tarefa 1] | ⏳ | — |
+| 02 | [Nome da tarefa 2] | ⏳ | — |
+
+## GRUPO P1 — [Nome do grupo: ex: Funcionalidades Principais]
+
+| # | Tarefa | Status | Notas |
+|---|--------|--------|-------|
+| 03 | [Nome da tarefa 3] | ⏳ | — |
+| 04 | [Nome da tarefa 4] | ⏳ | — |
+
+## GRUPO P2 — [Nome do grupo: ex: Qualidade e Testes]
+
+| # | Tarefa | Status | Notas |
+|---|--------|--------|-------|
+| 05 | [Nome da tarefa 5] | ⏳ | — |
+
+---
+
+## RESUMO — [YYYY-MM-DD HH:MM]
+
+| Grupo | Resolvido | Parcial | Pendente |
+|-------|-----------|---------|----------|
+| P0 | 0/2 | — | 2 |
+| P1 | 0/2 | — | 2 |
+| P2 | 0/1 | — | 1 |
+| **TOTAL** | **0/5** | **—** | **5** |

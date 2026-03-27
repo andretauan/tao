@@ -1,0 +1,59 @@
+# PLAN.md — Fase [XX]: [Nome da Fase]
+
+**Data:** [YYYY-MM-DD]
+**Fase:** [XX]
+**Objetivo:** [O que esta fase entrega, em 1 frase]
+
+---
+
+## Visão Geral
+
+[Descrição da fase em 3-5 frases. O que será construído, por quê, e qual o impacto para o projeto.]
+
+---
+
+## Grupos de Tarefas
+
+### Grupo P0 — [Nome: ex: Bugs Críticos]
+Tarefas que bloqueiam outros trabalhos. Prioridade máxima.
+
+- **T01** — [Nome] — [1 linha de descrição]
+- **T02** — [Nome] — [1 linha de descrição]
+
+### Grupo P1 — [Nome: ex: Funcionalidades Principais]
+Core da fase. Entrega o valor principal.
+
+- **T03** — [Nome] — [1 linha de descrição]
+- **T04** — [Nome] — [1 linha de descrição]
+
+### Grupo P2 — [Nome: ex: Qualidade]
+Polimento e testes.
+
+- **T05** — [Nome] — [1 linha de descrição]
+
+---
+
+## Ordem de Execução Recomendada
+
+```
+P0: T01 → T02
+P1: T03 → T04
+P2: T05
+```
+
+---
+
+## Critério de Conclusão da Fase
+
+- [ ] Todos os P0 concluídos
+- [ ] Todos os P1 concluídos
+- [ ] Quality gates passando
+- [ ] CONTEXT.md atualizado
+- [ ] CHANGELOG.md atualizado
+
+---
+
+## Dependências / Pré-requisitos
+
+- [Ex: Fase 02 concluída]
+- [Ex: Schema de banco atualizado]

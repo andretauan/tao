@@ -1,0 +1,49 @@
+# Tarefa [NN] — [Nome Descritivo da Tarefa]
+
+**Fase:** [XX] — [Nome da Fase]
+**Complexidade:** [Baixa | Média | Alta]
+**Executor:** [SONNET | OPUS]
+**Prioridade:** [P0 | P1 | P2 | P3]
+
+---
+
+## Objetivo
+
+[O que esta tarefa deve entregar. 2-3 frases claras. O executor não deve precisar interpretar — deve executar.]
+
+## Contexto
+
+[Por que esta tarefa existe. O que motivou ela. Contexto técnico necessário.]
+
+## Arquivos a Ler (ANTES de editar)
+
+- `path/ao/arquivo.ext` — [por que ler]
+- `path/ao/outro.ext` — [por que ler]
+
+## Arquivos a Criar/Editar
+
+- `path/ao/arquivo.ext` — [o que fazer nele]
+- `path/ao/novo.ext` — [criar com este conteúdo]
+
+## Passos de Implementação
+
+1. [Ler arquivos listados acima]
+2. [Ação específica 1 — o mais detalhado possível]
+3. [Ação específica 2]
+4. [Rodar quality gate: lint via tao.config.json]
+5. [Verificar com: ex: `curl -s http://localhost:3000/rota | grep "esperado"`]
+
+## Critério de Aceitação (Definition of Done)
+
+- [ ] [Critério 1 — verificável, não subjetivo]
+- [ ] [Critério 2]
+- [ ] [Quality gate passou sem erros]
+- [ ] [Commit feito com mensagem correta]
+
+## Notas / Gotchas
+
+[Armadilhas conhecidas, decisões já tomadas, o que NÃO fazer]
+
+---
+
+**Commit esperado:** `tipo(fase-XX): TNN — [breve descrição]`

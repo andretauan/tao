@@ -1,0 +1,17 @@
+## Codebase Patterns
+# Padrões descobertos durante a execução — atualizar conforme aprendizados
+# Exemplo:
+# - Validação de entrada usa Zod em todas as rotas de API
+# - Sem console.log em produção — usar logger.info/error
+# - Queries SQL sempre via prepared statements
+
+---
+
+## [YYYY-MM-DD HH:MM] — Tarefa 01 (Nome da primeira tarefa)
+- O que foi implementado
+- Arquivos: path/arquivo.ext
+- Commit: [hash]
+- **Aprendizados:**
+  - [Padrão descoberto]
+  - [Gotcha encontrado]
+---
