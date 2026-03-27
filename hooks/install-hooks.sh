@@ -60,25 +60,23 @@ else
 
 CONFIG="tao.config.json"
 if [ -f "$CONFIG" ]; then
-  AUTO_PUSH=$(python3 -c "
+  _git_cfg=$(python3 -c "
 import json
 try:
     c = json.load(open('$CONFIG'))
-    print('true' if c.get('git',{}).get('auto_push', False) else 'false')
+    g = c.get('git',{})
+    print('true' if g.get('auto_push', False) else 'false')
+    print(g.get('dev_branch', 'dev'))
 except:
     print('false')
-" 2>/dev/null) || AUTO_PUSH="false"
+    print('dev')
+" 2>/dev/null) || _git_cfg=""
+  AUTO_PUSH=$(echo "$_git_cfg" | sed -n '1p')
+  BRANCH=$(echo "$_git_cfg" | sed -n '2p')
+  : "${AUTO_PUSH:=false}"
+  : "${BRANCH:=dev}"
 
   if [ "$AUTO_PUSH" = "true" ]; then
-    BRANCH=$(python3 -c "
-import json
-try:
-    c = json.load(open('$CONFIG'))
-    print(c.get('git',{}).get('dev_branch', 'dev'))
-except:
-    print('dev')
-" 2>/dev/null) || BRANCH="dev"
-
     CURRENT=$(git branch --show-current 2>/dev/null)
     if [ "$CURRENT" = "$BRANCH" ]; then
       git push origin "$BRANCH" 2>/dev/null || true

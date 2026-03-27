@@ -239,7 +239,11 @@ with open(sys.argv[8], 'w') as f:
     json.dump(config, f, indent=2, ensure_ascii=False)
     f.write('\n')
 " "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "$LINT_STACK" "${LINT_CMD_VAL:-}" "$CONFIG_FILE"
-  installed "tao.config.json"
+  if [ -f "$CONFIG_FILE" ]; then
+    installed "tao.config.json"
+  else
+    warn "Failed to generate tao.config.json — python3 error"
+  fi
 fi
 
 # ═══════════════════════════════════════════════════════════════

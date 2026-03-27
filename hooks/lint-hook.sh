@@ -12,30 +12,12 @@ set -euo pipefail
 
 INPUT=$(cat)
 
-# ── Extract tool_name using python3 (portable, no jq dependency) ──
-TOOL_NAME=$(printf '%s' "$INPUT" | python3 -c "
+# ── Extract tool_name and file_path in a single python3 call ──
+_parsed=$(printf '%s' "$INPUT" | python3 -c "
 import sys, json
 try:
     d = json.load(sys.stdin)
     print(d.get('tool_name', ''))
-except:
-    print('')
-" 2>/dev/null)
-
-# Only process file edits
-case "$TOOL_NAME" in
-  editFiles|create_file|replace_string_in_file|multi_replace_string_in_file)
-    ;;
-  *)
-    exit 0
-    ;;
-esac
-
-# ── Extract file path ──
-FILE_PATH=$(printf '%s' "$INPUT" | python3 -c "
-import sys, json
-try:
-    d = json.load(sys.stdin)
     ti = d.get('tool_input', {})
     p = ti.get('filePath') or ti.get('file_path') or ''
     if not p:
@@ -49,7 +31,19 @@ try:
     print(p)
 except:
     print('')
+    print('')
 " 2>/dev/null)
+TOOL_NAME=$(echo "$_parsed" | sed -n '1p')
+FILE_PATH=$(echo "$_parsed" | sed -n '2p')
+
+# Only process file edits
+case "$TOOL_NAME" in
+  editFiles|create_file|replace_string_in_file|multi_replace_string_in_file)
+    ;;
+  *)
+    exit 0
+    ;;
+esac
 
 if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "None" ]; then
   exit 0
