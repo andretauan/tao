@@ -22,6 +22,31 @@ if [[ "${1:-}" == "--verbose" ]]; then
   VERBOSE=true
 fi
 
+# ── i18n name equivalences (intentional renames between languages) ──
+# Format: "en_name=ptbr_name" — these are NOT missing/orphan, just renamed
+I18N_EQUIV=(
+  "Shen-Architect.agent.md=Shen-Arquiteto.agent.md"
+  "task.md.template=tarefa.md.template"
+  "task.md=tarefa.md"
+)
+
+# Check if a file has a known equivalent in the other language
+has_equivalent() {
+  local filename="$1"
+  local direction="$2"  # "en2pt" or "pt2en"
+  for eq in "${I18N_EQUIV[@]}"; do
+    local en_name="${eq%%=*}"
+    local pt_name="${eq##*=}"
+    if [[ "$direction" == "en2pt" && "$(basename "$filename")" == "$en_name" ]]; then
+      return 0
+    fi
+    if [[ "$direction" == "pt2en" && "$(basename "$filename")" == "$pt_name" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # ── Directories to compare ──
 PAIRS=(
   "templates/en:templates/pt-br"
@@ -65,8 +90,15 @@ for pair in "${PAIRS[@]}"; do
     TOTAL_CHECKED=$((TOTAL_CHECKED + 1))
 
     if [ ! -f "$pt_file" ]; then
-      echo -e "  ${RED}MISSING${NC} $rel_path — exists in EN, not in PT-BR"
-      TOTAL_MISSING=$((TOTAL_MISSING + 1))
+      if has_equivalent "$en_file" "en2pt"; then
+        if $VERBOSE; then
+          echo -e "  ${GREEN}EQUIV${NC} $rel_path — known i18n rename"
+        fi
+        TOTAL_OK=$((TOTAL_OK + 1))
+      else
+        echo -e "  ${RED}MISSING${NC} $rel_path — exists in EN, not in PT-BR"
+        TOTAL_MISSING=$((TOTAL_MISSING + 1))
+      fi
       continue
     fi
 
@@ -118,8 +150,14 @@ for pair in "${PAIRS[@]}"; do
     en_file="$EN_DIR/$rel_path"
 
     if [ ! -f "$en_file" ]; then
-      echo -e "  ${RED}ORPHAN${NC} $rel_path — exists in PT-BR, not in EN"
-      TOTAL_MISSING=$((TOTAL_MISSING + 1))
+      if has_equivalent "$pt_file" "pt2en"; then
+        if $VERBOSE; then
+          echo -e "  ${GREEN}EQUIV${NC} $rel_path — known i18n rename"
+        fi
+      else
+        echo -e "  ${RED}ORPHAN${NC} $rel_path — exists in PT-BR, not in EN"
+        TOTAL_MISSING=$((TOTAL_MISSING + 1))
+      fi
     fi
   done < <(find "$PT_DIR" -type f | sort)
 

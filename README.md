@@ -81,6 +81,11 @@ Five agents, named after Taoist concepts, each with a clear role:
 
 ## 🚀 Quickstart
 
+### Prerequisites
+
+- **Git** and **Python 3** (3.8+) installed
+- **VS Code** with **GitHub Copilot** subscription and **Agent Mode** enabled
+
 ### 1. Clone TAO
 
 ```bash

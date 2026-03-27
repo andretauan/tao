@@ -23,32 +23,42 @@ PHASE_PREFIX="phase-"
 PROJECT_NAME="Project"
 
 if [ -f "$CONFIG_FILE" ]; then
-  eval "$(python3 -c "
+  _cfg=$(python3 -c "
 import json
 try:
-    with open('$CONFIG_FILE') as f:
-        cfg = json.load(f)
-    paths = cfg.get('paths', {})
-    print('PHASES_DIR=\"' + paths.get('phases', 'docs/phases') + '\"')
-    print('PHASE_PREFIX=\"' + paths.get('phase_prefix', 'phase-') + '\"')
-    print('PROJECT_NAME=\"' + cfg.get('project', {}).get('name', 'Project') + '\"')
+    c = json.load(open('$CONFIG_FILE'))
+    print(c.get('paths',{}).get('phases','docs/phases'))
+    print(c.get('paths',{}).get('phase_prefix','phase-'))
+    print(c.get('project',{}).get('name','Project'))
 except:
-    pass
-" 2>/dev/null)"
+    print('docs/phases')
+    print('phase-')
+    print('Project')
+" 2>/dev/null) || _cfg=""
+  if [ -n "$_cfg" ]; then
+    PHASES_DIR=$(echo "$_cfg" | sed -n '1p')
+    PHASES_DIR="${PHASES_DIR%/}"
+    PHASE_PREFIX=$(echo "$_cfg" | sed -n '2p')
+    PROJECT_NAME=$(echo "$_cfg" | sed -n '3p')
+  fi
 fi
 
 # ── Extract active phase number from CONTEXT.md ──
 PHASE=""
 # Try patterns: "Phase: 03", "Fase: 03", "phase-03", "fase-03"
-PHASE=$(grep -oP '(?:Phase|Fase):?\s*\K\d+' "$CONTEXT_FILE" 2>/dev/null | head -1 || echo "")
+PHASE=$(grep -oE '(Phase|Fase):?[[:space:]]*[0-9]+' "$CONTEXT_FILE" 2>/dev/null | grep -oE '[0-9]+' | head -1 || echo "")
 if [ -z "$PHASE" ]; then
-  PHASE=$(grep -oP "${PHASE_PREFIX}(\d+)" "$CONTEXT_FILE" 2>/dev/null | grep -oP '\d+' | head -1 || echo "")
+  PHASE=$(grep -oE "${PHASE_PREFIX}[0-9]+" "$CONTEXT_FILE" 2>/dev/null | grep -oE '[0-9]+' | head -1 || echo "")
 fi
 
 if [ -z "$PHASE" ]; then
   PHASE="??"
 fi
-PHASE_PADDED=$(printf "%02d" "$PHASE" 2>/dev/null || echo "$PHASE")
+if [[ "$PHASE" =~ ^[0-9]+$ ]]; then
+  PHASE_PADDED=$(printf "%02d" "$PHASE")
+else
+  PHASE_PADDED="$PHASE"
+fi
 
 # ── Git branch ──
 BRANCH=$(cd "$WORKSPACE_DIR" && git branch --show-current 2>/dev/null || echo "unknown")

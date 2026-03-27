@@ -96,7 +96,7 @@ LINT_CMD="${LINT_CMD//\{file\}/$FILE_PATH}"
 
 # ── Run lint ──
 LINT_EXIT=0
-LINT_OUTPUT=$(eval "$LINT_CMD" 2>&1) || LINT_EXIT=$?
+LINT_OUTPUT=$(bash -c "$LINT_CMD" 2>&1) || LINT_EXIT=$?
 
 if [ $LINT_EXIT -ne 0 ]; then
   # Escape for JSON using python3

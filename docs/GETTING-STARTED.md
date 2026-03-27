@@ -13,6 +13,7 @@ Before installing TAO, make sure you have:
 - **VS Code** with an active **GitHub Copilot** subscription
 - **Copilot Chat** enabled with **Agent Mode** available
 - **Git** initialized in your project (`git init`)
+- **Python 3** (3.8+) — used by hooks and scripts for JSON parsing
 - A language with a **CLI linter** (PHP, Python, TypeScript, Go, Ruby, Rust, etc.)
 
 ---

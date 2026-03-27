@@ -11,6 +11,32 @@
 
 set -e
 
+# ─── Prerequisites ────────────────────────────────────────────
+command -v python3 >/dev/null 2>&1 || {
+  echo "Error: python3 is required but not installed."
+  echo "Install Python 3.8+ and try again."
+  exit 1
+}
+
+command -v git >/dev/null 2>&1 || {
+  echo "Error: git is required but not installed."
+  exit 1
+}
+
+# ─── Portable sed -i (macOS + Linux) ─────────────────────────
+sed_i() {
+  local file="$1"
+  shift
+  local tmpfile
+  tmpfile=$(mktemp "${file}.XXXXXX")
+  if sed "$@" "$file" > "$tmpfile"; then
+    mv "$tmpfile" "$file"
+  else
+    rm -f "$tmpfile" 2>/dev/null
+    return 1
+  fi
+}
+
 # ─── Resolve paths ────────────────────────────────────────────
 TAO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$(cd "${1:-.}" 2>/dev/null && pwd)" || {
@@ -66,7 +92,7 @@ safe_copy() {
 
   if [ -f "$dst" ]; then
     skipped "$label"
-    return 1
+    return 0
   fi
 
   cp "$src" "$dst"
@@ -293,12 +319,12 @@ CONTEXT_FILE="$TARGET_DIR/CONTEXT.md"
 if [ -f "$CONTEXT_FILE" ]; then
   # If CONTEXT.md has a status placeholder, replace it; otherwise note it
   if grep -q 'status:' "$CONTEXT_FILE" 2>/dev/null; then
-    sed -i 's/status:.*/status: new_project/' "$CONTEXT_FILE"
+    sed_i "$CONTEXT_FILE" 's/status:.*/status: new_project/'
     echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: new_project"
   else
     # Append status line at top after first heading
-    sed -i '1,/^#/{/^#/a\status: new_project
-    }' "$CONTEXT_FILE" 2>/dev/null || true
+    sed_i "$CONTEXT_FILE" '1,/^#/{/^#/a\status: new_project
+    }' 2>/dev/null || true
     echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: new_project (appended)"
   fi
 else
@@ -311,11 +337,15 @@ fi
 step "Substituting placeholders"
 
 # Replace {{PROJECT_NAME}} and {{PROJECT_DESCRIPTION}} in all text files
+# Escape special sed characters in user input
+SAFE_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\\]/\\&/g')
+SAFE_DESC=$(printf '%s' "$PROJECT_DESC" | sed 's/[&/\\]/\\&/g')
+
 PLACEHOLDER_COUNT=0
 while IFS= read -r tgt_file; do
   if grep -q '{{PROJECT_NAME}}\|{{PROJECT_DESCRIPTION}}' "$tgt_file" 2>/dev/null; then
-    sed -i "s/{{PROJECT_NAME}}/$PROJECT_NAME/g" "$tgt_file"
-    sed -i "s/{{PROJECT_DESCRIPTION}}/$PROJECT_DESC/g" "$tgt_file"
+    sed_i "$tgt_file" "s|{{PROJECT_NAME}}|$SAFE_NAME|g"
+    sed_i "$tgt_file" "s|{{PROJECT_DESCRIPTION}}|$SAFE_DESC|g"
     PLACEHOLDER_COUNT=$((PLACEHOLDER_COUNT + 1))
   fi
 done < <(find "$TARGET_DIR" -maxdepth 3 -type f \( -name '*.md' -o -name '*.json' \) -not -path '*/.git/*' 2>/dev/null)

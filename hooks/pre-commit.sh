@@ -45,7 +45,7 @@ except:
 }
 
 # ─── Lint each staged file ───────────────────────────────────
-for file in $STAGED_FILES; do
+while IFS= read -r file; do
   [ ! -f "$file" ] && continue
 
   # Extract extension
@@ -58,15 +58,15 @@ for file in $STAGED_FILES; do
     # Replace {file} placeholder with actual file path
     cmd="${lint_cmd//\{file\}/$file}"
 
-    if ! eval "$cmd" > /dev/null 2>&1; then
+    if ! bash -c "$cmd" > /dev/null 2>&1; then
       echo -e "${RED}✗ Lint failed: ${file}${NC}"
-      eval "$cmd" 2>&1 | head -5
+      bash -c "$cmd" 2>&1 | head -5
       ERRORS=$((ERRORS + 1))
     else
       echo -e "${GREEN}✓ ${file}${NC}"
     fi
   fi
-done
+done <<< "$STAGED_FILES"
 
 # ─── Result ───────────────────────────────────────────────────
 if [ "$ERRORS" -gt 0 ]; then

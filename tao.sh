@@ -49,6 +49,8 @@ except:
 }
 
 PHASES_DIR=$(read_config "paths.phases" "docs/phases")
+# Strip trailing slash to avoid double-slash in paths
+PHASES_DIR="${PHASES_DIR%/}"
 PHASE_PREFIX=$(read_config "paths.phase_prefix" "phase-")
 LANG=$(read_config "project.language" "en")
 PROJECT_NAME=$(read_config "project.name" "Project")
@@ -169,7 +171,7 @@ count_done() {
 
 get_next_task() {
   local status_file="$1"
-  grep '⏳' "$status_file" 2>/dev/null | grep -oP '^\|\s*T?\K\d+' | head -1
+  grep '⏳' "$status_file" 2>/dev/null | grep -oE '^\|[[:space:]]*T?[0-9]+' | grep -oE '[0-9]+' | head -1
 }
 
 # ═══════════════════════════════════════════════════════════════
@@ -289,6 +291,7 @@ if [[ "${1:-}" == "report" ]]; then
     done
   else
     echo -e "  ${RED}❌ STATUS.md ${MSG_NOT_FOUND}: $STATUS_FILE${NC}"
+    exit 1
   fi
 
   if [ -f "$DEFERRED_FILE" ]; then
@@ -335,11 +338,11 @@ if [[ "${1:-}" == "dry-run" ]]; then
   OPUS_LIST=""
 
   while IFS= read -r line; do
-    num=$(echo "$line" | grep -oP '^\|\s*T?\K\d+')
+    num=$(echo "$line" | grep -oE '^\|[[:space:]]*T?[0-9]+' | grep -oE '[0-9]+' | head -1)
     [ -z "$num" ] && continue
     padded=$(printf "%02d" "$num")
 
-    if echo "$line" | grep -qi "opus"; then
+    if echo "$line" | grep -qiE "opus|architect|arquiteto"; then
       echo -e "  ${RED}⚠  T${padded}${NC} — ${DIM}Opus (${MSG_SKIPPED})${NC}"
       OPUS_LIST="${OPUS_LIST}T${padded} "
     else

@@ -34,16 +34,29 @@ if [ ! -d "$AGENTS_DIR" ]; then
   exit 1
 fi
 
-# ── Read models from config ──
-eval "$(python3 -c "
+# ── Read models from config (single call, no eval) ──
+_models=$(python3 -c "
 import json
-with open('$CONFIG_FILE') as f:
-    cfg = json.load(f)
-models = cfg.get('models', {})
-print('MODEL_ORCHESTRATOR=\"' + models.get('orchestrator', '') + '\"')
-print('MODEL_COMPLEX=\"' + models.get('complex_worker', '') + '\"')
-print('MODEL_FREE=\"' + models.get('free_tier', '') + '\"')
-" 2>/dev/null)"
+try:
+    c = json.load(open('$CONFIG_FILE'))
+    m = c.get('models',{})
+    print(m.get('orchestrator',''))
+    print(m.get('complex_worker',''))
+    print(m.get('free_tier',''))
+except:
+    print('')
+    print('')
+    print('')
+" 2>/dev/null) || _models=""
+if [ -n "$_models" ]; then
+  MODEL_ORCHESTRATOR=$(echo "$_models" | sed -n '1p')
+  MODEL_COMPLEX=$(echo "$_models" | sed -n '2p')
+  MODEL_FREE=$(echo "$_models" | sed -n '3p')
+else
+  MODEL_ORCHESTRATOR=""
+  MODEL_COMPLEX=""
+  MODEL_FREE=""
+fi
 
 echo "Models from tao.config.json:"
 echo "  orchestrator:     $MODEL_ORCHESTRATOR"

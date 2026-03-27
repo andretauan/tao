@@ -35,21 +35,33 @@ if [ ! -f "$CONFIG_FILE" ]; then
   exit 1
 fi
 
-# ── Read config via python3 ──
-eval "$(python3 -c "
+# ── Read config via python3 (single call, no eval) ──
+_cfg=$(python3 -c "
 import json
-with open('$CONFIG_FILE') as f:
-    cfg = json.load(f)
-lang = cfg.get('project', {}).get('language', 'en')
-paths = cfg.get('paths', {})
-phases_dir = paths.get('phases', 'docs/phases/')
-phase_prefix = paths.get('phase_prefix', 'phase-')
-project_name = cfg.get('project', {}).get('name', 'Project')
-print('LANG=\"' + lang + '\"')
-print('PHASES_DIR=\"' + phases_dir + '\"')
-print('PHASE_PREFIX=\"' + phase_prefix + '\"')
-print('PROJECT_NAME=\"' + project_name + '\"')
-" 2>/dev/null)"
+try:
+    c = json.load(open('$CONFIG_FILE'))
+    print(c.get('project',{}).get('language','en'))
+    print(c.get('paths',{}).get('phases','docs/phases/'))
+    print(c.get('paths',{}).get('phase_prefix','phase-'))
+    print(c.get('project',{}).get('name','Project'))
+except:
+    print('en')
+    print('docs/phases/')
+    print('phase-')
+    print('Project')
+" 2>/dev/null) || _cfg=""
+if [ -n "$_cfg" ]; then
+  LANG=$(echo "$_cfg" | sed -n '1p')
+  PHASES_DIR=$(echo "$_cfg" | sed -n '2p')
+  PHASES_DIR="${PHASES_DIR%/}"
+  PHASE_PREFIX=$(echo "$_cfg" | sed -n '3p')
+  PROJECT_NAME=$(echo "$_cfg" | sed -n '4p')
+else
+  LANG="en"
+  PHASES_DIR="docs/phases/"
+  PHASE_PREFIX="phase-"
+  PROJECT_NAME="Project"
+fi
 
 # ── Determine TAO install dir (where templates live) ──
 # If running from TAO repo itself, templates are local.
