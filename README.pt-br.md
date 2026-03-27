@@ -6,6 +6,8 @@
 
 *O Caminho do desenvolvimento AI-native*
 
+Um framework de agentes que dá estrutura ao VS Code Copilot: **brainstorm → planejar → executar** — roteando cada tarefa pro modelo de IA certo.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20PT--BR-blue.svg)](#-bilíngue)
 [![VS Code](https://img.shields.io/badge/VS%20Code-Copilot%20Agent%20Mode-purple.svg)](https://code.visualstudio.com/)
