@@ -1,0 +1,42 @@
+{
+  "project": {
+    "name": "MyProject",
+    "description": "One-line description of your project",
+    "language": "en"
+  },
+  "models": {
+    "orchestrator": "Claude Sonnet 4.6 (copilot)",
+    "complex_worker": "Claude Opus 4.6 (copilot)",
+    "free_tier": "GPT-4.1 (copilot)"
+  },
+  "git": {
+    "dev_branch": "dev",
+    "main_branch": "main",
+    "auto_push": true
+  },
+  "paths": {
+    "source": "src/",
+    "docs": "docs/",
+    "phases": "docs/phases/",
+    "phase_prefix": "phase-"
+  },
+  "lint_commands": {
+    ".php": "php -l {file}",
+    ".py": "python3 -m py_compile {file}",
+    ".ts": "npx tsc --noEmit",
+    ".js": "node --check {file}",
+    ".rb": "ruby -c {file}",
+    ".go": "go vet {file}",
+    ".rs": "cargo check"
+  },
+  "compliance": {
+    "require_skill_check": true,
+    "require_context_read": true,
+    "require_changelog": true,
+    "abex_enabled": true
+  },
+  "doc_sync": {
+    "enabled": false,
+    "script": "scripts/doc-sync.sh"
+  }
+}
