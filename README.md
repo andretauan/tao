@@ -36,17 +36,17 @@ TAO fixes this by giving Copilot Agent Mode a disciplined operating system.
 ```
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│   Layer 1 — THINK          @Wu (Opus)               │
+│   Layer 1 — THINK          @Brainstorm-Wu (Opus)               │
 │   ┌───────────────────────────────────────────┐     │
 │   │ Brainstorm → DISCOVERY → DECISIONS → BRIEF│     │
 │   └───────────────────────────────────────────┘     │
 │                      ↓                              │
-│   Layer 2 — PLAN           @Wu (Opus)               │
+│   Layer 2 — PLAN           @Brainstorm-Wu (Opus)               │
 │   ┌───────────────────────────────────────────┐     │
 │   │ BRIEF → PLAN.md → STATUS.md → Task files  │     │
 │   └───────────────────────────────────────────┘     │
 │                      ↓                              │
-│   Layer 3 — EXECUTE        @Tao (Sonnet)            │
+│   Layer 3 — EXECUTE        @Execute-Tao (Sonnet)            │
 │   ┌───────────────────────────────────────────┐     │
 │   │ Pick task → Route agent → Implement →     │     │
 │   │ Lint → Commit → Next task (loop)          │     │
@@ -69,13 +69,13 @@ Five agents, named after Taoist concepts, each with a clear role:
 
 | Agent | Meaning | Model | Cost | Role |
 |-------|---------|-------|------|------|
-| **@Tao** | 道 the way | Sonnet 4.6 | 1x | Orchestrator — runs the execution loop, routes tasks to agents |
-| **@Wu** | 悟 insight | Opus 4.6 | 3x | Brainstorm & planning — ideation, trade-offs, IBIS decisions, plan creation |
+| **@Execute-Tao** | 道 the way | Sonnet 4.6 | 1x | Orchestrator — runs the execution loop, routes tasks to agents |
+| **@Brainstorm-Wu** | 悟 insight | Opus 4.6 | 3x | Brainstorm & planning — ideation, trade-offs, IBIS decisions, plan creation |
 | **@Shen** | 深 depth | Opus 4.6 | 3x | Complex worker — hard debugging, architecture, security-critical code |
 | **@Di** | 地 earth | GPT-4.1 | free | DBA — database migrations, schema, query optimization |
 | **@Qi** | 气 flow | GPT-4.1 | free | Deploy — git operations, commit, push, merge |
 
-**@Shen-Architect** is a user-invocable variant of @Shen for direct access outside the loop.
+**@Investigate-Shen** is a user-invocable variant of @Shen for direct access outside the loop.
 
 ---
 
@@ -85,11 +85,12 @@ Five agents, named after Taoist concepts, each with a clear role:
 
 - **Git** and **Python 3** (3.8+) installed
 - **VS Code** with **GitHub Copilot** subscription and **Agent Mode** enabled
+- **OS**: macOS, Linux, or WSL2/Git Bash on Windows (native Windows CMD/PowerShell not supported)
 
 ### 1. Clone TAO
 
 ```bash
-git clone https://github.com/yourusername/tao.git ~/TAO
+git clone https://github.com/andretauan/tao.git ~/TAO
 ```
 
 ### 2. Run the installer in your project
@@ -111,7 +112,7 @@ chat.useCustomAgentHooks: true
 
 ### 4. Start a brainstorm
 
-Open Copilot Chat, select **@Wu**, and say:
+Open Copilot Chat, select **@Brainstorm-Wu**, and say:
 
 ```
 brainstorm phase 01
@@ -121,7 +122,7 @@ Wu will explore ideas, document decisions using the IBIS protocol, and produce a
 
 ### 5. Create the plan
 
-Still in **@Wu**:
+Still in **@Brainstorm-Wu**:
 
 ```
 plan phase 01
@@ -131,7 +132,7 @@ Wu turns the BRIEF into PLAN.md + STATUS.md + individual task files.
 
 ### 6. Execute
 
-Select **@Tao** and say:
+Select **@Execute-Tao** and say:
 
 ```
 execute
@@ -147,26 +148,39 @@ After running `install.sh`, your project gets:
 
 ```
 your-project/
-├── tao.config.json                # Central config — models, paths, lint, git
 ├── CLAUDE.md                      # Rules for all agents (your project context)
-├── CONTEXT.md                     # Active phase, state, decisions
-├── CHANGELOG.md                   # Structured changelog
 ├── .github/
 │   ├── copilot-instructions.md    # Auto-loaded by Copilot every session
+│   ├── instructions/
+│   │   └── tao.instructions.md    # TAO-specific instructions (auto-loaded)
 │   ├── agents/
-│   │   ├── Tao.agent.md           # @Tao — orchestrator
-│   │   ├── Wu.agent.md            # @Wu — brainstorm & planning
+│   │   ├── Execute-Tao.agent.md           # @Execute-Tao — orchestrator
+│   │   ├── Brainstorm-Wu.agent.md            # @Brainstorm-Wu — brainstorm & planning
 │   │   ├── Shen.agent.md          # @Shen — complex worker (subagent)
-│   │   ├── Shen-Architect.agent.md # @Shen-Architect — direct access
+│   │   ├── Investigate-Shen.agent.md # @Investigate-Shen — direct access
 │   │   ├── Di.agent.md            # @Di — DBA
 │   │   └── Qi.agent.md            # @Qi — deploy
-│   └── hooks/
-│       └── hooks.json             # VS Code PostToolUse & SessionStart hooks
-└── scripts/
-    ├── lint-hook.sh               # PostToolUse — lint after file edit
-    ├── context-hook.sh            # SessionStart — load context automatically
-    ├── install-hooks.sh           # Git hook installer
-    └── pre-commit.sh              # Modular pre-commit lint pipeline
+│   ├── hooks/
+│   │   └── hooks.json             # VS Code PostToolUse & SessionStart hooks
+│   └── tao/
+│       ├── tao.config.json        # Central config — models, paths, lint, git
+│       ├── CONTEXT.md             # Active phase, state, decisions
+│       ├── CHANGELOG.md           # Structured changelog
+│       ├── RULES.md               # Inviolable rules reference
+│       ├── scripts/
+│       │   ├── lint-hook.sh       # PostToolUse — lint after file edit
+│       │   ├── context-hook.sh    # SessionStart — load context automatically
+│       │   ├── install-hooks.sh   # Git hook installer
+│       │   ├── pre-commit.sh      # Modular pre-commit lint pipeline
+│       │   ├── validate-plan.sh   # Gate: validates PLAN.md coverage
+│       │   ├── validate-execution.sh # Gate: validates task execution
+│       │   ├── new-phase.sh       # Create new phase directory structure
+│       │   ├── faudit.sh          # Gate: 3-pass quality audit
+│       │   ├── forensic-audit.sh  # Gate: deep 3-round forensic audit
+│       │   └── doc-validate.sh    # Gate: documentation completeness
+│       └── phases/
+│           ├── en/                # English phase templates
+│           └── shared/            # Shared brainstorm templates
 ```
 
 When you create a phase, you get:
@@ -275,7 +289,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
-[MIT](LICENSE) — Tauan Bernardo, 2026
+[MIT](LICENSE) — Andre Tauan, 2026
 
 ---
 

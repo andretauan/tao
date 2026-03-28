@@ -36,17 +36,17 @@ O TAO resolve isso dando ao Copilot Agent Mode um sistema operacional disciplina
 ```
 ┌─────────────────────────────────────────────────────┐
 │                                                     │
-│   Camada 1 — PENSAR        @Wu (Opus)               │
+│   Camada 1 — PENSAR        @Brainstorm-Wu (Opus)               │
 │   ┌───────────────────────────────────────────┐     │
 │   │ Brainstorm → DISCOVERY → DECISIONS → BRIEF│     │
 │   └───────────────────────────────────────────┘     │
 │                      ↓                              │
-│   Camada 2 — PLANEJAR      @Wu (Opus)               │
+│   Camada 2 — PLANEJAR      @Brainstorm-Wu (Opus)               │
 │   ┌───────────────────────────────────────────┐     │
 │   │ BRIEF → PLAN.md → STATUS.md → Task files  │     │
 │   └───────────────────────────────────────────┘     │
 │                      ↓                              │
-│   Camada 3 — EXECUTAR      @Tao (Sonnet)            │
+│   Camada 3 — EXECUTAR      @Executar-Tao (Sonnet)            │
 │   ┌───────────────────────────────────────────┐     │
 │   │ Pega tarefa → Roteia agente → Implementa →│     │
 │   │ Lint → Commit → Próxima tarefa (loop)     │     │
@@ -69,22 +69,28 @@ Cinco agentes, nomeados a partir de conceitos taoístas, cada um com um papel cl
 
 | Agente | Significado | Modelo | Custo | Papel |
 |--------|-------------|--------|-------|-------|
-| **@Tao** | 道 o caminho | Sonnet 4.6 | 1x | Orquestrador — roda o loop de execução, roteia tarefas para os agentes |
-| **@Wu** | 悟 insight | Opus 4.6 | 3x | Brainstorm & planejamento — ideação, trade-offs, decisões IBIS, criação de planos |
+| **@Executar-Tao** | 道 o caminho | Sonnet 4.6 | 1x | Orquestrador — roda o loop de execução, roteia tarefas para os agentes |
+| **@Brainstorm-Wu** | 悟 insight | Opus 4.6 | 3x | Brainstorm & planejamento — ideação, trade-offs, decisões IBIS, criação de planos |
 | **@Shen** | 深 profundidade | Opus 4.6 | 3x | Worker complexo — debugging difícil, arquitetura, código crítico de segurança |
 | **@Di** | 地 terra | GPT-4.1 | grátis | DBA — migrations, schema, otimização de queries |
 | **@Qi** | 气 fluxo | GPT-4.1 | grátis | Deploy — operações git, commit, push, merge |
 
-**@Shen-Architect** é uma variante do @Shen que o usuário pode invocar diretamente, fora do loop.
+**@Investigar-Shen** é uma variante do @Shen que o usuário pode invocar diretamente, fora do loop.
 
 ---
 
 ## 🚀 Início Rápido
 
+### Pré-requisitos
+
+- **Git** e **Python 3** (3.8+) instalados
+- **VS Code** com assinatura **GitHub Copilot** e **Agent Mode** habilitado
+- **SO**: macOS, Linux ou WSL2/Git Bash no Windows (CMD/PowerShell nativo não suportado)
+
 ### 1. Clone o TAO
 
 ```bash
-git clone https://github.com/yourusername/tao.git ~/TAO
+git clone https://github.com/andretauan/tao.git ~/TAO
 ```
 
 ### 2. Rode o instalador no seu projeto
@@ -106,7 +112,7 @@ chat.useCustomAgentHooks: true
 
 ### 4. Inicie um brainstorm
 
-Abra o Copilot Chat, selecione **@Wu**, e diga:
+Abra o Copilot Chat, selecione **@Brainstorm-Wu**, e diga:
 
 ```
 brainstorm phase 01
@@ -116,7 +122,7 @@ Wu vai explorar ideias, documentar decisões usando o protocolo IBIS, e produzir
 
 ### 5. Crie o plano
 
-Ainda no **@Wu**:
+Ainda no **@Brainstorm-Wu**:
 
 ```
 plan phase 01
@@ -126,7 +132,7 @@ Wu transforma o BRIEF em PLAN.md + STATUS.md + arquivos de tarefa individuais.
 
 ### 6. Execute
 
-Selecione **@Tao** e diga:
+Selecione **@Executar-Tao** e diga:
 
 ```
 execute
@@ -142,26 +148,39 @@ Depois de rodar `install.sh`, seu projeto ganha:
 
 ```
 your-project/
-├── tao.config.json                # Config central — modelos, paths, lint, git
 ├── CLAUDE.md                      # Regras para todos os agentes (contexto do projeto)
-├── CONTEXT.md                     # Fase ativa, estado, decisões
-├── CHANGELOG.md                   # Changelog estruturado
 ├── .github/
 │   ├── copilot-instructions.md    # Carregado automaticamente pelo Copilot a cada sessão
+│   ├── instructions/
+│   │   └── tao.instructions.md    # Instruções específicas TAO (auto-carregado)
 │   ├── agents/
-│   │   ├── Tao.agent.md           # @Tao — orquestrador
-│   │   ├── Wu.agent.md            # @Wu — brainstorm & planejamento
+│   │   ├── Executar-Tao.agent.md           # @Executar-Tao — orquestrador
+│   │   ├── Brainstorm-Wu.agent.md            # @Brainstorm-Wu — brainstorm & planejamento
 │   │   ├── Shen.agent.md          # @Shen — worker complexo (subagent)
-│   │   ├── Shen-Architect.agent.md # @Shen-Architect — acesso direto
+│   │   ├── Investigar-Shen.agent.md # @Investigar-Shen — acesso direto
 │   │   ├── Di.agent.md            # @Di — DBA
 │   │   └── Qi.agent.md            # @Qi — deploy
-│   └── hooks/
-│       └── hooks.json             # Hooks PostToolUse & SessionStart do VS Code
-└── scripts/
-    ├── lint-hook.sh               # PostToolUse — lint após edição de arquivo
-    ├── context-hook.sh            # SessionStart — carrega contexto automaticamente
-    ├── install-hooks.sh           # Instalador de git hooks
-    └── pre-commit.sh              # Pipeline modular de lint no pre-commit
+│   ├── hooks/
+│   │   └── hooks.json             # Hooks PostToolUse & SessionStart do VS Code
+│   └── tao/
+│       ├── tao.config.json        # Config central — modelos, paths, lint, git
+│       ├── CONTEXT.md             # Fase ativa, estado, decisões
+│       ├── CHANGELOG.md           # Changelog estruturado
+│       ├── RULES.md               # Referência de regras invioláveis
+│       ├── scripts/
+│       │   ├── lint-hook.sh       # PostToolUse — lint após edição de arquivo
+│       │   ├── context-hook.sh    # SessionStart — carrega contexto automaticamente
+│       │   ├── install-hooks.sh   # Instalador de git hooks
+│       │   ├── pre-commit.sh      # Pipeline modular de lint no pre-commit
+│       │   ├── validate-plan.sh   # Gate: valida cobertura do PLAN.md
+│       │   ├── validate-execution.sh # Gate: valida execução de tarefas
+│       │   ├── new-phase.sh       # Cria estrutura de diretórios de nova fase
+│       │   ├── faudit.sh          # Gate: auditoria de qualidade em 3 passes
+│       │   ├── forensic-audit.sh  # Gate: auditoria forense profunda em 3 rounds
+│       │   └── doc-validate.sh    # Gate: completude da documentação
+│       └── phases/
+│           ├── pt-br/             # Templates de fase em Português
+│           └── shared/            # Templates compartilhados de brainstorm
 ```
 
 Quando você cria uma fase, ganha:
@@ -270,7 +289,7 @@ Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes.
 
 ## 📄 Licença
 
-[MIT](LICENSE) — Tauan Bernardo, 2026
+[MIT](LICENSE) — Andre Tauan, 2026
 
 ---
 

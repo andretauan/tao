@@ -23,7 +23,7 @@ Before installing TAO, make sure you have:
 ### Clone the TAO repository
 
 ```bash
-git clone https://github.com/yourusername/tao.git ~/TAO
+git clone https://github.com/andretauan/tao.git ~/TAO
 ```
 
 ### Run the installer in your project
@@ -60,22 +60,33 @@ After installation, your project contains:
 
 | File | Purpose |
 |------|---------|
-| `tao.config.json` | Central config — models, paths, lint commands, git settings |
 | `CLAUDE.md` | Rules for all agents — your project context, stack, conventions |
-| `CONTEXT.md` | Active phase, state, locked decisions — persists between sessions |
-| `CHANGELOG.md` | Structured changelog with timestamps |
 | `.github/copilot-instructions.md` | Auto-loaded by Copilot every session — points agents to CLAUDE.md |
-| `.github/agents/Tao.agent.md` | @Tao — execution orchestrator |
-| `.github/agents/Wu.agent.md` | @Wu — brainstorm & planning |
+| `.github/instructions/tao.instructions.md` | TAO-specific instructions (auto-loaded by Copilot) |
+| `.github/agents/Execute-Tao.agent.md` | @Execute-Tao — execution orchestrator |
+| `.github/agents/Brainstorm-Wu.agent.md` | @Brainstorm-Wu — brainstorm & planning |
 | `.github/agents/Shen.agent.md` | @Shen — complex worker (subagent, not user-invocable) |
-| `.github/agents/Shen-Architect.agent.md` | @Shen-Architect — direct access to the complex worker |
+| `.github/agents/Investigate-Shen.agent.md` | @Investigate-Shen — direct access to the complex worker |
 | `.github/agents/Di.agent.md` | @Di — DBA (database operations) |
 | `.github/agents/Qi.agent.md` | @Qi — deploy (git operations) |
 | `.github/hooks/hooks.json` | VS Code PostToolUse & SessionStart hook definitions |
-| `scripts/lint-hook.sh` | Runs linter automatically after every file edit |
-| `scripts/context-hook.sh` | Loads CONTEXT.md + CLAUDE.md at session start |
-| `scripts/install-hooks.sh` | Installs git pre-commit hook |
-| `scripts/pre-commit.sh` | Modular pre-commit lint pipeline |
+| `.github/tao/tao.config.json` | Central config — models, paths, lint commands, git settings |
+| `.github/tao/CONTEXT.md` | Active phase, state, locked decisions — persists between sessions |
+| `.github/tao/CHANGELOG.md` | Structured changelog with timestamps |
+| `.github/tao/RULES.md` | Inviolable rules reference |
+| `.github/tao/scripts/lint-hook.sh` | Runs linter automatically after every file edit |
+| `.github/tao/scripts/enforcement-hook.sh` | Enforces R0/R5 via session state tracking |
+| `.github/tao/scripts/context-hook.sh` | Loads context at session start + R2 handoff |
+| `.github/tao/scripts/install-hooks.sh` | Installs git pre-commit hook |
+| `.github/tao/scripts/pre-commit.sh` | Modular pre-commit lint pipeline |
+| `.github/tao/scripts/validate-plan.sh` | Gate: validates PLAN.md decision coverage |
+| `.github/tao/scripts/validate-execution.sh` | Gate: validates task execution completeness |
+| `.github/tao/scripts/new-phase.sh` | Creates new phase directory structure |
+| `.github/tao/scripts/faudit.sh` | Gate: 3-pass quality audit |
+| `.github/tao/scripts/forensic-audit.sh` | Gate: deep 3-round forensic audit |
+| `.github/tao/scripts/validate-brainstorm.sh` | Gate: brainstorm artifact validation |
+| `.github/tao/scripts/doc-validate.sh` | Gate: documentation completeness check |
+| `.github/tao/phases/` | Phase templates for creating new phases |
 
 </details>
 
@@ -87,7 +98,8 @@ If you prefer to set things up by hand:
 1. **Create `tao.config.json`** — copy from `TAO/tao.config.json.example` and fill in your values:
 
 ```bash
-cp ~/TAO/tao.config.json.example ./tao.config.json
+mkdir -p .github/tao
+cp ~/TAO/tao.config.json.example ./.github/tao/tao.config.json
 # Edit: project name, description, language, lint commands, branch names
 ```
 
@@ -95,8 +107,12 @@ cp ~/TAO/tao.config.json.example ./tao.config.json
 
 ```bash
 cp ~/TAO/templates/en/CLAUDE.md ./CLAUDE.md
-cp ~/TAO/templates/en/CONTEXT.md ./CONTEXT.md
-cp ~/TAO/templates/en/CHANGELOG.md ./CHANGELOG.md
+mkdir -p .github/tao
+cp ~/TAO/templates/en/CONTEXT.md ./.github/tao/CONTEXT.md
+cp ~/TAO/templates/en/CHANGELOG.md ./.github/tao/CHANGELOG.md
+cp ~/TAO/templates/en/RULES.md ./.github/tao/RULES.md
+mkdir -p .github/instructions
+cp ~/TAO/templates/shared/tao.instructions.md ./.github/instructions/tao.instructions.md
 cp ~/TAO/templates/en/copilot-instructions.md ./.github/copilot-instructions.md
 ```
 
@@ -107,25 +123,41 @@ mkdir -p .github/agents
 cp ~/TAO/agents/en/*.agent.md .github/agents/
 ```
 
-4. **Copy hooks**:
+4. **Copy hooks and scripts**:
 
 ```bash
-mkdir -p .github/hooks scripts
+mkdir -p .github/hooks .github/tao/scripts
 cp ~/TAO/templates/shared/hooks.json .github/hooks/hooks.json
-cp ~/TAO/hooks/lint-hook.sh scripts/lint-hook.sh
-cp ~/TAO/hooks/context-hook.sh scripts/context-hook.sh
-cp ~/TAO/hooks/install-hooks.sh scripts/install-hooks.sh
-cp ~/TAO/hooks/pre-commit.sh scripts/pre-commit.sh
-chmod +x scripts/*.sh
+cp ~/TAO/hooks/lint-hook.sh .github/tao/scripts/lint-hook.sh
+cp ~/TAO/hooks/enforcement-hook.sh .github/tao/scripts/enforcement-hook.sh
+cp ~/TAO/hooks/context-hook.sh .github/tao/scripts/context-hook.sh
+cp ~/TAO/hooks/install-hooks.sh .github/tao/scripts/install-hooks.sh
+cp ~/TAO/hooks/pre-commit.sh .github/tao/scripts/pre-commit.sh
+cp ~/TAO/scripts/validate-plan.sh .github/tao/scripts/validate-plan.sh
+cp ~/TAO/scripts/validate-execution.sh .github/tao/scripts/validate-execution.sh
+cp ~/TAO/scripts/new-phase.sh .github/tao/scripts/new-phase.sh
+cp ~/TAO/scripts/faudit.sh .github/tao/scripts/faudit.sh
+cp ~/TAO/scripts/forensic-audit.sh .github/tao/scripts/forensic-audit.sh
+cp ~/TAO/scripts/validate-brainstorm.sh .github/tao/scripts/validate-brainstorm.sh
+cp ~/TAO/scripts/doc-validate.sh .github/tao/scripts/doc-validate.sh
+chmod +x .github/tao/scripts/*.sh
 ```
 
-5. **Install git hooks**:
+5. **Copy phase templates**:
 
 ```bash
-bash scripts/install-hooks.sh
+mkdir -p .github/tao/phases/en .github/tao/phases/shared
+cp ~/TAO/phases/en/*.template .github/tao/phases/en/
+cp ~/TAO/phases/shared/*.template .github/tao/phases/shared/
 ```
 
-6. **Enable VS Code hooks** — add `"chat.useCustomAgentHooks": true` to settings.
+6. **Install git hooks**:
+
+```bash
+bash .github/tao/scripts/install-hooks.sh
+```
+
+7. **Enable VS Code hooks** — add `"chat.useCustomAgentHooks": true` to settings.
 
 </details>
 
@@ -133,7 +165,7 @@ bash scripts/install-hooks.sh
 
 ## Step 2 — Understand the Config
 
-`tao.config.json` is the single source of truth for project-specific settings. Agents read it every session.
+`.github/tao/tao.config.json` is the single source of truth for project-specific settings. Agents read it every session.
 
 The key sections:
 
@@ -196,8 +228,8 @@ The key sections:
 |-------|-------------|
 | `project.name` | Used in templates, commit messages, and reports |
 | `project.language` | `en` or `pt-br` — controls template language and i18n for `tao.sh` |
-| `models.orchestrator` | Model for @Tao (routine tasks) — typically Sonnet (1x cost) |
-| `models.complex_worker` | Model for @Shen and @Wu (hard tasks) — typically Opus (3x cost) |
+| `models.orchestrator` | Model for @Execute-Tao (routine tasks) — typically Sonnet (1x cost) |
+| `models.complex_worker` | Model for @Shen and @Brainstorm-Wu (hard tasks) — typically Opus (3x cost) |
 | `models.free_tier` | Model for @Di and @Qi — typically GPT-4.1 (free) |
 | `git.dev_branch` | Working branch — agents commit here |
 | `git.main_branch` | Production branch — agents never push here without explicit order |
@@ -229,23 +261,23 @@ This creates:
 
 ```
 docs/phases/phase-01/
-├── PLAN.md              # What to build (filled by @Wu)
+├── PLAN.md              # What to build (filled by @Brainstorm-Wu)
 ├── STATUS.md            # Task table with status tracking
 ├── progress.txt         # Session log + codebase patterns
 ├── brainstorm/
 │   ├── DISCOVERY.md     # Exploration by topic
 │   ├── DECISIONS.md     # IBIS-format decisions
 │   └── BRIEF.md         # Compressed synthesis
-└── tasks/               # Individual task specs (created by @Wu)
+└── tasks/               # Individual task specs (created by @Brainstorm-Wu)
 ```
 
 The templates are pre-filled with structure — the agents know exactly what each file expects.
 
 ---
 
-## Step 4 — Brainstorm with @Wu
+## Step 4 — Brainstorm with @Brainstorm-Wu
 
-Open **Copilot Chat** in VS Code, select **@Wu** from the agent dropdown, and say:
+Open **Copilot Chat** in VS Code, select **@Brainstorm-Wu** from the agent dropdown, and say:
 
 ```
 brainstorm phase 01
@@ -298,7 +330,7 @@ Wu only generates `BRIEF.md` (the compressed synthesis) when the brainstorm has 
 | 6 | Scope defined (in/out) |
 | 7 | Existing codebase patterns considered |
 
-The BRIEF is the bridge between brainstorm and plan — it's what @Wu reads when creating PLAN.md.
+The BRIEF is the bridge between brainstorm and plan — it's what @Brainstorm-Wu reads when creating PLAN.md.
 
 </details>
 
@@ -331,9 +363,9 @@ Wu operates in 5 distinct modes, switching based on context:
 
 ---
 
-## Step 5 — Plan with @Wu
+## Step 5 — Plan with @Brainstorm-Wu
 
-Once the brainstorm has a mature BRIEF (≥ 5/7), tell @Wu:
+Once the brainstorm has a mature BRIEF (≥ 5/7), tell @Brainstorm-Wu:
 
 ```
 plan phase 01
@@ -395,7 +427,7 @@ Expected commit: feat(phase-01): T03 — create user authentication
 ```
 
 **Key fields:**
-- **Executor** — tells @Tao whether to handle it directly (SONNET) or route to @Shen (OPUS)
+- **Executor** — tells @Execute-Tao whether to handle it directly (SONNET) or route to @Shen (OPUS)
 - **Files to Read** — agents MUST read these before editing anything. No guessing.
 - **Acceptance Criteria** — verifiable conditions, not subjective opinions
 - **Expected commit** — exact format for the commit message
@@ -404,9 +436,9 @@ Expected commit: feat(phase-01): T03 — create user authentication
 
 ---
 
-## Step 6 — Execute with @Tao
+## Step 6 — Execute with @Execute-Tao
 
-Select **@Tao** from the agent dropdown and say:
+Select **@Execute-Tao** from the agent dropdown and say:
 
 ```
 execute
@@ -429,13 +461,13 @@ task 03
 <details>
 <summary>🔄 L3: The execution loop</summary>
 
-Here's what @Tao does on each iteration:
+Here's what @Execute-Tao does on each iteration:
 
 ```
 1. CHECK_PAUSE  → Is .tao-pause present? → STOP
 2. READ_STATUS  → Read STATUS.md → parse task table
 3. PLAN_CHECK   → Does PLAN.md exist? Does BRIEF.md exist?
-                  → If neither: STOP ("use @Wu to brainstorm")
+                  → If neither: STOP ("use @Brainstorm-Wu to brainstorm")
 4. PICK_TASK    → First ⏳ task in recommended order
                   → If task needs Opus → route to @Shen subagent
 5. NO ⏳ LEFT   → Phase complete → report → advance
@@ -462,19 +494,19 @@ The loop continues until all tasks are ✅ or a pause file is detected.
 <details>
 <summary>🤖 L4: Agent routing matrix</summary>
 
-@Tao routes each task to the right agent based on these criteria (first match wins):
+@Execute-Tao routes each task to the right agent based on these criteria (first match wins):
 
 | # | Criterion | Routes to | Cost |
 |---|-----------|-----------|------|
 | 1 | Task file says `Executor: OPUS` | **@Shen** (Opus) | 3x |
-| 2 | Task creates/reviews a plan | **@Wu** (Opus) | 3x |
+| 2 | Task creates/reviews a plan | **@Brainstorm-Wu** (Opus) | 3x |
 | 3 | Architecture decision (new module, multi-system integration) | **@Shen** (Opus) | 3x |
 | 4 | Security-critical (auth, crypto, HMAC) | **@Shen** (Opus) | 3x |
 | 5 | High complexity + design trade-offs | **@Shen** (Opus) | 3x |
 | 6 | Task file says `Executor: DBA` | **@Di** (GPT-4.1) | free |
 | 7 | Database migration, schema change | **@Di** (GPT-4.1) | free |
 | 8 | Git operations (commit, push, merge) | **@Qi** (GPT-4.1) | free |
-| 9 | Everything else (CRUD, views, fixes, tests) | **@Tao** directly (Sonnet) | 1x |
+| 9 | Everything else (CRUD, views, fixes, tests) | **@Execute-Tao** directly (Sonnet) | 1x |
 
 **The math:** A typical phase has ~10 tasks. Without routing, all 10 use Opus (30x). With TAO: 2 Opus (6x), 6 Sonnet (6x), 2 free (0x) = **12x total — a 60% reduction.**
 
@@ -568,12 +600,12 @@ Here's the full cycle at a glance:
 ```
 1. Install          bash ~/TAO/install.sh .
 2. Create phase     bash scripts/new-phase.sh 01 "Feature Name"
-3. Brainstorm       @Wu → "brainstorm phase 01"
-4. Plan             @Wu → "plan phase 01"
-5. Execute          @Tao → "execute"
+3. Brainstorm       @Brainstorm-Wu → "brainstorm phase 01"
+4. Plan             @Brainstorm-Wu → "plan phase 01"
+5. Execute          @Execute-Tao → "execute"
 6. Monitor          ./tao.sh status
 7. Next phase       bash scripts/new-phase.sh 02 "Next Feature"
-8. Repeat           @Wu brainstorm → @Wu plan → @Tao execute
+8. Repeat           @Brainstorm-Wu brainstorm → @Brainstorm-Wu plan → @Execute-Tao execute
 ```
 
 ---
@@ -592,13 +624,13 @@ Here's the full cycle at a glance:
 - Test manually: run the lint command on a file to see if it works outside of TAO
 - If you don't want lint hooks, set `lint_commands` to `{}` in config
 
-### @Tao says "phase requires brainstorm"
+### @Execute-Tao says "phase requires brainstorm"
 
 - `PLAN.md` doesn't exist yet for the active phase
-- Run `@Wu → "plan phase XX"` first (brainstorm with BRIEF if you haven't already)
+- Run `@Brainstorm-Wu → "plan phase XX"` first (brainstorm with BRIEF if you haven't already)
 - Or create PLAN.md and STATUS.md manually if you prefer to skip brainstorming
 
-### @Wu won't generate a BRIEF
+### @Brainstorm-Wu won't generate a BRIEF
 
 - The maturity gate requires ≥ 5/7 criteria met
 - Tell Wu to `"check maturity"` to see which criteria are missing
@@ -627,7 +659,7 @@ Here's the full cycle at a glance:
 # Reset all tasks to pending
 cd docs/phases/phase-01
 # Edit STATUS.md: change ✅ or ❌ back to ⏳
-# Then: @Tao → "execute"
+# Then: @Execute-Tao → "execute"
 ```
 
 ---
