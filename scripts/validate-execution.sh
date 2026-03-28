@@ -118,15 +118,20 @@ import re, sys
 text = open(sys.argv[1]).read()
 
 # Tasks: **T{NN}** or T{NN} in table rows
-task_matches = re.findall(r'\*\*T(\d+)\*\*', text)
+task_matches = re.findall(r'\bT(\d+)\b', text)
 task_ids = sorted(set(int(t) for t in task_matches))
 
 for tid in task_ids:
-    # Extract description after T{NN}
+    # Extract description — try bold format first, then table format
     match = re.search(
         r'\*\*T' + str(tid) + r'\*\*\s*[-—–]?\s*([^\n]{0,80})',
         text
     )
+    if not match:
+        match = re.search(
+            r'\|\s*T0*' + str(tid) + r'\s*\|\s*([^|\n]{0,80})',
+            text
+        )
     desc = match.group(1).strip() if match else ''
     # Clean markdown formatting
     desc = re.sub(r'\*\*([^*]+)\*\*', r'\1', desc)
@@ -197,7 +202,7 @@ TASKS_PENDING=0
 TASKS_MISSING=0
 
 if [ -z "$PLAN_TASKS" ]; then
-  echo -e "${YELLOW}  ⚠  No tasks found in PLAN.md (check **T{NN}** format)${NC}"
+  echo -e "${YELLOW}  ⚠  No tasks found in PLAN.md (check **T{NN}** or | T{NN} | table format)${NC}"
   WARNINGS=$((WARNINGS + 1))
 else
   while IFS=: read -r task_id task_desc; do

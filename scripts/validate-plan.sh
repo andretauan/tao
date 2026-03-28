@@ -114,7 +114,7 @@ brief = open(sys.argv[1]).read()
 
 # Find maturity section — between 'Maturity' header and next ---
 mat_match = re.search(
-    r'(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n##)',
+    r'(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n##|\Z)',
     brief, re.DOTALL | re.IGNORECASE
 )
 
@@ -176,12 +176,11 @@ for m in re.finditer(r'\bD(\d+)\b\s*[-—,()\s]{0,5}SUPERSEDED', text, re.IGNORE
 active = [d for d in all_ids if d not in superseded]
 sup_list = sorted(superseded)
 
-print(','.join(str(d) for d in active))
-print(','.join(str(d) for d in sup_list))
-" "$BRIEF_FILE" 2>/dev/null) || DECISIONS_RESULT=","
+print(','.join(str(d) for d in active) + '|' + ','.join(str(d) for d in sup_list))
+" "$BRIEF_FILE" 2>/dev/null) || DECISIONS_RESULT="|"
 
-ACTIVE_DECISIONS="${DECISIONS_RESULT%%$'\n'*}"
-SUPERSEDED_DECISIONS="${DECISIONS_RESULT##*$'\n'}"
+ACTIVE_DECISIONS="${DECISIONS_RESULT%%|*}"
+SUPERSEDED_DECISIONS="${DECISIONS_RESULT##*|}"
 
 ACTIVE_COUNT=0
 if [ -n "$ACTIVE_DECISIONS" ]; then
@@ -271,14 +270,14 @@ import re, sys
 
 text = open(sys.argv[1]).read()
 
-# Tasks: **T{NN}** or **T{N}**
-task_matches = re.findall(r'\*\*T(\d+)\*\*', text)
+# Tasks: **T{NN}** or T{NN} in table rows
+task_matches = re.findall(r'\bT(\d+)\b', text)
 task_ids = sorted(set(int(t) for t in task_matches))
 
 # Decision refs in task lines (D{N} patterns)
 decisions_covered = set()
 for line in text.splitlines():
-    if re.search(r'\*\*T\d+\*\*', line) or re.search(r'D\d+', line):
+    if re.search(r'\bT\d+\b', line) or re.search(r'D\d+', line):
         refs = re.findall(r'\bD(\d+)\b', line)
         for r in refs:
             decisions_covered.add(int(r))

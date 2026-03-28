@@ -143,7 +143,7 @@ else
   _mat_result=$(python3 -c "
 import re, sys
 text = open(sys.argv[1]).read()
-mat = re.search(r'^##\s+(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n## )', text, re.DOTALL|re.IGNORECASE|re.MULTILINE)
+mat = re.search(r'^##\s+(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n## |\Z)', text, re.DOTALL|re.IGNORECASE|re.MULTILINE)
 if not mat:
     print('NO_CHECKLIST')
     sys.exit()

@@ -276,14 +276,14 @@ _markers=$(find "$WORKSPACE_DIR" -type f \
   ! -name "forensic-audit.sh" ! -name "faudit.sh" \
   ! -name "validate-execution.sh" ! -name "validate-plan.sh" \
   ! -name "doc-validate.sh" \
-  -print0 2>/dev/null | xargs -0 grep -lE '\b(TODO|FIXME|HACK|XXX)\b' 2>/dev/null | head -10)
+  -print0 2>/dev/null | xargs -0 grep -lE '(#|//|/\*|--|;)\s*(TODO|FIXME|HACK|XXX)\b|\b(TODO|FIXME|HACK|XXX)\s*:' 2>/dev/null | head -10)
 if [ -z "$_markers" ]; then
   ok "No TODO/FIXME/HACK/XXX markers in delivered code"
 else
   _mcount=$(echo "$_markers" | wc -l | tr -d ' ')
   fail "${_mcount} file(s) still contain TODO/FIXME/HACK/XXX markers"
   echo "$_markers" | head -5 | while IFS= read -r m; do
-    _preview=$(grep -nE '\b(TODO|FIXME|HACK|XXX)\b' "$m" 2>/dev/null | head -1)
+    _preview=$(grep -nE '(#|//|/\*|--|;)\s*(TODO|FIXME|HACK|XXX)\b|\b(TODO|FIXME|HACK|XXX)\s*:' "$m" 2>/dev/null | head -1)
     info "${m#$WORKSPACE_DIR/}: ${_preview}"
   done
 fi
@@ -396,7 +396,7 @@ import re
 plan_text = open('$PLAN_FILE').read()
 status_text = open('$STATUS_FILE').read()
 
-plan_ids = set(re.findall(r'\*\*T(\d+)\*\*', plan_text))
+plan_ids = set(re.findall(r'\bT(\d+)\b', plan_text))
 status_ids = set()
 for line in status_text.splitlines():
     if '|' not in line: continue
@@ -429,7 +429,7 @@ else:
       ok "PLAN ↔ STATUS: ${_count} tasks in sync"
       ;;
     NOPLAN)
-      warn "No **T{NN}** pattern found in PLAN.md — cannot cross-check"
+      warn "No T{NN} pattern found in PLAN.md — cannot cross-check"
       ;;
     MISMATCH:*)
       _detail="${_sync_result#MISMATCH:}"

@@ -258,7 +258,7 @@ except:
       _plan_count=$(python3 -c "
 import re
 text = open('$PLAN_FILE').read()
-print(len(set(re.findall(r'\*\*T(\d+)\*\*', text))))
+print(len(set(re.findall(r'\bT(\d+)\b', text))))
 " 2>/dev/null || echo "0")
       _status_count=$(python3 -c "
 import re
@@ -274,7 +274,7 @@ print(len(ids))
       if [ "$_plan_count" = "$_status_count" ] && [ "$_plan_count" != "0" ]; then
         ok "PLAN tasks (${_plan_count}) == STATUS tasks (${_status_count})"
       elif [ "$_plan_count" = "0" ]; then
-        warn "No tasks found in PLAN.md (check **T{NN}** format)"
+        warn "No tasks found in PLAN.md (check **T{NN}** or | T{NN} | table format)"
       else
         fail "Task count mismatch: PLAN has ${_plan_count}, STATUS has ${_status_count}"
         info "Add missing tasks to STATUS.md or remove extra ones"
@@ -293,7 +293,7 @@ print(len(ids))
     _mat=$(python3 -c "
 import re
 text = open('$BRIEF_FILE').read()
-mat = re.search(r'(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n## )', text, re.DOTALL|re.IGNORECASE)
+mat = re.search(r'(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n## |\Z)', text, re.DOTALL|re.IGNORECASE)
 if mat:
     checked = len(re.findall(r'- \[x\]', mat.group(1), re.IGNORECASE))
     print(checked)
