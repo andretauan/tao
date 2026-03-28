@@ -202,7 +202,7 @@ cd /path/to/your-project
 bash ~/TAO/install.sh .
 ```
 
-The installer asks 5 questions (language, project name, description, branch, lint stack) and generates everything — agents, hooks, config, templates.
+The installer asks 5 questions (language, project name, description, branch, lint stack) and generates everything — agents, hooks, skills, config, templates.
 
 Then enable VS Code hooks (one-time setting):
 ```
@@ -246,6 +246,22 @@ your-project/
 │   ├── agents/                    # 6 agent files (3 user-facing + 3 subagents)
 │   ├── hooks/
 │   │   └── hooks.json             # SessionStart + PostToolUse hooks
+│   ├── skills/                    # 14 TAO skills (auto-discovered by VS Code)
+│   │   ├── INDEX.md               # Skill catalog — R3 bridge
+│   │   ├── tao-onboarding/        # Framework guide for new users
+│   │   ├── tao-plan-writing/      # Task decomposition methodology
+│   │   ├── tao-brainstorm/        # IBIS brainstorm methodology
+│   │   ├── tao-code-review/       # 6-axis code review
+│   │   ├── tao-security-audit/    # OWASP Top 10 checklist
+│   │   ├── tao-test-strategy/     # Test pyramid + coverage
+│   │   ├── tao-refactoring/       # Safe refactoring protocol
+│   │   ├── tao-clean-code/        # SOLID, DRY, KISS principles
+│   │   ├── tao-architecture-decision/  # ADR writing + trade-off matrix
+│   │   ├── tao-api-design/        # REST API conventions
+│   │   ├── tao-database-design/   # Schema + migration patterns
+│   │   ├── tao-git-workflow/      # Commit conventions + branch strategy
+│   │   ├── tao-debug-investigation/  # Structured debugging protocol
+│   │   └── tao-performance-audit/ # Profiling + optimization
 │   └── tao/
 │       ├── tao.config.json        # Central config (models, lint, git, paths)
 │       ├── CONTEXT.md             # Active state — persists between sessions
@@ -273,6 +289,35 @@ docs/phases/phase-01/
 ```
 
 </details>
+
+---
+
+## 🧠 Skills Library
+
+TAO ships with **14 built-in skills** — expert knowledge that VS Code auto-discovers and loads on demand. You never need to repeat context. The right knowledge activates at the right moment.
+
+**How it works:** Skills are folders with a `SKILL.md` file following the [Agent Skills open standard](https://agentskills.io). VS Code reads only the name and description at startup (zero overhead). When a task matches, the full instructions load into context. When it doesn't, it stays silent.
+
+| Skill | Type | What it does |
+|-------|------|--------------|
+| `tao-onboarding` | /slash + auto | Guides new users through TAO setup and first execution |
+| `tao-plan-writing` | auto | Expert task decomposition for PLAN.md |
+| `tao-brainstorm` | auto | IBIS brainstorming with maturity gate |
+| `tao-code-review` | /slash + auto | Structured 6-axis review (correctness → patterns) |
+| `tao-security-audit` | /slash + auto | OWASP Top 10 checklist with remediation steps |
+| `tao-test-strategy` | /slash + auto | Test pyramid, edge case patterns, coverage targets |
+| `tao-refactoring` | /slash + auto | Safe refactoring with pre-flight checklist |
+| `tao-clean-code` | auto | SOLID, DRY, KISS — loaded as background knowledge |
+| `tao-architecture-decision` | /slash + auto | ADR template with trade-off analysis matrix |
+| `tao-api-design` | /slash + auto | REST conventions, status codes, pagination, errors |
+| `tao-database-design` | /slash + auto | Schema patterns, migration safety, indexing strategy |
+| `tao-git-workflow` | auto | TAO commit conventions and branch strategy |
+| `tao-debug-investigation` | /slash + auto | Hypothesis → isolate → fix → verify protocol |
+| `tao-performance-audit` | /slash + auto | Profiling methodology and optimization patterns |
+
+**No conflicts:** All skills use the `tao-` prefix. Your own project skills live alongside without interference.
+
+**Add your own:** Create a folder in `.github/skills/your-skill-name/` with a `SKILL.md`. It appears in the catalog automatically. See [agentskills.io](https://agentskills.io) for the format.
 
 ---
 

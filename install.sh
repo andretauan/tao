@@ -291,6 +291,29 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════════
+# STEP 4b — Copy skills (language-specific)
+# ═══════════════════════════════════════════════════════════════
+step "Copying skills ($LANG_CHOICE)"
+
+SKILLS_DIR="$TAO_DIR/skills/$LANG_CHOICE"
+mkdir -p "$TARGET_DIR/.github/skills"
+
+# Copy INDEX.md
+safe_copy "$TAO_DIR/templates/$LANG_CHOICE/INDEX.md" "$TARGET_DIR/.github/skills/INDEX.md" ".github/skills/INDEX.md"
+
+# Copy each skill directory
+if [ -d "$SKILLS_DIR" ]; then
+  for skill_dir in "$SKILLS_DIR/"*/; do
+    [ -d "$skill_dir" ] || continue
+    SKILL_NAME="$(basename "$skill_dir")"
+    mkdir -p "$TARGET_DIR/.github/skills/$SKILL_NAME"
+    safe_copy "$skill_dir/SKILL.md" "$TARGET_DIR/.github/skills/$SKILL_NAME/SKILL.md" ".github/skills/$SKILL_NAME/SKILL.md"
+  done
+else
+  warn "No skills found in skills/$LANG_CHOICE/ — check TAO installation"
+fi
+
+# ═══════════════════════════════════════════════════════════════
 # STEP 5 — Copy shared files (language-neutral)
 # ═══════════════════════════════════════════════════════════════
 step "Copying shared files"

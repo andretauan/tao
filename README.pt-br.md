@@ -202,7 +202,7 @@ cd /caminho/do/seu-projeto
 bash ~/TAO/install.sh .
 ```
 
-O instalador faz 5 perguntas (idioma, nome do projeto, descrição, branch, stack de lint) e gera tudo automaticamente — agentes, hooks, config, templates.
+O instalador faz 5 perguntas (idioma, nome do projeto, descrição, branch, stack de lint) e gera tudo automaticamente — agentes, hooks, skills, config, templates.
 
 Depois habilite os hooks no VS Code (configuração única):
 ```
@@ -246,6 +246,22 @@ seu-projeto/
 │   ├── agents/                    # 6 arquivos de agente (3 visíveis + 3 subagentes)
 │   ├── hooks/
 │   │   └── hooks.json             # Hooks SessionStart + PostToolUse
+│   ├── skills/                    # 14 skills TAO (auto-descobertas pelo VS Code)
+│   │   ├── INDEX.md               # Catálogo de skills — ponte R3
+│   │   ├── tao-onboarding/        # Guia do framework para novos usuários
+│   │   ├── tao-plan-writing/      # Metodologia de decomposição de tarefas
+│   │   ├── tao-brainstorm/        # Metodologia de brainstorm IBIS
+│   │   ├── tao-code-review/       # Code review em 6 eixos
+│   │   ├── tao-security-audit/    # Checklist OWASP Top 10
+│   │   ├── tao-test-strategy/     # Pirâmide de testes + cobertura
+│   │   ├── tao-refactoring/       # Protocolo de refatoração segura
+│   │   ├── tao-clean-code/        # Princípios SOLID, DRY, KISS
+│   │   ├── tao-architecture-decision/  # ADR + matriz de trade-offs
+│   │   ├── tao-api-design/        # Convenções REST API
+│   │   ├── tao-database-design/   # Schema + padrões de migration
+│   │   ├── tao-git-workflow/      # Convenções de commit + estratégia de branch
+│   │   ├── tao-debug-investigation/  # Protocolo de debugging estruturado
+│   │   └── tao-performance-audit/ # Profiling + otimização
 │   └── tao/
 │       ├── tao.config.json        # Config central (modelos, lint, git, paths)
 │       ├── CONTEXT.md             # Estado ativo — persiste entre sessões
@@ -273,6 +289,35 @@ docs/phases/phase-01/
 ```
 
 </details>
+
+---
+
+## 🧠 Biblioteca de Skills
+
+O TAO vem com **14 skills especializadas** — conhecimento expert que o VS Code auto-descobre e carrega sob demanda. Você nunca precisa repetir contexto. O conhecimento certo ativa no momento certo.
+
+**Como funciona:** Skills são pastas com um arquivo `SKILL.md` seguindo o [padrão aberto Agent Skills](https://agentskills.io). O VS Code lê apenas nome e descrição na inicialização (zero overhead). Quando uma tarefa combina, as instruções completas carregam no contexto. Quando não combina, fica em silêncio.
+
+| Skill | Tipo | O que faz |
+|-------|------|----------|
+| `tao-onboarding` | /slash + auto | Guia novos usuários pelo setup e primeira execução |
+| `tao-plan-writing` | auto | Decomposição expert de tarefas para PLAN.md |
+| `tao-brainstorm` | auto | Brainstorming IBIS com gate de maturidade |
+| `tao-code-review` | /slash + auto | Review estruturado em 6 eixos (corretude → padrões) |
+| `tao-security-audit` | /slash + auto | Checklist OWASP Top 10 com passos de remediação |
+| `tao-test-strategy` | /slash + auto | Pirâmide de testes, edge cases, metas de cobertura |
+| `tao-refactoring` | /slash + auto | Refatoração segura com checklist pré-voo |
+| `tao-clean-code` | auto | SOLID, DRY, KISS — carregado como conhecimento de fundo |
+| `tao-architecture-decision` | /slash + auto | Template ADR com matriz de análise de trade-offs |
+| `tao-api-design` | /slash + auto | Convenções REST, status codes, paginação, erros |
+| `tao-database-design` | /slash + auto | Padrões de schema, segurança de migration, indexação |
+| `tao-git-workflow` | auto | Convenções de commit TAO e estratégia de branches |
+| `tao-debug-investigation` | /slash + auto | Protocolo hipótese → isolar → corrigir → verificar |
+| `tao-performance-audit` | /slash + auto | Metodologia de profiling e padrões de otimização |
+
+**Sem conflitos:** Todas as skills usam o prefixo `tao-`. Suas skills de projeto vivem ao lado sem interferência.
+
+**Adicione as suas:** Crie uma pasta em `.github/skills/nome-da-skill/` com um `SKILL.md`. Aparece no catálogo automaticamente. Veja [agentskills.io](https://agentskills.io) para o formato.
 
 ---
 
