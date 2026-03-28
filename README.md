@@ -2,11 +2,11 @@
 
 # 道 TAO
 
-**Stop prompting. Start operating.**
+**From vibe coding to engineering.**
 
-*You say "execute". TAO picks the task, routes the right model, implements, lints, commits — and loops to the next one. Autonomously.*
+*You say "execute". TAO picks the task, routes the right model, implements, lints, commits — and loops to the next one. No prompting. No babysitting. No chaos.*
 
-An AI-native development framework for VS Code Copilot that turns agent mode into a **self-running engineering pipeline** with brainstorm, planning, and autonomous execution.
+An AI-native development framework for VS Code Copilot that replaces prompt-and-pray with a **self-running engineering pipeline** — brainstorm, plan, execute in a loop.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20PT--BR-blue.svg)](#-bilingual)
@@ -19,38 +19,66 @@ An AI-native development framework for VS Code Copilot that turns agent mode int
 
 ---
 
+## Vibe Code vs TAO Code
+
+You've seen it — or lived it. Someone opens Copilot, types "build me an app", gets a wall of code, hits accept, types another prompt, accepts again. Thirty prompts later there's a project that *kind of* works but nobody planned, nobody reviewed, and nobody can maintain.
+
+That's **vibe coding** — building software on vibes. No structure. No plan. No quality control. Just prompts and hope.
+
+It works for demos. It doesn't work for anything real.
+
+**TAO Code is the opposite.** It's a mindset shift:
+
+> **Don't just prompt. Think first. Plan first. Then let the machine execute — with guardrails.**
+
+You still use AI for everything. You still write zero (or minimal) code by hand. But instead of a chaotic chain of prompts, you get:
+
+- **A brainstorm phase** where the AI explores your problem *before* writing a single line
+- **A structured plan** where every task is defined, scoped, and ordered — before any code exists
+- **An autonomous execution loop** that implements each task, one by one, with lint checks, quality gates, and atomic commits
+- **Real engineering artifacts** — decision logs, traceability, changelogs — not just "it compiled, ship it"
+
+**The result is the same:** AI builds your project. **The process is completely different:** organized, traceable, professional.
+
+You don't need to know programming to use TAO. But if you use TAO, you'll start *thinking* like an engineer — because the framework forces structure before code.
+
+**That's the upgrade. From vibe code to TAO code.**
+
+---
+
 ## Why TAO
 
-<table>
-<tr>
-<td width="50%">
-
 ### 🔄 Autonomous Loop
+
 You say `execute`. TAO picks the task, implements, lints, commits — **and loops to the next one without stopping.** Go grab a coffee. Come back to 10 atomic commits, each traced to a planned task.
 
-</td>
-<td width="50%">
+No more prompt-by-prompt babysitting. One command runs the entire phase.
 
 ### 🔒 Bulletproof Quality
-Every commit passes through pre-commit linting, compliance checks, and a 3-pass ABEX audit (security · UX · performance). **Nothing ships without being thoroughly analyzed.** The guardrails are code-enforced, not honor-system.
 
-</td>
-</tr>
-<tr>
-<td width="50%">
+Every commit passes through pre-commit linting, compliance checks, and a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). **Nothing ships without being thoroughly analyzed.**
+
+The guardrails are code-enforced — bash scripts that block bad commits. Not honor-system. Not "please remember to lint." Code that doesn't pass, doesn't ship. Period.
 
 ### 💰 60% Cost Reduction
-Smart routing sends each task to the cheapest model that can handle it. CRUD → Sonnet (1x). Database → GPT-4.1 (free). **Only architecture and security use Opus (3x).** Same work, fraction of the premium requests.
 
-</td>
-<td width="50%">
+Smart routing sends each task to the cheapest AI model that can handle it:
+
+- Simple stuff (CRUD, forms, tests) → **Sonnet** (1x cost)
+- Complex stuff (architecture, security) → **Opus** (3x cost)
+- Database and git operations → **GPT-4.1** (free)
+
+Without routing: 10 tasks × expensive model = 30x cost. With TAO: **12x cost.** Same work, 60% cheaper.
 
 ### 🛡️ Rate Limit Shield
-Copilot blocks you when you burn through premium requests too fast — even on Pro+. TAO **prevents quota exhaustion** through routing, and if you do hit the cap, **automatic model fallback keeps the loop running** at zero cost.
 
-</td>
-</tr>
-</table>
+GitHub Copilot blocks you when you burn through premium requests too fast — even on Pro+. TAO fights this at three levels:
+
+1. **Prevention** — routing keeps ~60-80% of requests on cheaper/free models
+2. **Fallback** — if the primary model is blocked, the loop automatically switches to a free model and keeps running
+3. **Zero-cost ops** — hooks, lint, git operations never consume premium requests
+
+You stretch your monthly quota from ~2 sessions to ~4+ sessions.
 
 ---
 
@@ -59,8 +87,8 @@ Copilot blocks you when you burn through premium requests too fast — even on P
 You tell the AI **what** to build. TAO handles the **how**, **when**, and **in what order** — in a continuous loop, without stopping to ask you anything.
 
 ```
-Without TAO:                          With TAO:
-─────────────                         ─────────
+Without TAO (vibe coding):            With TAO:
+──────────────────────────             ────────
 prompt → wait → review                "execute"
 prompt → wait → review                  ↓
 prompt → wait → review                ┌──────────────────────────┐
@@ -69,8 +97,8 @@ prompt → wait → review                │ → Route to right model   │
 prompt → wait → fix                   │ → Read context & files   │
 prompt → wait → review                │ → Implement              │
 prompt → wait → re-prompt             │ → Lint & validate        │
-(you babysit 30+ prompts)            │ → Commit                 │
-                                      │ → Next task ←───── LOOP  │
+prompt → wait → hope it works         │ → Commit                 │
+(you babysit 30+ prompts)             │ → Next task ←───── LOOP  │
                                       └──────────────────────────┘
                                       (you review the finished result)
 ```
@@ -79,9 +107,9 @@ prompt → wait → re-prompt             │ → Lint & validate        │
 
 ---
 
-## 🔄 The Loop — TAO's Core
+## 🔄 The Loop — TAO's Engine
 
-The execution loop is what makes TAO different from a collection of prompt templates. When you say `execute`, this happens **automatically, in sequence, without pausing**:
+The execution loop is what makes TAO different from prompt templates or agent wrappers. When you say `execute`, this runs **automatically, in sequence, without pausing**:
 
 ```
  ┌─→ 1. CHECK PAUSE    Is .tao-pause present? → STOP
@@ -91,108 +119,122 @@ The execution loop is what makes TAO different from a collection of prompt templ
  │                     Database → @Di (free)
  │                     Git ops → @Qi (free)
  │   4. READ & IMPLEMENT  Read required files → code → test
- │   5. QUALITY GATE   Run linter → fix if failed (3 attempts)
+ │   5. QUALITY GATE   Run linter → fix if failed (up to 3 attempts)
  │   6. COMMIT         git add (specific files) → commit → push
  │   7. ADVANCE        Mark ⏳ → ✅ in STATUS.md
  └─← 8. LOOP           Back to step 1 — immediately
 ```
 
-The loop runs until every task in the phase is ✅ — or you hit the kill switch (`.tao-pause`).
+The loop runs until **every task in the phase is ✅** — or you hit the kill switch (`.tao-pause`).
 
-**What this means in practice:** you start a phase with 10 tasks, say "execute", and come back to find 10 atomic commits, each with lint passing, each traced to a planned task.
+**What this means in practice:** you start a phase with 10 tasks, say "execute", and come back to find 10 atomic commits, each with lint passing, each traced to a planned task. If something fails 3 times, the loop escalates to a more powerful model automatically — it never stops and never asks you to intervene.
 
 ---
 
-## ☯️ Three Layers
+## ☯️ Think → Plan → Execute
 
-TAO structures every project into **Think → Plan → Execute**:
+TAO structures every project into three layers. This is the core of the "TAO Code" mindset — **think before you code, plan before you build:**
 
-```
-┌──────────────────────────────────────────────────┐
-│                                                  │
-│  THINK          @Brainstorm-Wu (Opus)            │
-│  ┌────────────────────────────────────────────┐  │
-│  │ Brainstorm → DISCOVERY → DECISIONS → BRIEF │  │
-│  └────────────────────────────────────────────┘  │
-│                       ↓                          │
-│  PLAN            @Brainstorm-Wu (Opus)           │
-│  ┌────────────────────────────────────────────┐  │
-│  │ BRIEF → PLAN.md → STATUS.md → Task files   │  │
-│  └────────────────────────────────────────────┘  │
-│                       ↓                          │
-│  EXECUTE         @Execute-Tao (Sonnet)           │
-│  ┌────────────────────────────────────────────┐  │
-│  │ Pick task → Route model → Implement →      │  │
-│  │ Lint → Commit → ───────── LOOP ──→ repeat  │  │
-│  └────────────────────────────────────────────┘  │
-│                                                  │
-│  ── Guardrails (zero LLM cost) ───────────────── │
-│  Pre-commit hooks · Lint on save · ABEX audit    │
-│  Compliance block · Context persistence          │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
+**1. THINK — `@Brainstorm-Wu` (Opus)**
 
-**Think** before you code. **Plan** before you build. **Execute** in a loop — not prompt by prompt.
+Before any code exists, Wu explores your problem space. It produces three documents:
+- **DISCOVERY.md** — open exploration of the domain, constraints, and possibilities
+- **DECISIONS.md** — structured decisions using the IBIS protocol (position → argument → counter-argument)
+- **BRIEF.md** — compressed synthesis with a maturity gate (must reach 5/7 to proceed)
+
+*Think of it as the architect's sketch before construction begins.*
+
+**2. PLAN — `@Brainstorm-Wu` (Opus)**
+
+From the BRIEF, Wu creates an actionable plan:
+- **PLAN.md** — what to build and why, with decision traceability
+- **STATUS.md** — task table with order, complexity, and executor assignment
+- **Task files** — individual specs for each task (objective, files to touch, steps, acceptance criteria)
+
+*Think of it as the blueprint — every room, every wall, every wire, defined before the first nail is hammered.*
+
+**3. EXECUTE — `@Execute-Tao` (Sonnet)**
+
+Tao enters the autonomous loop. It picks the first pending task, reads the relevant files, implements, runs lint, commits, and immediately moves to the next one. Complex tasks are automatically routed to @Shen (Opus). Database tasks go to @Di (free).
+
+*Think of it as the construction crew — following the blueprint, room by room, with quality inspections at every step.*
+
+**Why this matters:** In vibe coding, AI writes code based on your vibes — no plan, no structure, no traceability. In TAO Code, every line of code traces back to a decision that traces back to an exploration. When something breaks, you know *why* it was built that way. When you hand the project to someone else, they understand the reasoning.
 
 ---
 
 ## 🤖 The Agents
 
-Five agents, each with a fixed model — no manual switching, no cost surprises:
+Five specialized agents, each locked to a specific AI model — no manual switching, no cost surprises:
 
-| Agent | Model | Cost | What it does |
-|-------|-------|------|-------------|
+| Agent | Model | Cost | Role |
+|-------|-------|------|------|
 | **@Execute-Tao** 道 | Sonnet 4.6 | 1x | **The loop.** Picks tasks, routes models, implements, lints, commits, repeats. |
-| **@Brainstorm-Wu** 悟 | Opus 4.6 | 3x | Explores ideas, documents decisions (IBIS protocol), creates plans. |
-| **@Shen** 深 | Opus 4.6 | 3x | Complex worker — hard debugging, architecture, security. Called by Tao when needed. |
-| **@Di** 地 | GPT-4.1 | free | DBA — migrations, schema, query optimization. |
-| **@Qi** 气 | GPT-4.1 | free | Deploy — git commit, push, merge. |
+| **@Brainstorm-Wu** 悟 | Opus 4.6 | 3x | Thinks and plans. Explores ideas, documents decisions, creates structured plans. |
+| **@Shen** 深 | Opus 4.6 | 3x | Complex worker. Hard debugging, architecture, security. Called by Tao when needed. |
+| **@Di** 地 | GPT-4.1 | free | DBA. Migrations, schema design, query optimization. |
+| **@Qi** 气 | GPT-4.1 | free | Deploy. Git commit, push, merge. |
 
-**@Investigate-Shen** is a user-invocable variant of @Shen for direct access outside the loop.
+**@Investigate-Shen** is a user-invocable variant of @Shen — use it for direct investigations outside the loop.
+
+**How they work together:** You talk to **Wu** (brainstorm & plan) and **Tao** (execute). Tao automatically calls **Shen** for hard tasks, **Di** for database work, and **Qi** for git operations. You never manually switch between agents during execution.
 
 ---
 
 ## 🚀 Quickstart
 
-### Prerequisites
+### What you need
 
 - **VS Code** with **GitHub Copilot** (Agent Mode enabled)
 - **Git** and **Python 3** (3.8+)
 - macOS, Linux, or WSL2 (native Windows CMD not supported)
 
-### Install
+### Install (2 minutes)
 
 ```bash
+# Clone TAO (once, anywhere)
 git clone https://github.com/andretauan/tao.git ~/TAO
+
+# Go to your project (new or existing)
 cd /path/to/your-project
+
+# Run the installer
 bash ~/TAO/install.sh .
 ```
 
-The installer asks 5 questions (language, project name, description, branch, lint stack) and generates everything.
+The installer asks 5 questions (language, project name, description, branch, lint stack) and generates everything — agents, hooks, config, templates.
 
-Enable VS Code hooks in Settings:
+Then enable VS Code hooks (one-time setting):
 ```
-chat.useCustomAgentHooks: true
+Settings → search "chat.useCustomAgentHooks" → enable
 ```
 
-### Use
+### Your first project (3 steps)
 
-**1. Brainstorm** — Select @Brainstorm-Wu → `brainstorm phase 01`
-Wu explores ideas, documents decisions, and produces a BRIEF.
+**Step 1 — Brainstorm.** In Copilot Chat, select `@Brainstorm-Wu` and say:
 
-**2. Plan** — Still in @Brainstorm-Wu → `plan phase 01`
-Wu creates PLAN.md, STATUS.md, and individual task files with full specs.
+> brainstorm phase 01 — I want to build [describe your project]
 
-**3. Execute** — Select @Execute-Tao → `execute`
-**This is where TAO shines.** Tao enters the autonomous loop: picks the first pending task, reads files, implements, lints, commits, and immediately moves to the next one. Complex tasks route to @Shen (Opus). Database tasks route to @Di (free). You don't prompt again until the phase is done.
+Wu explores the problem, documents decisions, and produces a BRIEF.
+
+**Step 2 — Plan.** Still in `@Brainstorm-Wu`:
+
+> plan phase 01
+
+Wu creates PLAN.md, STATUS.md, and individual task files with full specs. Review and adjust before proceeding.
+
+**Step 3 — Execute.** Select `@Execute-Tao` and say:
+
+> execute
+
+**That's it.** Tao enters the autonomous loop — picks the first task, implements, lints, commits, and moves to the next one without stopping. Come back to find atomic commits for every task, each traced to the plan.
 
 ---
 
 ## 📦 What Gets Installed
 
 <details>
-<summary>Click to expand file tree</summary>
+<summary>Click to expand the full file tree</summary>
 
 ```
 your-project/
@@ -201,7 +243,7 @@ your-project/
 │   ├── copilot-instructions.md    # Auto-loaded by Copilot every session
 │   ├── instructions/
 │   │   └── tao.instructions.md    # TAO-specific instructions
-│   ├── agents/                    # 6 agent files (3 visible + 3 subagents)
+│   ├── agents/                    # 6 agent files (3 user-facing + 3 subagents)
 │   ├── hooks/
 │   │   └── hooks.json             # SessionStart + PostToolUse hooks
 │   └── tao/
@@ -210,19 +252,19 @@ your-project/
 │       ├── CHANGELOG.md           # Structured changelog
 │       ├── RULES.md               # Inviolable rules reference
 │       ├── scripts/               # 12 shell scripts (hooks, gates, validators)
-│       └── phases/                # Phase templates
+│       └── phases/                # Phase templates (language-specific)
 ```
 
-When you create a phase:
+When a phase is created:
 
 ```
 docs/phases/phase-01/
 ├── PLAN.md                        # What to build and why
-├── STATUS.md                      # Task table with ⏳/✅/❌ tracking
-├── progress.txt                   # Session log + codebase patterns
+├── STATUS.md                      # Task table: ⏳ pending, ✅ done, ❌ blocked
+├── progress.txt                   # Session log
 ├── brainstorm/
-│   ├── DISCOVERY.md               # Exploration by topic
-│   ├── DECISIONS.md               # IBIS decisions with invalidation conditions
+│   ├── DISCOVERY.md               # Open exploration of the problem space
+│   ├── DECISIONS.md               # IBIS-structured decisions
 │   └── BRIEF.md                   # Compressed synthesis (5/7 maturity gate)
 └── tasks/
     ├── 01-setup-database.md       # Full spec: objective, files, steps, criteria
@@ -236,42 +278,45 @@ docs/phases/phase-01/
 
 ## 💰 Model Economics
 
-The loop routes every task to the cheapest model that can handle it — automatically, no manual switching:
+The loop routes every task to the cheapest AI model that can handle it — automatically, no manual switching:
 
 | Task Type | Model | Cost | Examples |
 |-----------|-------|------|----------|
-| CRUD, views, bug fixes | Sonnet 4.6 | **1x** | Forms, API endpoints, CSS, tests |
-| Architecture, debugging, security | Opus 4.6 | **3x** | Race conditions, auth systems, system design |
-| Database operations | GPT-4.1 | **free** | Migrations, schema changes, EXPLAIN ANALYZE |
+| Routine work | Sonnet 4.6 | **1x** | Forms, API endpoints, CSS, tests, bug fixes |
+| Complex work | Opus 4.6 | **3x** | Architecture, security, race conditions, system design |
+| Database ops | GPT-4.1 | **free** | Migrations, schema changes, query optimization |
 | Git operations | GPT-4.1 | **free** | Commit, push, merge |
-| Brainstorm & planning | Opus 4.6 | **3x** | Worth it — a bad plan costs 6+ execution cycles |
+| Brainstorm & planning | Opus 4.6 | **3x** | Worth the cost — a bad plan costs way more in rework |
 
-**Typical phase — 10 tasks:** Without routing, all 10 hit Opus (30x). With TAO: 2 Opus (6x) + 6 Sonnet (6x) + 2 free (0x) = **12x instead of 30x — 60% reduction**.
+**Typical phase — 10 tasks:**
+
+Without routing: 10 tasks × Opus (3x) = **30x cost**.
+With TAO: 2 Opus (6x) + 6 Sonnet (6x) + 2 free (0x) = **12x cost — 60% savings**.
+
+See [ECONOMICS.md](docs/ECONOMICS.md) for the complete cost math.
 
 ---
 
 ## 🛡️ Rate Limit Shield
 
-GitHub Copilot caps premium requests — even on Pro+ plans. Use too much of an expensive model and you're **blocked until the quota resets**. TAO attacks this problem at three levels:
+GitHub Copilot caps premium requests — even on Pro+ plans. Use too much of an expensive model and you're **blocked until the quota resets**. TAO attacks this at three levels:
 
-**1. Prevention — smart routing**
-The loop routes ~60-80% of tasks to Sonnet (1x) or GPT-4.1 (free). You stretch your monthly quota from ~2 sessions to ~4 sessions doing the same amount of work.
+**Level 1 — Prevention (smart routing)**
+The loop routes ~60-80% of tasks to Sonnet (1x) or GPT-4.1 (free). You stretch your monthly quota from ~2 full sessions to ~4+ sessions doing the same amount of work.
 
-**2. Automatic fallback**
-The orchestrator (@Execute-Tao) defines a model chain in its YAML frontmatter:
+**Level 2 — Automatic fallback**
+The orchestrator defines a model chain:
 ```yaml
 model:
-  - Claude Sonnet 4.6 (copilot)
-  - GPT-4.1 (copilot)
+  - Claude Sonnet 4.6 (copilot)   # primary
+  - GPT-4.1 (copilot)             # fallback (free)
 ```
 If Sonnet is rate-limited, VS Code automatically falls back to GPT-4.1 (free). **The loop doesn't stop** — it keeps running at reduced capability but zero cost.
 
-**3. Zero-cost operations by design**
-Hooks (lint after edit, context loading) are deterministic shell scripts. Database ops (@Di) and git ops (@Qi) use the free tier. None of these consume premium requests — ever.
+**Level 3 — Zero-cost operations by design**
+Hooks (lint after edit, context loading) are deterministic shell scripts — no AI involved. Database ops (@Di) and git ops (@Qi) use the free tier. These **never** consume premium requests.
 
-**Why @Brainstorm-Wu has no fallback (by design):** Planning requires Opus-level reasoning. A bad plan from a cheaper model costs 6+ execution cycles in rework. It's better to wait for Opus quota to reset than to plan badly.
-
-See [ECONOMICS.md](docs/ECONOMICS.md) for the full cost math.
+**Why @Brainstorm-Wu has no fallback (by design):** Planning requires deep reasoning. A bad plan from a cheaper model costs 6+ execution cycles in rework. It's better to wait for the Opus quota to reset than to plan badly.
 
 ---
 
@@ -280,11 +325,10 @@ See [ECONOMICS.md](docs/ECONOMICS.md) for the full cost math.
 TAO ships with full support for **English** and **Brazilian Portuguese**:
 
 - All 6 agents in both languages
-- CLAUDE.md, CONTEXT.md, CHANGELOG.md templates in both languages
-- Phase templates (PLAN, STATUS, task, progress) in both languages
-- Brainstorm templates (DISCOVERY, DECISIONS, BRIEF) are shared (language-neutral structure)
+- All templates (CLAUDE.md, CONTEXT.md, CHANGELOG.md, phases, tasks) in both languages
+- Brainstorm templates are shared (language-neutral structure)
 
-This is cultural adaptation, not mechanical translation. The PT-BR agents use Brazilian conventions, terminology, and phrasing that feel native — not translated.
+This is cultural adaptation, not mechanical translation. The PT-BR agents use Brazilian conventions, terminology, and phrasing that feel native.
 
 Choose your language during `install.sh` and everything is set.
 
@@ -294,37 +338,37 @@ Choose your language during `install.sh` and everything is set.
 
 | Tier | Platform | Support |
 |------|----------|---------|
-| **Tier 1** | GitHub Copilot (VS Code Agent Mode) | Full — agents, hooks, tool access |
+| **Tier 1** | GitHub Copilot (VS Code Agent Mode) | Full — agents, hooks, model routing, tool access |
 | **Tier 2** | Claude Code | Adapter planned — CLAUDE.md works natively |
-| **Tier 3** | Cursor, Cline, Windsurf | Minimal — CLAUDE.md and templates work, agents need manual setup |
+| **Tier 3** | Cursor, Cline, Windsurf | Partial — templates and docs work, agents need manual setup |
 
-TAO is built for GitHub Copilot's agent mode (custom agents via `.agent.md`, custom hooks via `hooks.json`, model routing via YAML frontmatter). Other platforms can use the templates and documentation structure.
+TAO is built for GitHub Copilot's agent mode (custom agents, custom hooks, model routing via YAML frontmatter). Other platforms can use the templates and documentation structure.
 
 ---
 
 ## 📐 Design Principles
 
-1. **Autonomy within guardrails** — Agents don't ask questions. They read context, decide, execute, commit, and loop. The guardrails are code-enforced, not honor-system.
-2. **Config over convention** — `tao.config.json` holds all project-specific values. Zero manual find-and-replace.
-3. **Disk is the source of truth** — Every decision, plan, and progress log is persisted to files. Chat is ephemeral; the repo is permanent.
+1. **Autonomy within guardrails** — Agents don't ask questions. They read context, decide, execute, commit, and loop. Guardrails are enforced by code, not by honor system.
+2. **Config over convention** — `tao.config.json` is the single source of truth. Zero manual find-and-replace.
+3. **Disk is the source of truth** — Every decision, plan, and log is persisted to files. Chat is ephemeral; the repo is permanent.
 4. **The cheapest model that works** — Opus only when reasoning depth is required. Sonnet for execution. Free tier wherever possible.
-5. **Language-agnostic** — Lint commands are configurable per extension. Works with PHP, Python, TypeScript, Ruby, Go, Rust, or anything with a CLI linter.
+5. **Language-agnostic** — Lint commands are configurable per file extension. Works with Python, TypeScript, PHP, Ruby, Go, Rust — anything with a CLI linter.
 
 ---
 
 ## 💡 Inspiration
 
-TAO's design was heavily influenced by **Ralph Ammer's** writing on thinking tools and creative processes — particularly the distinction between divergent exploration and convergent decision-making that shapes the brainstorm protocol.
+TAO's brainstorm protocol was influenced by **Ralph Ammer's** writing on thinking tools — the distinction between divergent exploration and convergent decision-making.
 
-The agent naming follows Taoist philosophy: **Tao** (道 the way) as the central path, **Wu** (悟 insight) for deliberation, **Shen** (深 depth) for complex work, **Di** (地 earth) for grounded data operations, and **Qi** (气 flow) for movement and deployment.
+The agent naming follows Taoist philosophy: **Tao** (道 the way), **Wu** (悟 insight), **Shen** (深 depth), **Di** (地 earth), **Qi** (气 flow).
 
-The IBIS protocol (Issue-Based Information System) used in brainstorm sessions comes from Kunz & Rittel (1970) — a structured argumentation method where every decision traces back through positions, arguments, and counter-arguments.
+The IBIS protocol (Issue-Based Information System) used in brainstorm sessions comes from Kunz & Rittel (1970) — a structured argumentation method for complex design decisions.
 
 ---
 
 ## 🛠️ CLI Monitor
 
-TAO includes `tao.sh` — a monitoring script for checking progress without opening VS Code:
+TAO includes `tao.sh` — a terminal tool for checking progress without opening VS Code:
 
 ```bash
 ./tao.sh status          # Show state of all phases
@@ -347,13 +391,3 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## 📄 License
 
 [MIT](LICENSE) — Andre Tauan, 2026
-
----
-
-<div align="center">
-
-*"The way that can be told is not the eternal Way."* — Lao Tzu
-
-**TAO** — The AI runs. You review.
-
-</div>
