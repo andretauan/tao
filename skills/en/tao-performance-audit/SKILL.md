@@ -1,7 +1,7 @@
 ---
 name: tao-performance-audit
 description: "Performance analysis methodology with profiling techniques, bottleneck identification, and optimization patterns. Use when auditing performance, optimizing slow code, or planning capacity."
-argument-hint: "Describe the performance issue or area to optimize"
+user-invocable: false
 ---
 # TAO Performance Audit
 

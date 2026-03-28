@@ -13,7 +13,7 @@ Para executar tarefas TAO (trigger "executar"/"continuar"), use o agente **@Exec
 1. Ler `CLAUDE.md` — regras invioláveis
 2. Ler `.github/tao/CONTEXT.md` — fase ativa + decisões travadas
 3. Consultar `.github/tao/CHANGELOG.md` — últimas 3 entradas
-4. Consultar `.github/skills/INDEX.md` — identificar skills aplicáveis (se existir)
+4. Consultar `.github/skills/INDEX.md` — skills auto-forçadas, verificar roteamento
 
 ---
 
@@ -24,7 +24,7 @@ Para executar tarefas TAO (trigger "executar"/"continuar"), use o agente **@Exec
 | R0 | Compliance check no início de toda resposta que modifica código |
 | R1 | Verificação de syntax/lint após toda edição (ler .github/tao/tao.config.json → lint_commands) |
 | R2 | Handoff = prompt de auditoria, não continuação cega |
-| R3 | Consulta de skills antes de qualquer código (se skills existirem) |
+| R3 | Roteamento de skills — auto-forçado por instruction files (zero ação do usuário) |
 | R4 | Timestamp em toda documentação: YYYY-MM-DD HH:MM |
 | R5 | NUNCA editar arquivo sem ler primeiro |
 | R6 | Atualizar .github/tao/CONTEXT.md após toda edição |

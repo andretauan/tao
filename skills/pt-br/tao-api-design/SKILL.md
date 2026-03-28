@@ -1,7 +1,7 @@
 ---
 name: tao-api-design
 description: "Convenções de design de API RESTful incluindo nomenclatura de endpoints, métodos HTTP, status codes, paginação, tratamento de erros e padrões de versionamento. Use ao projetar APIs, criar endpoints ou revisar contratos."
-argument-hint: "Descreva o recurso ou endpoint da API a projetar"
+user-invocable: false
 ---
 # TAO Guia de Design de API
 

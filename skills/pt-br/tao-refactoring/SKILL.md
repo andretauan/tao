@@ -1,7 +1,7 @@
 ---
 name: tao-refactoring
 description: "Metodologia de refatoração segura com detecção de code smells, transformação passo-a-passo e prevenção de regressão. Use ao refatorar código, reduzir dívida técnica ou melhorar estrutura."
-argument-hint: "Descreva o código a refatorar ou o smell a corrigir"
+user-invocable: false
 ---
 # TAO Refatoração Segura
 

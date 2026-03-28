@@ -27,7 +27,7 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Execute-Tao** 
 | R0 | Compliance check at start of every code-modifying response |
 | R1 | Syntax/lint check after every code edit (read .github/tao/tao.config.json → lint_commands) |
 | R2 | Handoff = audit prompt, not blind continuation |
-| R3 | Skill check before any code task (if skills exist) |
+| R3 | Skill routing — auto-enforced (see table below) |
 | R4 | Timestamp in all documentation: YYYY-MM-DD HH:MM |
 | R5 | NEVER edit a file without reading it first |
 | R6 | Update .github/tao/CONTEXT.md after every file edit |
@@ -52,6 +52,36 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Execute-Tao** 
 - **DESTRUCTIVE**: NEVER `rm -rf`, `DROP TABLE/DATABASE`, `TRUNCATE`, `DELETE FROM` without WHERE
 - **PAUSE**: If `.tao-pause` exists at project root → **IMMEDIATE STOP**
 - **COMMIT**: NEVER commit without quality gates. Message: `type(scope): description`. 1 commit = 1 task.
+
+---
+
+## SKILL ROUTING (R3 — auto-enforced, zero user action required)
+
+TAO skills are auto-loaded by VS Code based on context. The instruction files `tao-code`, `tao-test`, `tao-api`, `tao-db` inject critical rules into every matching file. Skills provide deep knowledge on demand.
+
+**Always active (every code task):**
+| Skill | Trigger |
+|-------|---------|
+| `tao-clean-code` | Any code file — SOLID, DRY, KISS, function design |
+| `tao-security-audit` | Any code file — OWASP Top 10, injection, auth |
+| `tao-code-review` | Any code change — 6-axis self-review before commit |
+| `tao-git-workflow` | Any git operation — commit format, branch discipline |
+
+**Context-triggered (auto-loaded when relevant):**
+| Skill | Trigger |
+|-------|---------|
+| `tao-test-strategy` | Test files — pyramid, edge cases, coverage |
+| `tao-api-design` | Route/controller files — REST, status codes, pagination |
+| `tao-database-design` | SQL/model/migration files — schema, indexes, safety |
+| `tao-refactoring` | Refactoring tasks — pre-flight checklist, safe transforms |
+| `tao-debug-investigation` | Bug investigation — hypothesis → isolate → fix → verify |
+| `tao-performance-audit` | Performance tasks — profiling, bottleneck identification |
+| `tao-architecture-decision` | Architecture decisions — ADR template, trade-off matrix |
+| `tao-plan-writing` | PLAN.md creation — task decomposition methodology |
+| `tao-brainstorm` | Brainstorming — IBIS methodology, maturity gate |
+| `tao-onboarding` | New user questions — TAO setup guide |
+
+**Compliance check must list which skills were active.** If a skill should have triggered but didn't, read it manually from `.github/skills/`.
 
 ---
 

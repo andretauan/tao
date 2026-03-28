@@ -1,7 +1,7 @@
 ---
 name: tao-onboarding
 description: "Guia novos usuários pelo setup do TAO, conceitos e primeira execução. Use quando alguém perguntar sobre o TAO, como começar, ou precisar de ajuda com o workflow."
-argument-hint: "Descreva o que precisa de ajuda no TAO"
+user-invocable: false
 ---
 # Guia de Onboarding TAO
 

@@ -1,7 +1,7 @@
 ---
 name: tao-refactoring
 description: "Safe refactoring methodology with code smell detection, step-by-step transformation, and regression prevention. Use when refactoring code, reducing technical debt, or improving code structure."
-argument-hint: "Describe the code to refactor or the smell to fix"
+user-invocable: false
 ---
 # TAO Safe Refactoring
 

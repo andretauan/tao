@@ -1,7 +1,7 @@
 ---
 name: tao-code-review
 description: "Code review estruturado em 6 eixos cobrindo corretude, segurança, performance, legibilidade, testes e padrões. Use ao revisar código, fazer reviews de PR ou verificar qualidade."
-argument-hint: "Descreva o que revisar ou cole o código"
+user-invocable: false
 ---
 # TAO Code Review (6 Eixos)
 

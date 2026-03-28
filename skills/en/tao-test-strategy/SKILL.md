@@ -1,7 +1,7 @@
 ---
 name: tao-test-strategy
 description: "Test pyramid strategy with coverage analysis, edge case identification, and test planning. Use when planning tests, improving coverage, identifying edge cases, or writing test specifications."
-argument-hint: "Describe the feature or module to test"
+user-invocable: false
 ---
 # TAO Test Strategy
 

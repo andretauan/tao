@@ -13,7 +13,7 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Execute-Tao** 
 1. Read `CLAUDE.md` — inviolable rules
 2. Read `.github/tao/CONTEXT.md` — active phase + locked decisions
 3. Consult `.github/tao/CHANGELOG.md` — last 3 entries
-4. Consult `.github/skills/INDEX.md` — identify applicable skills (if exists)
+4. Consult `.github/skills/INDEX.md` — skills are auto-enforced, verify routing
 
 ---
 
@@ -24,7 +24,7 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Execute-Tao** 
 | R0 | Compliance check at start of every code-modifying response |
 | R1 | Syntax/lint check after every code edit (read .github/tao/tao.config.json → lint_commands) |
 | R2 | Handoff = audit prompt, not blind continuation |
-| R3 | Skill check before any code task (if skills exist) |
+| R3 | Skill routing — auto-enforced by instruction files (no user action needed) |
 | R4 | Timestamp in all documentation: YYYY-MM-DD HH:MM |
 | R5 | NEVER edit a file without reading it first |
 | R6 | Update .github/tao/CONTEXT.md after every file edit |

@@ -1,7 +1,7 @@
 ---
 name: tao-code-review
 description: "Structured 6-axis code review covering correctness, security, performance, readability, tests, and patterns. Use when reviewing code, doing pull request reviews, or checking code quality."
-argument-hint: "Describe what to review or paste the code"
+user-invocable: false
 ---
 # TAO Code Review (6-Axis)
 

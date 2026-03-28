@@ -1,7 +1,7 @@
 ---
 name: tao-debug-investigation
 description: "Metodologia de debugging estruturada com investigação por hipóteses, isolamento sistemático e análise de causa raiz. Use ao debugar problemas, investigar erros ou troubleshooting de produção."
-argument-hint: "Descreva o bug, mensagem de erro ou comportamento inesperado"
+user-invocable: false
 ---
 # TAO Investigação de Debug
 

@@ -1,7 +1,7 @@
 ---
 name: tao-security-audit
 description: "Auditoria de segurança alinhada ao OWASP Top 10 com checklist para injection, XSS, autenticação, autorização, gestão de secrets e vulnerabilidades comuns. Use ao auditar segurança, revisar código de auth ou hardening de aplicação."
-argument-hint: "Descreva o que auditar ou a preocupação de segurança"
+user-invocable: false
 ---
 # TAO Auditoria de Segurança (OWASP)
 

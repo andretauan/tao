@@ -1,7 +1,7 @@
 ---
 name: tao-architecture-decision
 description: "Registro de Decisão de Arquitetura (ADR) com matriz de análise de trade-offs e framework de avaliação. Use ao tomar decisões de arquitetura, escolher tecnologias ou documentar decisões de design."
-argument-hint: "Descreva a decisão de arquitetura a avaliar"
+user-invocable: false
 ---
 # TAO Registros de Decisão de Arquitetura
 

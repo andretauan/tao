@@ -1,7 +1,7 @@
 ---
 name: tao-database-design
 description: "Design de schema de banco de dados com normalização, estratégia de indexação, planejamento de migrations e padrões de constraints. Use ao projetar schemas, planejar migrations, otimizar queries ou revisar modelos de dados."
-argument-hint: "Descreva o modelo de dados ou preocupação com o banco"
+user-invocable: false
 ---
 # TAO Design de Banco de Dados
 

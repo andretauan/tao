@@ -1,7 +1,7 @@
 ---
 name: tao-test-strategy
 description: "Estratégia de pirâmide de testes com análise de cobertura, identificação de edge cases e planejamento de testes. Use ao planejar testes, melhorar cobertura, identificar edge cases ou escrever especificações de teste."
-argument-hint: "Descreva a feature ou módulo a testar"
+user-invocable: false
 ---
 # TAO Estratégia de Testes
 

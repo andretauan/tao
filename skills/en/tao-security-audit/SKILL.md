@@ -1,7 +1,7 @@
 ---
 name: tao-security-audit
 description: "OWASP Top 10 security audit with checklist for injection, XSS, authentication, authorization, secrets management, and common vulnerabilities. Use when auditing security, reviewing auth code, or hardening an application."
-argument-hint: "Describe what to audit or the security concern"
+user-invocable: false
 ---
 # TAO Security Audit (OWASP-Aligned)
 

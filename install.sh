@@ -270,6 +270,14 @@ mkdir -p "$TARGET_DIR/.github/instructions"
 cp "$TAO_DIR/templates/shared/tao.instructions.md" "$TARGET_DIR/.github/instructions/tao.instructions.md"
 installed ".github/instructions/tao.instructions.md"
 
+# Context-triggered instruction files — always overwrite (TAO-managed)
+for instr_file in "$TAO_DIR/templates/shared/"tao-*.instructions.md; do
+  [ -f "$instr_file" ] || continue
+  INSTR_NAME="$(basename "$instr_file")"
+  cp "$instr_file" "$TARGET_DIR/.github/instructions/$INSTR_NAME"
+  installed ".github/instructions/$INSTR_NAME"
+done
+
 # copilot-instructions.md — only if user doesn't already have one (non-invasive)
 safe_copy "$TMPL_DIR/copilot-instructions.md" "$TARGET_DIR/.github/copilot-instructions.md" ".github/copilot-instructions.md"
 

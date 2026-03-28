@@ -1,7 +1,7 @@
 ---
 name: tao-api-design
 description: "RESTful API design conventions including endpoint naming, HTTP methods, status codes, pagination, error handling, and versioning patterns. Use when designing APIs, creating endpoints, or reviewing API contracts."
-argument-hint: "Describe the API resource or endpoint to design"
+user-invocable: false
 ---
 # TAO API Design Guide
 

@@ -1,7 +1,7 @@
 ---
 name: tao-architecture-decision
 description: "Architecture Decision Record (ADR) writing with trade-off analysis matrix and decision evaluation framework. Use when making architectural decisions, choosing technologies, or documenting design decisions."
-argument-hint: "Describe the architectural decision to evaluate"
+user-invocable: false
 ---
 # TAO Architecture Decision Records
 

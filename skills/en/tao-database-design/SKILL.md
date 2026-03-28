@@ -1,7 +1,7 @@
 ---
 name: tao-database-design
 description: "Database schema design with normalization, indexing strategy, migration planning, and constraint patterns. Use when designing database schemas, planning migrations, optimizing queries, or reviewing data models."
-argument-hint: "Describe the data model or database concern"
+user-invocable: false
 ---
 # TAO Database Design
 

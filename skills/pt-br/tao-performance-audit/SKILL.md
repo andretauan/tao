@@ -1,7 +1,7 @@
 ---
 name: tao-performance-audit
 description: "Metodologia de análise de performance com técnicas de profiling, identificação de gargalos e padrões de otimização. Use ao auditar performance, otimizar código lento ou planejar capacidade."
-argument-hint: "Descreva o problema de performance ou área a otimizar"
+user-invocable: false
 ---
 # TAO Auditoria de Performance
 
