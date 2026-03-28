@@ -44,16 +44,16 @@
 
 | # | Task | Status | Executor | Complexity | Notes |
 |---|---|---|---|---|---|
-| T18 | agents/en/Tao.agent.md | ✅ | Opus | High | 5413f70 |
-| T19 | agents/en/Wu.agent.md | ✅ | Opus | High | 81d8ea3 |
+| T18 | agents/en/Execute-Tao.agent.md | ✅ | Opus | High | 5413f70 |
+| T19 | agents/en/Brainstorm-Wu.agent.md | ✅ | Opus | High | 81d8ea3 |
 | T20 | agents/en/Shen.agent.md | ✅ | Sonnet | Medium | 476c584 |
-| T21 | agents/en/Shen-Architect.agent.md | ✅ | Sonnet | Medium | 3296b9a |
+| T21 | agents/en/Investigate-Shen.agent.md | ✅ | Sonnet | Medium | 3296b9a |
 | T22 | agents/en/Di.agent.md | ✅ | Sonnet | Low | cf6f432 |
 | T23 | agents/en/Qi.agent.md | ✅ | Sonnet | Low | 4c28ee6 |
-| T24 | agents/pt-br/Tao.agent.md | ✅ | Opus | High | 0f05604 |
-| T25 | agents/pt-br/Wu.agent.md | ✅ | Opus | High | ecfa3ef |
+| T24 | agents/pt-br/Execute-Tao.agent.md | ✅ | Opus | High | 0f05604 |
+| T25 | agents/pt-br/Brainstorm-Wu.agent.md | ✅ | Opus | High | ecfa3ef |
 | T26 | agents/pt-br/Shen.agent.md | ✅ | Sonnet | Medium | 9aeb10e |
-| T27 | agents/pt-br/Shen-Arquiteto.agent.md | ✅ | Sonnet | Medium | 331f99b |
+| T27 | agents/pt-br/Investigar-Shen.agent.md | ✅ | Sonnet | Medium | 331f99b |
 | T28 | agents/pt-br/Di.agent.md | ✅ | Sonnet | Low | fec8625 |
 | T29 | agents/pt-br/Qi.agent.md | ✅ | Sonnet | Low | 3c1fb58 |
 

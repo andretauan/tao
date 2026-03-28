@@ -116,9 +116,9 @@
 3. Both — manual + agent integration
 
 **Decision:** P3 — Both
-**Rationale:** Manual allows standalone use. Agent integration makes it a hard gate. Tao.agent.md gains 2 new steps: validate-plan after PLAN creation, validate-execution when all ✅.
+**Rationale:** Manual allows standalone use. Agent integration makes it a hard gate. Execute-Tao.agent.md gains 2 new steps: validate-plan after PLAN creation, validate-execution when all ✅.
 **Would invalidate if:** Agent loop becomes too slow with validation steps (unlikely — scripts are fast).
-**Impacts:** Tao.agent.md (EN + PT-BR), Wu.agent.md (validate after PLAN generation)
+**Impacts:** Execute-Tao.agent.md (EN + PT-BR), Brainstorm-Wu.agent.md (validate after PLAN generation)
 
 ---
 

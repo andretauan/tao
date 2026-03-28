@@ -100,9 +100,9 @@ TAO's pipeline (BRIEF → PLAN → STATUS → disk) has ZERO automated verificat
 
 ### Connections
 - Both scripts READ tao.config.json for phase directory paths
-- Tao.agent.md (EN + PT-BR) must reference validate-plan.sh in PLAN_CHECK step
-- Tao.agent.md (EN + PT-BR) must reference validate-execution.sh in phase completion step
-- Wu.agent.md (EN + PT-BR) should run validate-plan.sh after generating PLAN
+- Execute-Tao.agent.md (EN + PT-BR) must reference validate-plan.sh in PLAN_CHECK step
+- Execute-Tao.agent.md (EN + PT-BR) must reference validate-execution.sh in phase completion step
+- Brainstorm-Wu.agent.md (EN + PT-BR) should run validate-plan.sh after generating PLAN
 
 ---
 

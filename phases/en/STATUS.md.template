@@ -7,25 +7,28 @@
 > **Recommended execution order:**
 > [01 → 02 → 03 → ...]
 
+<!-- Executor values: Sonnet (Tao runs directly) | Architect (→ Shen subagent) | DBA (→ Di subagent) -->
+<!-- Complexity: Low | Medium | High -->
+
 ## GROUP P0 — [Group name: e.g., Critical Bugs]
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 01 | [Task name 1] | ⏳ | — |
-| 02 | [Task name 2] | ⏳ | — |
+| # | Task | Complexity | Executor | Status | Notes |
+|---|------|------------|----------|--------|-------|
+| 01 | [Task name 1] | Low | Sonnet | ⏳ | — |
+| 02 | [Task name 2] | High | Architect | ⏳ | — |
 
 ## GROUP P1 — [Group name: e.g., Core Features]
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 03 | [Task name 3] | ⏳ | — |
-| 04 | [Task name 4] | ⏳ | — |
+| # | Task | Complexity | Executor | Status | Notes |
+|---|------|------------|----------|--------|-------|
+| 03 | [Task name 3] | Medium | Sonnet | ⏳ | — |
+| 04 | [Task name 4] | Low | Sonnet | ⏳ | — |
 
 ## GROUP P2 — [Group name: e.g., Quality & Tests]
 
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 05 | [Task name 5] | ⏳ | — |
+| # | Task | Complexity | Executor | Status | Notes |
+|---|------|------------|----------|--------|-------|
+| 05 | [Task name 5] | Low | Sonnet | ⏳ | — |
 
 ---
 

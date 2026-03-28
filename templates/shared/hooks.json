@@ -3,14 +3,19 @@
     "PostToolUse": [
       {
         "type": "command",
-        "command": "./scripts/lint-hook.sh",
+        "command": "./.github/tao/scripts/lint-hook.sh",
         "timeout": 10
+      },
+      {
+        "type": "command",
+        "command": "./.github/tao/scripts/enforcement-hook.sh",
+        "timeout": 5
       }
     ],
     "SessionStart": [
       {
         "type": "command",
-        "command": "./scripts/context-hook.sh",
+        "command": "./.github/tao/scripts/context-hook.sh",
         "timeout": 5
       }
     ]

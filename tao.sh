@@ -16,14 +16,14 @@
 #   ./tao.sh unpause             → remove kill switch
 #
 # HOW TO RUN TASKS:
-#   Open VS Code Copilot Chat, select @Tao, and say: "execute"
+#   Open VS Code Copilot Chat, select @Execute-Tao, and say: "execute"
 #   The agent does EVERYTHING: reads tasks, implements, tests, commits.
 #   Use this script only to monitor or pause.
 
 set -e
 
 # ─── Load Config ──────────────────────────────────────────────
-CONFIG_FILE="tao.config.json"
+CONFIG_FILE=".github/tao/tao.config.json"
 
 read_config() {
   local key="$1"
@@ -55,6 +55,7 @@ PHASE_PREFIX=$(read_config "paths.phase_prefix" "phase-")
 LANG=$(read_config "project.language" "en")
 PROJECT_NAME=$(read_config "project.name" "Project")
 PAUSE_FILE=".tao-pause"
+PAUSE_FILE_LEGACY=".gsd-pause"
 
 # ─── Colors ───────────────────────────────────────────────────
 GREEN='\033[0;32m'
@@ -104,7 +105,7 @@ if [[ "$LANG" == "pt-br" ]]; then
   MSG_NO_PHASES="Nenhuma fase encontrada"
   MSG_NO_DIR="Pasta não encontrada"
   MSG_DEFERRED_COUNT="itens adiados"
-  MSG_HINT="Para executar tarefas: abra o Copilot Chat, selecione @Tao e diga \"executar\""
+  MSG_HINT="Para executar tarefas: abra o Copilot Chat, selecione @Executar-Tao e diga \"executar\""
 else
   MSG_TITLE="TAO — Phase Status"
   MSG_PAUSED="PAUSED — .tao-pause detected. Run ./tao.sh unpause to continue."
@@ -142,13 +143,13 @@ else
   MSG_NO_PHASES="No phases found"
   MSG_NO_DIR="Directory not found"
   MSG_DEFERRED_COUNT="deferred items"
-  MSG_HINT="To run tasks: open Copilot Chat, select @Tao and say \"execute\""
+  MSG_HINT="To run tasks: open Copilot Chat, select @Execute-Tao and say \"execute\""
 fi
 
 # ─── Helper functions ─────────────────────────────────────────
 
 check_pause() {
-  if [ -f "$PAUSE_FILE" ]; then
+  if [ -f "$PAUSE_FILE" ] || [ -f "$PAUSE_FILE_LEGACY" ]; then
     echo -e "${RED}⏸  ${MSG_PAUSED}${NC}"
     return 1
   fi
@@ -216,7 +217,8 @@ if [[ "${1:-}" == "status" ]]; then
       pending=$(count_pending "$status_file")
       total=$((done_count + pending))
       if [ "$pending" -eq 0 ] && [ "$total" -gt 0 ]; then
-        echo -e "  ${GREEN}✅ $fase${NC} — ${MSG_COMPLETED} (${done_count} ${MSG_TASKS,,})"
+        MSG_TASKS_LOWER=$(echo "$MSG_TASKS" | tr '[:upper:]' '[:lower:]')
+        echo -e "  ${GREEN}✅ $fase${NC} — ${MSG_COMPLETED} (${done_count} ${MSG_TASKS_LOWER})"
       elif [ "$total" -eq 0 ]; then
         echo -e "  ${DIM}○  $fase${NC} — ${MSG_EMPTY}"
       else
@@ -233,7 +235,7 @@ if [[ "${1:-}" == "status" ]]; then
     echo -e "  ${DIM}${MSG_NO_PHASES} in $PHASES_DIR${NC}"
   fi
 
-  if [ -f "$PAUSE_FILE" ]; then
+  if [ -f "$PAUSE_FILE" ] || [ -f "$PAUSE_FILE_LEGACY" ]; then
     echo ""
     echo -e "  ${RED}⏸  LOOP ${MSG_PAUSED}${NC}"
   fi
@@ -241,7 +243,8 @@ if [[ "${1:-}" == "status" ]]; then
   for fase_dir in "$PHASES_DIR"/${PHASE_PREFIX}*/; do
     deferred="$fase_dir/deferred-items.md"
     if [ -f "$deferred" ]; then
-      count=$(grep -c '^-' "$deferred" 2>/dev/null || echo 0)
+      count=$(grep -c '^-' "$deferred" 2>/dev/null || true)
+      count=${count:-0}
       if [ "$count" -gt 0 ]; then
         echo -e "  ${RED}⚠  $(basename "$fase_dir"): ${count} ${MSG_DEFERRED_COUNT} (deferred-items.md)${NC}"
       fi

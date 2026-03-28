@@ -16,8 +16,8 @@ GitHub Copilot charges premium requests based on model multipliers. Without rout
 
 | Model | Multiplier | Role in TAO | Best For |
 |---|---|---|---|
-| **Claude Opus 4.6** | 3x | @Wu (brainstorm), Shen (complex), Shen-Architect | Architecture, security, trade-offs, debugging |
-| **Claude Sonnet 4.6** | 1x | @Tao (orchestrator) | CRUD, views, bug fixes, tests, routine features |
+| **Claude Opus 4.6** | 3x | @Brainstorm-Wu (brainstorm), Shen (complex), Investigate-Shen | Architecture, security, trade-offs, debugging |
+| **Claude Sonnet 4.6** | 1x | @Execute-Tao (orchestrator) | CRUD, views, bug fixes, tests, routine features |
 | **GPT-4.1** | **0x (free)** | @Di (DBA), @Qi (deploy), fallback | Migrations, schema, git operations |
 
 **Source:** [GitHub Premium Requests Documentation](https://docs.github.com/en/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests)
@@ -26,7 +26,7 @@ GitHub Copilot charges premium requests based on model multipliers. Without rout
 
 ## Routing Logic
 
-TAO's orchestrator (@Tao) evaluates each task and routes to the cheapest sufficient model:
+TAO's orchestrator (@Execute-Tao) evaluates each task and routes to the cheapest sufficient model:
 
 ```
 Task arrives
@@ -92,7 +92,7 @@ These operations consume **0 premium requests**:
 
 Opus costs 3x per request, but specific tasks justify the cost:
 
-### Brainstorm & Planning (@Wu)
+### Brainstorm & Planning (@Brainstorm-Wu)
 
 A bad plan from Sonnet costs 6+ execution cycles in rework. A thorough brainstorm in Opus costs ~10 turns × 3x = 30 requests — and saves all the rework.
 
@@ -147,8 +147,8 @@ If the primary model is unavailable, VS Code automatically uses the next in the 
 
 ## Optimizing Your Budget
 
-1. **Let @Tao route** — don't manually select Opus for routine tasks
-2. **Use @Wu for planning** — invest Opus upfront to avoid rework
+1. **Let @Execute-Tao route** — don't manually select Opus for routine tasks
+2. **Use @Brainstorm-Wu for planning** — invest Opus upfront to avoid rework
 3. **Batch DB tasks** — @Di uses the free tier, so DB operations cost nothing
 4. **Let hooks lint** — 0 cost, catches errors before the LLM needs to fix them
 5. **Review STATUS.md executor column** — ensure complex tasks are marked correctly so Shen handles them instead of Tao struggling and wasting turns

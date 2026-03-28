@@ -2,7 +2,7 @@
 
 **Fase:** [XX] — [Nome da Fase]
 **Complexidade:** [Baixa | Média | Alta]
-**Executor:** [SONNET | OPUS]
+**Executor:** [Sonnet | Architect | DBA]
 **Prioridade:** [P0 | P1 | P2 | P3]
 
 ---
@@ -30,7 +30,7 @@
 1. [Ler arquivos listados acima]
 2. [Ação específica 1 — o mais detalhado possível]
 3. [Ação específica 2]
-4. [Rodar quality gate: lint via tao.config.json]
+4. [Rodar quality gate: lint via .github/tao/tao.config.json]
 5. [Verificar com: ex: `curl -s http://localhost:3000/rota | grep "esperado"`]
 
 ## Critério de Aceitação (Definition of Done)

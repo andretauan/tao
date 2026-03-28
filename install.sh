@@ -168,7 +168,8 @@ echo -e "    → ${GREEN}$LINT_STACK${NC}"
 # ═══════════════════════════════════════════════════════════════
 step "Generating tao.config.json"
 
-CONFIG_FILE="$TARGET_DIR/tao.config.json"
+mkdir -p "$TARGET_DIR/.github/tao"
+CONFIG_FILE="$TARGET_DIR/.github/tao/tao.config.json"
 
 if [ -f "$CONFIG_FILE" ]; then
   skipped "tao.config.json"
@@ -213,7 +214,7 @@ config = {
     'git': {
         'dev_branch': sys.argv[4],
         'main_branch': 'main',
-        'auto_push': True
+        'auto_push': False
     },
     'paths': {
         'source': 'src/',
@@ -222,6 +223,7 @@ config = {
         'phase_prefix': sys.argv[5]
     },
     'lint_commands': {},
+    'commit_scopes': [],
     'compliance': {
         'require_skill_check': True,
         'require_context_read': True,
@@ -230,7 +232,7 @@ config = {
     },
     'doc_sync': {
         'enabled': False,
-        'script': 'scripts/doc-sync.sh'
+        'script': '.github/tao/scripts/doc-sync.sh'
     }
 }
 if sys.argv[6] != 'none':
@@ -240,7 +242,7 @@ with open(sys.argv[8], 'w') as f:
     f.write('\n')
 " "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "$LINT_STACK" "${LINT_CMD_VAL:-}" "$CONFIG_FILE"
   if [ -f "$CONFIG_FILE" ]; then
-    installed "tao.config.json"
+    installed ".github/tao/tao.config.json"
   else
     warn "Failed to generate tao.config.json — python3 error"
   fi
@@ -254,10 +256,21 @@ step "Copying templates ($LANG_CHOICE)"
 TMPL_DIR="$TAO_DIR/templates/$LANG_CHOICE"
 
 safe_copy "$TMPL_DIR/CLAUDE.md"    "$TARGET_DIR/CLAUDE.md"    "CLAUDE.md"
-safe_copy "$TMPL_DIR/CONTEXT.md"   "$TARGET_DIR/CONTEXT.md"   "CONTEXT.md"
-safe_copy "$TMPL_DIR/CHANGELOG.md" "$TARGET_DIR/CHANGELOG.md" "CHANGELOG.md"
 
-mkdir -p "$TARGET_DIR/.github"
+mkdir -p "$TARGET_DIR/.github/tao"
+safe_copy "$TMPL_DIR/CONTEXT.md"   "$TARGET_DIR/.github/tao/CONTEXT.md"   ".github/tao/CONTEXT.md"
+safe_copy "$TMPL_DIR/CHANGELOG.md" "$TARGET_DIR/.github/tao/CHANGELOG.md" ".github/tao/CHANGELOG.md"
+
+# TAO-managed files — always overwrite (no safe_copy)
+mkdir -p "$TARGET_DIR/.github/tao"
+cp "$TMPL_DIR/RULES.md" "$TARGET_DIR/.github/tao/RULES.md"
+installed ".github/tao/RULES.md"
+
+mkdir -p "$TARGET_DIR/.github/instructions"
+cp "$TAO_DIR/templates/shared/tao.instructions.md" "$TARGET_DIR/.github/instructions/tao.instructions.md"
+installed ".github/instructions/tao.instructions.md"
+
+# copilot-instructions.md — only if user doesn't already have one (non-invasive)
 safe_copy "$TMPL_DIR/copilot-instructions.md" "$TARGET_DIR/.github/copilot-instructions.md" ".github/copilot-instructions.md"
 
 # ═══════════════════════════════════════════════════════════════
@@ -290,12 +303,44 @@ safe_copy "$TAO_DIR/templates/shared/hooks.json" "$TARGET_DIR/.github/hooks/hook
 # ═══════════════════════════════════════════════════════════════
 step "Copying hooks & scripts"
 
-mkdir -p "$TARGET_DIR/scripts"
+mkdir -p "$TARGET_DIR/.github/tao/scripts"
 
-safe_copy_exec "$TAO_DIR/hooks/lint-hook.sh"      "$TARGET_DIR/scripts/lint-hook.sh"      "scripts/lint-hook.sh"
-safe_copy_exec "$TAO_DIR/hooks/context-hook.sh"    "$TARGET_DIR/scripts/context-hook.sh"    "scripts/context-hook.sh"
-safe_copy_exec "$TAO_DIR/hooks/install-hooks.sh"   "$TARGET_DIR/scripts/install-hooks.sh"   "scripts/install-hooks.sh"
-safe_copy_exec "$TAO_DIR/hooks/pre-commit.sh"      "$TARGET_DIR/scripts/pre-commit.sh"      "scripts/pre-commit.sh"
+safe_copy_exec "$TAO_DIR/hooks/lint-hook.sh"      "$TARGET_DIR/.github/tao/scripts/lint-hook.sh"      ".github/tao/scripts/lint-hook.sh"
+safe_copy_exec "$TAO_DIR/hooks/context-hook.sh"    "$TARGET_DIR/.github/tao/scripts/context-hook.sh"    ".github/tao/scripts/context-hook.sh"
+safe_copy_exec "$TAO_DIR/hooks/enforcement-hook.sh" "$TARGET_DIR/.github/tao/scripts/enforcement-hook.sh" ".github/tao/scripts/enforcement-hook.sh"
+safe_copy_exec "$TAO_DIR/hooks/install-hooks.sh"   "$TARGET_DIR/.github/tao/scripts/install-hooks.sh"   ".github/tao/scripts/install-hooks.sh"
+safe_copy_exec "$TAO_DIR/hooks/pre-commit.sh"      "$TARGET_DIR/.github/tao/scripts/pre-commit.sh"      ".github/tao/scripts/pre-commit.sh"
+safe_copy_exec "$TAO_DIR/scripts/validate-plan.sh"      "$TARGET_DIR/.github/tao/scripts/validate-plan.sh"      ".github/tao/scripts/validate-plan.sh"
+safe_copy_exec "$TAO_DIR/scripts/validate-execution.sh"  "$TARGET_DIR/.github/tao/scripts/validate-execution.sh"  ".github/tao/scripts/validate-execution.sh"
+safe_copy_exec "$TAO_DIR/scripts/new-phase.sh"           "$TARGET_DIR/.github/tao/scripts/new-phase.sh"           ".github/tao/scripts/new-phase.sh"
+safe_copy_exec "$TAO_DIR/scripts/validate-brainstorm.sh"  "$TARGET_DIR/.github/tao/scripts/validate-brainstorm.sh"  ".github/tao/scripts/validate-brainstorm.sh"
+safe_copy_exec "$TAO_DIR/scripts/faudit.sh"              "$TARGET_DIR/.github/tao/scripts/faudit.sh"              ".github/tao/scripts/faudit.sh"
+safe_copy_exec "$TAO_DIR/scripts/forensic-audit.sh"      "$TARGET_DIR/.github/tao/scripts/forensic-audit.sh"      ".github/tao/scripts/forensic-audit.sh"
+safe_copy_exec "$TAO_DIR/scripts/doc-validate.sh"        "$TARGET_DIR/.github/tao/scripts/doc-validate.sh"        ".github/tao/scripts/doc-validate.sh"
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6b — Copy phase templates
+# ═══════════════════════════════════════════════════════════════
+step "Copying phase templates"
+
+PHASE_TMPL_LANG="$TAO_DIR/phases/$LANG_CHOICE"
+PHASE_TMPL_SHARED="$TAO_DIR/phases/shared"
+PHASE_TARGET="$TARGET_DIR/.github/tao/phases"
+
+mkdir -p "$PHASE_TARGET/$LANG_CHOICE"
+mkdir -p "$PHASE_TARGET/shared"
+
+if [ -d "$PHASE_TMPL_LANG" ]; then
+  for tmpl in "$PHASE_TMPL_LANG/"*; do
+    [ -f "$tmpl" ] && safe_copy "$tmpl" "$PHASE_TARGET/$LANG_CHOICE/$(basename "$tmpl")" ".github/tao/phases/$LANG_CHOICE/$(basename "$tmpl")"
+  done
+fi
+
+if [ -d "$PHASE_TMPL_SHARED" ]; then
+  for tmpl in "$PHASE_TMPL_SHARED/"*; do
+    [ -f "$tmpl" ] && safe_copy "$tmpl" "$PHASE_TARGET/shared/$(basename "$tmpl")" ".github/tao/phases/shared/$(basename "$tmpl")"
+  done
+fi
 
 # ═══════════════════════════════════════════════════════════════
 # STEP 7 — Install git hooks
@@ -303,19 +348,19 @@ safe_copy_exec "$TAO_DIR/hooks/pre-commit.sh"      "$TARGET_DIR/scripts/pre-comm
 step "Installing git hooks"
 
 if [ -d "$TARGET_DIR/.git" ]; then
-  if [ -x "$TARGET_DIR/scripts/install-hooks.sh" ]; then
-    echo -e "    Running ${BOLD}scripts/install-hooks.sh${NC}..."
-    (cd "$TARGET_DIR" && bash scripts/install-hooks.sh) && {
+  if [ -x "$TARGET_DIR/.github/tao/scripts/install-hooks.sh" ]; then
+    echo -e "    Running ${BOLD}.github/tao/scripts/install-hooks.sh${NC}..."
+    (cd "$TARGET_DIR" && bash .github/tao/scripts/install-hooks.sh) && {
       echo -e "    ${GREEN}✅${NC} Git hooks installed"
     } || {
       warn "install-hooks.sh exited with error — configure hooks manually"
     }
   else
-    warn "scripts/install-hooks.sh not found or not executable — skipping hook installation"
+    warn ".github/tao/scripts/install-hooks.sh not found or not executable — skipping hook installation"
   fi
 else
   warn "Not a git repository — skipping hook installation"
-  echo -e "    Run ${BOLD}git init && bash scripts/install-hooks.sh${NC} later"
+  echo -e "    Run ${BOLD}git init && bash .github/tao/scripts/install-hooks.sh${NC} later"
 fi
 
 # ═══════════════════════════════════════════════════════════════
@@ -323,17 +368,24 @@ fi
 # ═══════════════════════════════════════════════════════════════
 step "Setting onboarding mode"
 
-CONTEXT_FILE="$TARGET_DIR/CONTEXT.md"
+CONTEXT_FILE="$TARGET_DIR/.github/tao/CONTEXT.md"
 if [ -f "$CONTEXT_FILE" ]; then
   # If CONTEXT.md has a status placeholder, replace it; otherwise note it
+  # Use language-appropriate status value
+  if [ "$LANG_CHOICE" = "pt-br" ]; then
+    ONBOARD_STATUS="novo_projeto"
+  else
+    ONBOARD_STATUS="new_project"
+  fi
+
   if grep -q 'status:' "$CONTEXT_FILE" 2>/dev/null; then
-    sed_i "$CONTEXT_FILE" 's/status:.*/status: new_project/'
-    echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: new_project"
+    sed_i "$CONTEXT_FILE" "s/status:.*/status: $ONBOARD_STATUS/"
+    echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: $ONBOARD_STATUS"
   else
     # Append status line at top after first heading
-    sed_i "$CONTEXT_FILE" '1,/^#/{/^#/a\status: new_project
-    }' 2>/dev/null || true
-    echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: new_project (appended)"
+    sed_i "$CONTEXT_FILE" "1,/^#/{/^#/a\\status: $ONBOARD_STATUS
+    }" 2>/dev/null || true
+    echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: $ONBOARD_STATUS (appended)"
   fi
 else
   warn "CONTEXT.md not found — onboarding status not set"
@@ -386,11 +438,11 @@ fi
 echo ""
 echo -e "  ${BOLD}Next steps:${NC}"
 echo ""
-echo -e "  1. Review ${BOLD}tao.config.json${NC} — customize models, paths, lint commands"
-echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and stack info"
-echo -e "  3. Edit ${BOLD}CONTEXT.md${NC} — set your first active phase"
+echo -e "  1. Review ${BOLD}.github/tao/tao.config.json${NC} — customize models, paths, lint commands"
+echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and code patterns"
+echo -e "  3. Edit ${BOLD}.github/tao/CONTEXT.md${NC} — set your first active phase"
 echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
-echo -e "  5. In Copilot Chat: select ${BOLD}@Tao${NC} and say ${BOLD}\"execute\"${NC}"
+echo -e "  5. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
 echo ""
 echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
 echo ""

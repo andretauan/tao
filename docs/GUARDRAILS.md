@@ -204,7 +204,7 @@ Every PLAN.md must reference its source BRIEF.md. Plans without provenance are i
 Create a `.tao-pause` file in the workspace root to stop the execution loop:
 
 ```bash
-touch .tao-pause    # Stop — @Tao checks this at every iteration
+touch .tao-pause    # Stop — @Execute-Tao checks this at every iteration
 rm .tao-pause       # Resume
 ```
 

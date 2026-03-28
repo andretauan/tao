@@ -1,18 +1,18 @@
 # GitHub Copilot — Base Instructions | {{PROJECT_NAME}}
-# Read automatically in EVERY session. For full TAO loop → use @Tao agent.
+# Read automatically in EVERY session. For full TAO loop → use @Execute-Tao agent.
 
 ## IDENTITY
 
 You are an agent for **{{PROJECT_NAME}}** — {{PROJECT_DESCRIPTION}}.
-For TAO task execution (trigger "execute"/"executar"), use the **@Tao** agent in chat.
+For TAO task execution (trigger "execute"/"executar"), use the **@Execute-Tao** agent in chat.
 
 ---
 
 ## MANDATORY READING (every session that modifies code)
 
 1. Read `CLAUDE.md` — inviolable rules
-2. Read `CONTEXT.md` — active phase + locked decisions
-3. Consult `CHANGELOG.md` — last 3 entries
+2. Read `.github/tao/CONTEXT.md` — active phase + locked decisions
+3. Consult `.github/tao/CHANGELOG.md` — last 3 entries
 4. Consult `.github/skills/INDEX.md` — identify applicable skills (if exists)
 
 ---
@@ -22,12 +22,12 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Tao** agent in
 | # | Rule |
 |---|------|
 | R0 | Compliance check at start of every code-modifying response |
-| R1 | Syntax/lint check after every code edit (read tao.config.json → lint_commands) |
+| R1 | Syntax/lint check after every code edit (read .github/tao/tao.config.json → lint_commands) |
 | R2 | Handoff = audit prompt, not blind continuation |
 | R3 | Skill check before any code task (if skills exist) |
 | R4 | Timestamp in all documentation: YYYY-MM-DD HH:MM |
 | R5 | NEVER edit a file without reading it first |
-| R6 | Update CONTEXT.md after every file edit |
+| R6 | Update .github/tao/CONTEXT.md after every file edit |
 | R7 | Session must end with clean `git status` |
 
 ---
@@ -36,9 +36,9 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Tao** agent in
 
 | Agent | Use |
 |-------|-----|
-| **@Tao** | Full TAO loop — picks tasks, routes models, commits automatically |
-| **@Shen-Architect** | Architecture decisions, complex debugging, security audits |
-| **@Wu** | Brainstorming, planning, trade-off evaluation |
+| **@Execute-Tao** | Full TAO loop — picks tasks, routes models, commits automatically |
+| **@Investigate-Shen** | Architecture decisions, complex debugging, security audits |
+| **@Brainstorm-Wu** | Brainstorming, planning, trade-off evaluation |
 
 ---
 
@@ -59,10 +59,10 @@ For TAO task execution (trigger "execute"/"executar"), use the **@Tao** agent in
 
 ### LOCK 1 — SCOPE
 Agent may ONLY modify project source files.
-**FORBIDDEN without approval:** `CLAUDE.md`, `.github/copilot-instructions.md`, `.github/workflows/`, `vendor/`, `node_modules/`, `venv/`, `.env`
+**FORBIDDEN without approval:** `CLAUDE.md`, `.github/instructions/tao.instructions.md`, `.github/workflows/`, `vendor/`, `node_modules/`, `venv/`, `.env`
 
 ### LOCK 2 — BRANCH
-- Work ONLY on `dev` (or branch defined in tao.config.json → git.dev_branch)
+- Work ONLY on `dev` (or branch defined in .github/tao/tao.config.json → git.dev_branch)
 - NEVER `git push origin main`
 - NEVER `git push --force`
 - NEVER `git reset --hard`
@@ -92,7 +92,7 @@ Every code-modifying response MUST start with:
 📋 COMPLIANCE CHECK
 ├─ Skills consulted: [list or "none applicable"]
 ├─ Files read before editing: [list]
-├─ CONTEXT.md read: YES
-├─ CHANGELOG.md consulted: YES
+├─ .github/tao/CONTEXT.md read: YES
+├─ .github/tao/CHANGELOG.md consulted: YES
 └─ ABEX: [PASS / N/A]
 ```

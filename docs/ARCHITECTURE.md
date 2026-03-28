@@ -38,26 +38,39 @@ After installation, a TAO project contains:
 
 ```
 project/
-├── tao.config.json                      ← Central config (models, paths, lint, git)
 ├── CLAUDE.md                            ← Rules for all agents
-├── CONTEXT.md                           ← Active phase, state, decisions
-├── CHANGELOG.md                         ← Structured change log
 ├── .github/
 │   ├── copilot-instructions.md          ← Minimal pointer to CLAUDE.md
+│   ├── instructions/
+│   │   └── tao.instructions.md          ← TAO-specific instructions (auto-loaded)
 │   ├── agents/
-│   │   ├── Tao.agent.md                 ← Orchestrator (Sonnet)
-│   │   ├── Wu.agent.md                  ← Brainstorm & planning (Opus)
+│   │   ├── Execute-Tao.agent.md                 ← Orchestrator (Sonnet)
+│   │   ├── Brainstorm-Wu.agent.md                  ← Brainstorm & planning (Opus)
 │   │   ├── Shen.agent.md               ← Complex worker (Opus) — subagent only
-│   │   ├── Shen-Architect.agent.md      ← Direct access (Opus) — user-invocable
+│   │   ├── Investigate-Shen.agent.md      ← Direct access (Opus) — user-invocable
 │   │   ├── Di.agent.md                  ← Database (GPT-4.1) — subagent only
 │   │   └── Qi.agent.md                 ← Deploy (GPT-4.1) — subagent only
-│   └── hooks/
-│       └── hooks.json                   ← PostToolUse + SessionStart config
-├── scripts/
-│   ├── lint-hook.sh                     ← PostToolUse — lint after file edit
-│   ├── context-hook.sh                  ← SessionStart — inject context
-│   ├── install-hooks.sh                 ← Git hook installer
-│   └── pre-commit.sh                   ← Modular pre-commit pipeline
+│   ├── hooks/
+│   │   └── hooks.json                   ← PostToolUse + SessionStart config
+│   └── tao/
+│       ├── tao.config.json              ← Central config (models, paths, lint, git)
+│       ├── CONTEXT.md                   ← Active phase, state, decisions
+│       ├── CHANGELOG.md                 ← Structured change log
+│       ├── RULES.md                     ← Inviolable rules reference
+│       ├── scripts/
+│       │   ├── lint-hook.sh             ← PostToolUse — lint after file edit
+│       │   ├── enforcement-hook.sh      ← PostToolUse — R0/R5 enforcement
+│       │   ├── context-hook.sh          ← SessionStart — inject context + R2 handoff
+│       │   ├── install-hooks.sh         ← Git hook installer
+│       │   ├── pre-commit.sh            ← Modular pre-commit pipeline
+│       │   ├── validate-plan.sh         ← Gate: validates PLAN.md coverage
+│       │   ├── validate-execution.sh    ← Gate: validates task execution
+│       │   ├── new-phase.sh             ← Creates new phase directories
+│       │   ├── validate-brainstorm.sh   ← Gate: brainstorm artifact validation
+│       │   ├── faudit.sh                ← Gate: 3-pass quality audit
+│       │   ├── forensic-audit.sh        ← Gate: deep 3-round forensic audit
+│       │   └── doc-validate.sh          ← Gate: documentation completeness
+│       └── phases/                      ← Phase templates
 └── docs/phases/{phase_prefix}XX/
     ├── PLAN.md
     ├── STATUS.md
@@ -113,7 +126,7 @@ All project-specific values live in `tao.config.json`. No manual find-and-replac
   },
   "doc_sync": {
     "enabled": false,
-    "script": "scripts/doc-sync.sh"
+    "script": ".github/tao/scripts/doc-sync.sh"
   }
 }
 ```
@@ -245,14 +258,14 @@ VS Code combines ALL these instruction sources:
 
 ```
 User
- ├── @Tao (Sonnet 4.6 — 1x) ─────── Orchestrator (execution loop)
+ ├── @Execute-Tao (Sonnet 4.6 — 1x) ─────── Orchestrator (execution loop)
  │   ├── Shen (Opus 4.6 — 3x)        │ Subagent for complex tasks
  │   ├── Di (GPT-4.1 — 0x)           │ Subagent for database
  │   └── Qi (GPT-4.1 — 0x)           │ Subagent for git/deploy
  │
- ├── @Wu (Opus 4.6 — 3x) ──────────── Brainstorm & planning (IBIS)
+ ├── @Brainstorm-Wu (Opus 4.6 — 3x) ──────────── Brainstorm & planning (IBIS)
  │
- └── @Shen-Architect (Opus 4.6 — 3x)  Direct access outside the loop
+ └── @Investigate-Shen (Opus 4.6 — 3x)  Direct access outside the loop
      ├── Di (GPT-4.1 — 0x)
      └── Qi (GPT-4.1 — 0x)
 ```
@@ -261,16 +274,16 @@ User
 
 | Agent | Invoked By | When |
 |---|---|---|
-| **@Tao** | User (dropdown) | "execute", "continue" — task loop |
+| **@Execute-Tao** | User (dropdown) | "execute", "continue" — task loop |
 | **Shen** | Tao (subagent) | Complex tasks, security-critical, architecture |
-| **@Wu** | User (dropdown) | "brainstorm phase 01", "plan phase 01" |
-| **@Shen-Architect** | User (dropdown) | Debugging, architecture decisions outside the loop |
-| **Di** | Tao or Shen-Architect (subagent) | Migrations, schema, query performance |
-| **Qi** | Tao or Shen-Architect (subagent) | Git commit, push, merge |
+| **@Brainstorm-Wu** | User (dropdown) | "brainstorm phase 01", "plan phase 01" |
+| **@Investigate-Shen** | User (dropdown) | Debugging, architecture decisions outside the loop |
+| **Di** | Execute-Tao or Investigate-Shen (subagent) | Migrations, schema, query performance |
+| **Qi** | Execute-Tao or Investigate-Shen (subagent) | Git commit, push, merge |
 
 ### 3.3 Routing Matrix
 
-The @Tao orchestrator evaluates each task and decides:
+The @Execute-Tao orchestrator evaluates each task and decides:
 
 | Criterion | Action |
 |----------|------|
@@ -292,7 +305,7 @@ The @Tao orchestrator evaluates each task and decides:
 
 | Model | Multiplier | Used By |
 |---|---|---|
-| Opus 4.6 | 3x | Shen, Shen-Architect, Wu |
+| Opus 4.6 | 3x | Shen, Investigate-Shen, Brainstorm-Wu |
 | Sonnet 4.6 | 1x | Tao |
 | GPT-4.1 | **0x (free)** | Di, Qi, fallback |
 
@@ -326,7 +339,7 @@ The @Tao orchestrator evaluates each task and decides:
 
 ### Layer 1 — Think (Brainstorm)
 
-**Agent:** @Wu (Opus)
+**Agent:** @Brainstorm-Wu (Opus)
 **Protocol:** IBIS (Issue-Based Information System, Kunz & Rittel 1970)
 
 1. **DIVERGE** — Explore ideas, question assumptions, generate alternatives
@@ -353,7 +366,7 @@ The @Tao orchestrator evaluates each task and decides:
 
 ### Layer 2 — Plan
 
-**Agent:** @Wu (Opus) — Sonnet is forbidden from planning (see "Sonnet Never Plans")
+**Agent:** @Brainstorm-Wu (Opus) — Sonnet is forbidden from planning (see "Sonnet Never Plans")
 **Input:** BRIEF.md (maturity ≥ 5/7)
 **Output:** PLAN.md + STATUS.md + individual task files
 
@@ -367,12 +380,12 @@ Each task file contains:
 
 ### Layer 3 — Execute
 
-**Agent:** @Tao (Sonnet) + subagents
+**Agent:** @Execute-Tao (Sonnet) + subagents
 **Input:** STATUS.md with task table
 
 **Execution Loop (pseudocode):**
 ```
-TRIGGER: user says "execute" to @Tao
+TRIGGER: user says "execute" to @Execute-Tao
 
 LOOP {
   1. CHECK_PAUSE   → .tao-pause exists → STOP
@@ -424,17 +437,36 @@ Guardrails operate across all three layers:
 
 **Cost:** 0 premium requests.
 
-### 6.2 context-hook.sh (SessionStart)
+### 6.2 enforcement-hook.sh (PostToolUse)
 
-**Purpose:** Inject TAO context at session start, eliminating 2-3 roundtrips of file reading.
+**Purpose:** Enforce R0 (compliance check) and R5 (read before edit) via session state tracking.
 
 **Flow:**
-1. Read `tao.config.json` → extract phase prefix, paths
-2. Read `CONTEXT.md` → extract active phase number
-3. Read `git branch` → current branch
-4. Read `STATUS.md` → count ⏳ and ✅ tasks
-5. Check `.tao-pause` → paused state
-6. Output JSON with consolidated `additionalContext`
+1. Receive JSON via stdin with `tool_name` and `tool_input`
+2. If `read_file`: log file path to `.tao-session/reads.log`
+3. If edit tool: check `.tao-session/reads.log` for this file
+   - File NOT in log → inject `⚠️ R5 VIOLATION` into `additionalContext`
+4. On first edit of session: check if CONTEXT.md + CHANGELOG.md were read
+   - NOT read → inject `⚠️ R0 COMPLIANCE VIOLATION` into `additionalContext`
+
+**Cost:** 0 premium requests.
+
+### 6.3 context-hook.sh (SessionStart)
+
+**Purpose:** Inject TAO context at session start + R2 handoff enforcement.
+
+**Flow:**
+1. Read `.tao-session/handoff.md` from previous session (if exists)
+2. Clean session state (reads.log, edits.log) for new session
+3. Mark session start timestamp in `.tao-session/started`
+4. Read `tao.config.json` → extract phase prefix, paths
+5. Read `CONTEXT.md` → extract active phase number
+6. Read `git branch` → current branch
+7. Read `STATUS.md` → count ⏳ and ✅ tasks
+8. Check `.tao-pause` → paused state
+9. Inject handoff from previous session (R2)
+10. Detect orphan sessions (previous session ended without handoff)
+11. Output JSON with consolidated `additionalContext`
 
 **Cost:** 0 premium requests.
 
@@ -454,7 +486,7 @@ Add to `.vscode/settings.json` or global user settings.
 
 ## 8. Subagent Prompt Format
 
-When @Tao invokes Shen, the prompt must contain:
+When @Execute-Tao invokes Shen, the prompt must contain:
 
 ```
 Phase {XX}, Task T{NN}: {title}
@@ -503,18 +535,18 @@ On completion:
 | E1 | Agents appear in dropdown | VS Code → Copilot Chat → agent dropdown |
 | E2 | Shen/Di/Qi NOT in dropdown | Verify `user-invocable: false` hides them |
 | E3 | Lint hook executes | Edit a file with syntax error → should get error message |
-| E4 | Context hook injects | Open chat with @Tao → should see phase/branch/tasks |
-| E5 | Scripts are executable | `ls -la scripts/*.sh` → should have `x` permission |
+| E4 | Context hook injects | Open chat with @Execute-Tao → should see phase/branch/tasks |
+| E5 | Scripts are executable | `ls -la .github/tao/scripts/*.sh` → should have `x` permission |
 
 ### Functional
 
 | # | Test | Expected |
 |---|---|---|
-| F1 | `@Tao execute` with 1 ⏳ task | Executes, commits, marks ✅ |
+| F1 | `@Execute-Tao execute` with 1 ⏳ task | Executes, commits, marks ✅ |
 | F2 | Task marked "Executor: Architect" | Tao invokes Shen subagent |
 | F3 | Task "Executor: DBA" | Tao invokes Di subagent |
 | F4 | Edit file with syntax error | Hook injects correction message |
-| F5 | `@Shen-Architect` with hard problem | Uses Opus, resolves |
+| F5 | `@Investigate-Shen` with hard problem | Uses Opus, resolves |
 | F6 | All phases complete | Tao reports "PROJECT COMPLETE" |
 | F7 | `.tao-pause` exists | Tao stops at next iteration |
 | F8 | All tasks ✅ | Tao reports "PHASE COMPLETE", advances |
@@ -526,13 +558,13 @@ On completion:
 | Problem | Cause | Solution |
 |---|---|---|
 | Agent not in dropdown | Invalid YAML frontmatter | Check indentation, quotes, `---` delimiters |
-| Hook not executing | Script not executable | `chmod +x scripts/*.sh` |
+| Hook not executing | Script not executable | `chmod +x .github/tao/scripts/*.sh` |
 | Hook not running at all | Setting disabled | `chat.useCustomAgentHooks: true` |
 | Subagent lacks project context | Context-isolated | Include project info in `.agent.md` inline |
 | Wrong model activated | Incorrect model string | Use exact string: `Claude Sonnet 4.6 (copilot)` |
 | `agent` tool error | `agents:` set without `agent` in `tools:` | Add `agent` to tools list |
 | Lint command not found | CLI tool not installed | Install the linter for your language |
-| Context hook empty | No CONTEXT.md found | Run installer or create CONTEXT.md manually |
+| Context hook empty | No CONTEXT.md found | Run installer or create `.github/tao/CONTEXT.md` manually |
 
 ---
 

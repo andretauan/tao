@@ -8,6 +8,7 @@ Thumbs.db
 
 # IDE
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
@@ -27,3 +28,6 @@ __pycache__/
 # Pause file (TAO kill switch — .gsd-pause kept for backward compat)
 .gsd-pause
 .tao-pause
+
+# Session state (ephemeral — used by enforcement-hook.sh)
+.tao-session/

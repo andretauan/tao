@@ -2,7 +2,7 @@
 
 **Phase:** [XX] — [Phase Name]
 **Complexity:** [Low | Medium | High]
-**Executor:** [SONNET | OPUS]
+**Executor:** [Sonnet | Architect | DBA]
 **Priority:** [P0 | P1 | P2 | P3]
 
 ---
@@ -30,7 +30,7 @@
 1. [Read files listed above]
 2. [Specific action 1 — as detailed as possible]
 3. [Specific action 2]
-4. [Run quality gate: e.g., lint command from tao.config.json]
+4. [Run quality gate: e.g., lint command from .github/tao/tao.config.json]
 5. [Verify with: e.g., `curl -s http://localhost:3000/route | grep "expected"`]
 
 ## Acceptance Criteria (Definition of Done)

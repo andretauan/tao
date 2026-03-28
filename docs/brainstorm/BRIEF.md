@@ -39,8 +39,8 @@ O desafio: empacotar para que um dev desconhecido consiga (1) entender em 2 min,
 
 ### Naming — TAO (supersede D4)
 - **Projeto:** TAO (道) — "The Way". Sigla: **T**race · **A**lign · **O**perate
-- **Orchestrator agent:** `@Tao` — o caminho, roda o loop
-- **Brainstorm agent:** `@Wu` (悟 insight) — deliberação, IBIS
+- **Orchestrator agent:** `@Execute-Tao` — o caminho, roda o loop
+- **Brainstorm agent:** `@Brainstorm-Wu` (悟 insight) — deliberação, IBIS
 - **Complex Worker:** `@Shen` (深 profundo) — Opus, tarefas complexas
 - **Architect:** `@Shen` (mesmo — acesso direto fora do loop)
 - **DBA:** `@Di` (地 terra) — fundação, banco de dados
@@ -172,7 +172,7 @@ O desafio: empacotar para que um dev desconhecido consiga (1) entender em 2 min,
 
 ### Verdades invioláveis
 1. TAO = The Way. Trace · Align · Operate.
-2. Agents taoístas: @Tao, @Wu, @Shen, @Di, @Qi
+2. Agents taoístas: @Execute-Tao, @Brainstorm-Wu, @Shen, @Di, @Qi
 3. 3 layers + Guardrails transversal
 4. CLAUDE.md = fonte única de regras
 5. Enforcement (pre-commit) = core, não addon
@@ -183,7 +183,7 @@ O desafio: empacotar para que um dev desconhecido consiga (1) entender em 2 min,
 2. `tao.config.json` — config centralizada (zero [SUBSTITUIR])
 3. `tao.sh` — monitor (renomear de gsd.sh)
 4. 6 agents taoístas (EN + PT-BR = 12 arquivos)
-5. Wu.agent.md (Brainstorm) — novo, ~200 linhas, IBIS + 5 modos
+5. Brainstorm-Wu.agent.md (Brainstorm) — novo, ~200 linhas, IBIS + 5 modos
 6. Templates: CLAUDE.md, CONTEXT.md, CHANGELOG.md, copilot-instructions.md (EN + PT-BR)
 7. Phase templates: PLAN, STATUS, task/tarefa, progress (EN + PT-BR)
 8. Brainstorm templates: DISCOVERY.md, DECISIONS.md, BRIEF.md
@@ -201,7 +201,7 @@ O desafio: empacotar para que um dev desconhecido consiga (1) entender em 2 min,
 - Agents REFERENCIEM CLAUDE.md (não dupliquem)
 - Pre-commit LEIA tao.config.json para lint commands
 - Context hook LEIA tao.config.json para phase_prefix
-- Wu.agent.md USE templates de DISCOVERY/DECISIONS/BRIEF
+- Brainstorm-Wu.agent.md USE templates de DISCOVERY/DECISIONS/BRIEF
 
 ---
 

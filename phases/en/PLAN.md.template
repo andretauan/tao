@@ -48,8 +48,8 @@ P2: T05
 - [ ] All P0 completed
 - [ ] All P1 completed
 - [ ] Quality gates passing
-- [ ] CONTEXT.md updated
-- [ ] CHANGELOG.md updated
+- [ ] .github/tao/CONTEXT.md updated
+- [ ] .github/tao/CHANGELOG.md updated
 
 ---
 

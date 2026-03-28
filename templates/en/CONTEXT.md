@@ -14,9 +14,10 @@
 
 > When `status: new_project`, agents should:
 > 1. Read CLAUDE.md fully
-> 2. Read tao.config.json for project configuration
-> 3. Help the user plan their first phase
-> 4. Update this status to `planning` or `in_progress`
+> 2. Read .github/tao/RULES.md for TAO framework rules
+> 3. Read .github/tao/tao.config.json for project configuration
+> 4. Help the user plan their first phase
+> 5. Update this status to `planning` or `in_progress`
 
 ---
 

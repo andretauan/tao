@@ -7,25 +7,28 @@
 > **Ordem de execução recomendada:**
 > [01 → 02 → 03 → ...]
 
+<!-- Executor: Sonnet (Tao executa direto) | Architect (→ subagent Shen) | DBA (→ subagent Di) -->
+<!-- Complexidade: Baixa | Média | Alta -->
+
 ## GRUPO P0 — [Nome do grupo: ex: Bugs Críticos]
 
-| # | Tarefa | Status | Notas |
-|---|--------|--------|-------|
-| 01 | [Nome da tarefa 1] | ⏳ | — |
-| 02 | [Nome da tarefa 2] | ⏳ | — |
+| # | Tarefa | Complexidade | Executor | Status | Notas |
+|---|--------|--------------|----------|--------|-------|
+| 01 | [Nome da tarefa 1] | Baixa | Sonnet | ⏳ | — |
+| 02 | [Nome da tarefa 2] | Alta | Architect | ⏳ | — |
 
 ## GRUPO P1 — [Nome do grupo: ex: Funcionalidades Principais]
 
-| # | Tarefa | Status | Notas |
-|---|--------|--------|-------|
-| 03 | [Nome da tarefa 3] | ⏳ | — |
-| 04 | [Nome da tarefa 4] | ⏳ | — |
+| # | Tarefa | Complexidade | Executor | Status | Notas |
+|---|--------|--------------|----------|--------|-------|
+| 03 | [Nome da tarefa 3] | Média | Sonnet | ⏳ | — |
+| 04 | [Nome da tarefa 4] | Baixa | Sonnet | ⏳ | — |
 
 ## GRUPO P2 — [Nome do grupo: ex: Qualidade e Testes]
 
-| # | Tarefa | Status | Notas |
-|---|--------|--------|-------|
-| 05 | [Nome da tarefa 5] | ⏳ | — |
+| # | Tarefa | Complexidade | Executor | Status | Notas |
+|---|--------|--------------|----------|--------|-------|
+| 05 | [Nome da tarefa 5] | Baixa | Sonnet | ⏳ | — |
 
 ---
 

@@ -158,18 +158,18 @@ Considered making validate-execution.sh a pre-commit hook. Rejected because:
 ### Where in the TAO Loop
 
 **validate-plan.sh:**
-- Tao.agent.md: step 2b (PLAN_CHECK) should include `bash scripts/validate-plan.sh [phase-dir]`
-- Wu.agent.md: after generating PLAN.md, run validation before handing to executor
+- Execute-Tao.agent.md: step 2b (PLAN_CHECK) should include `bash scripts/validate-plan.sh [phase-dir]`
+- Brainstorm-Wu.agent.md: after generating PLAN.md, run validation before handing to executor
 - Can also run standalone: `bash scripts/validate-plan.sh docs/phases/phase-01`
 
 **validate-execution.sh:**
-- Tao.agent.md: when all STATUS tasks are ✅, run before declaring phase complete
+- Execute-Tao.agent.md: when all STATUS tasks are ✅, run before declaring phase complete
 - Step 4 (SEM ⏳ = FASE CONCLUÍDA): add validation gate
 - Can also run standalone: `bash scripts/validate-execution.sh docs/phases/phase-01`
 
 ### Agent Template Changes Needed
 
-In Tao.agent.md (both EN + PT-BR), add to the loop:
+In Execute-Tao.agent.md (both EN + PT-BR), add to the loop:
 ```
 After PLAN creation:
   Run: bash scripts/validate-plan.sh [phase-dir]

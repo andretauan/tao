@@ -11,10 +11,10 @@
 Transformar o GSD portable (22 arquivos, 2336 linhas) no TAO v0.1:
 - Corrigir 8 bugs (2 critical, 2 high)
 - Eliminar 42 hardcodes via `tao.config.json` centralizado
-- Renomear agents para ecossistema taoísta (@Tao, @Wu, @Shen, @Di, @Qi)
+- Renomear agents para ecossistema taoísta (@Execute-Tao, @Brainstorm-Wu, @Shen, @Di, @Qi)
 - Bilíngue EN + PT-BR com adaptação cultural
 - Pre-commit hooks modulares no core
-- Brainstorm agent (@Wu) novo com IBIS e 5 modos
+- Brainstorm agent (@Brainstorm-Wu) novo com IBIS e 5 modos
 - README excelente com accordion onboarding (L1→L5)
 - Tudo em `/home/tauan/Apps/TAO/` — zero dependência do RevelaME
 
@@ -56,17 +56,17 @@ TAO/
 │
 ├── agents/
 │   ├── en/                             # English agents
-│   │   ├── Tao.agent.md               # Orchestrator
-│   │   ├── Wu.agent.md                # Brainstorm (NEW)
+│   │   ├── Execute-Tao.agent.md               # Orchestrator
+│   │   ├── Brainstorm-Wu.agent.md                # Brainstorm (NEW)
 │   │   ├── Shen.agent.md              # Complex Worker (subagent)
-│   │   ├── Shen-Architect.agent.md    # Architect (user-invocable)
+│   │   ├── Investigate-Shen.agent.md    # Architect (user-invocable)
 │   │   ├── Di.agent.md                # DBA
 │   │   └── Qi.agent.md                # Deploy
 │   └── pt-br/                         # Portuguese agents
-│       ├── Tao.agent.md
-│       ├── Wu.agent.md
+│       ├── Execute-Tao.agent.md
+│       ├── Brainstorm-Wu.agent.md
 │       ├── Shen.agent.md
-│       ├── Shen-Arquiteto.agent.md
+│       ├── Investigar-Shen.agent.md
 │       ├── Di.agent.md
 │       └── Qi.agent.md
 │
@@ -136,16 +136,16 @@ TAO/
 ### SPRINT 3 — Agents Taoístas (P0)
 > O coração do TAO. Cada agent é um .agent.md com YAML frontmatter.
 
-- **T18** — `agents/en/Tao.agent.md` — Orchestrator (renomear de GSD.agent.md). Loop contínuo, routing matrix, subagents [Shen, Di, Qi]. Modelo: Sonnet. ~250 linhas. (D1, D8)
-- **T19** — `agents/en/Wu.agent.md` — Brainstorm agent (NOVO). 5 modos (DIVERGE/CONVERGE/CAPTURE/SYNTHESIZE/RESUME), IBIS protocol, maturity gate, artefatos (DISCOVERY/DECISIONS/BRIEF). Modelo: Opus. ~350 linhas. (D3, D15)
-- **T20** — `agents/en/Shen.agent.md` — Complex Worker subagent (renomear de Opus-Worker). Context-isolated, recebe prompt do @Tao. Modelo: Opus. (D1)
-- **T21** — `agents/en/Shen-Architect.agent.md` — Architect user-invocable (renomear de Arquiteto). Acesso direto fora do loop. Modelo: Opus. Subagents: [Di, Qi]. (D1)
+- **T18** — `agents/en/Execute-Tao.agent.md` — Orchestrator (renomear de GSD.agent.md). Loop contínuo, routing matrix, subagents [Shen, Di, Qi]. Modelo: Sonnet. ~250 linhas. (D1, D8)
+- **T19** — `agents/en/Brainstorm-Wu.agent.md` — Brainstorm agent (NOVO). 5 modos (DIVERGE/CONVERGE/CAPTURE/SYNTHESIZE/RESUME), IBIS protocol, maturity gate, artefatos (DISCOVERY/DECISIONS/BRIEF). Modelo: Opus. ~350 linhas. (D3, D15)
+- **T20** — `agents/en/Shen.agent.md` — Complex Worker subagent (renomear de Opus-Worker). Context-isolated, recebe prompt do @Execute-Tao. Modelo: Opus. (D1)
+- **T21** — `agents/en/Investigate-Shen.agent.md` — Architect user-invocable (renomear de Arquiteto). Acesso direto fora do loop. Modelo: Opus. Subagents: [Di, Qi]. (D1)
 - **T22** — `agents/en/Di.agent.md` — DBA subagent (renomear de DBA). Generic DB patterns. Modelo: GPT-4.1. (D1)
 - **T23** — `agents/en/Qi.agent.md` — Deploy subagent (renomear de Deploy). Git operations. Modelo: GPT-4.1. (D1)
-- **T24** — `agents/pt-br/Tao.agent.md` — Adaptação cultural do T18. (D20)
-- **T25** — `agents/pt-br/Wu.agent.md` — Adaptação cultural do T19. (D20)
+- **T24** — `agents/pt-br/Execute-Tao.agent.md` — Adaptação cultural do T18. (D20)
+- **T25** — `agents/pt-br/Brainstorm-Wu.agent.md` — Adaptação cultural do T19. (D20)
 - **T26** — `agents/pt-br/Shen.agent.md` — Adaptação cultural do T20. (D20)
-- **T27** — `agents/pt-br/Shen-Arquiteto.agent.md` — Adaptação cultural do T21. (D20)
+- **T27** — `agents/pt-br/Investigar-Shen.agent.md` — Adaptação cultural do T21. (D20)
 - **T28** — `agents/pt-br/Di.agent.md` — Adaptação cultural do T22. (D20)
 - **T29** — `agents/pt-br/Qi.agent.md` — Adaptação cultural do T23. (D20)
 
@@ -293,7 +293,7 @@ Toda decisão IBIS tem pelo menos 1 tarefa que a implementa:
 | Bilíngue atrasa lançamento | Média | Escape: lançar EN-only, PT-BR em v0.1.1 |
 | Agent YAML frontmatter muda | Baixa | Documentado em ARCHITECTURE. VS Code é estável. |
 | Hooks JSON schema muda | Baixa | gsd-hooks.json é simples. Monitorar release notes. |
-| Wu.agent.md fica muito complexo | Média | Manter ~350 linhas. IBIS jargão opt-in. |
+| Brainstorm-Wu.agent.md fica muito complexo | Média | Manter ~350 linhas. IBIS jargão opt-in. |
 | install.sh não funciona em todas as shells | Média | Testar bash 4+ e zsh. `#!/usr/bin/env bash`. |
 
 ---
@@ -376,4 +376,4 @@ Toda decisão IBIS tem pelo menos 1 tarefa que a implementa:
 **Criado em:** 2026-03-27 10:08
 **Auditoria 3×:** 2026-03-27 10:08
 **Source:** BRIEF.md (maturity 7/7) → 20 decisões IBIS
-**Executor:** @Tao (Sonnet) para maioria | @Shen (Opus) para T19 (Wu agent) e T09 (CLAUDE.md rewrite)
+**Executor:** @Execute-Tao (Sonnet) para maioria | @Shen (Opus) para T19 (Wu agent) e T09 (CLAUDE.md rewrite)

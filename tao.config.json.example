@@ -12,7 +12,7 @@
   "git": {
     "dev_branch": "dev",
     "main_branch": "main",
-    "auto_push": true
+    "auto_push": false
   },
   "paths": {
     "source": "src/",
@@ -29,6 +29,7 @@
     ".go": "go vet {file}",
     ".rs": "cargo check"
   },
+  "commit_scopes": ["api", "auth", "db", "ui", "core", "deploy"],
   "compliance": {
     "require_skill_check": true,
     "require_context_read": true,
@@ -37,6 +38,6 @@
   },
   "doc_sync": {
     "enabled": false,
-    "script": "scripts/doc-sync.sh"
+    "script": ".github/tao/scripts/doc-sync.sh"
   }
 }

@@ -48,8 +48,8 @@ P2: T05
 - [ ] Todos os P0 concluídos
 - [ ] Todos os P1 concluídos
 - [ ] Quality gates passando
-- [ ] CONTEXT.md atualizado
-- [ ] CHANGELOG.md atualizado
+- [ ] .github/tao/CONTEXT.md atualizado
+- [ ] .github/tao/CHANGELOG.md atualizado
 
 ---
 
