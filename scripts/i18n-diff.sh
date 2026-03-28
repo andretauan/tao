@@ -25,7 +25,8 @@ fi
 # ── i18n name equivalences (intentional renames between languages) ──
 # Format: "en_name=ptbr_name" — these are NOT missing/orphan, just renamed
 I18N_EQUIV=(
-  "Shen-Architect.agent.md=Shen-Arquiteto.agent.md"
+  "Investigate-Shen.agent.md=Investigar-Shen.agent.md"
+  "Execute-Tao.agent.md=Executar-Tao.agent.md"
   "task.md.template=tarefa.md.template"
   "task.md=tarefa.md"
 )
@@ -118,8 +119,10 @@ for pair in "${PAIRS[@]}"; do
     fi
 
     # Compare section headers (## lines) as structural check
-    en_headers=$(grep -c '^##' "$en_file" 2>/dev/null || echo "0")
-    pt_headers=$(grep -c '^##' "$pt_file" 2>/dev/null || echo "0")
+    en_headers=$(grep -c '^##' "$en_file" 2>/dev/null || true)
+    en_headers=${en_headers:-0}
+    pt_headers=$(grep -c '^##' "$pt_file" 2>/dev/null || true)
+    pt_headers=${pt_headers:-0}
 
     header_match=true
     if [ "$en_headers" != "$pt_headers" ]; then

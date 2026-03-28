@@ -7,9 +7,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
-CONFIG_FILE="$WORKSPACE_DIR/tao.config.json"
+CONFIG_FILE="$WORKSPACE_DIR/.github/tao/tao.config.json"
 AGENTS_DIR="$WORKSPACE_DIR/.github/agents"
 
 # ── Colors ──
@@ -65,8 +64,8 @@ echo "  free_tier:        $MODEL_FREE"
 echo ""
 
 # ── Agent → model mapping (by role) ──
-# Tao = orchestrator (multi-model: orchestrator + free)
-# Shen, Shen-Architect, Wu = complex_worker
+# Execute-Tao = orchestrator (multi-model: orchestrator + free)
+# Shen, Investigate-Shen, Brainstorm-Wu = complex_worker
 # Di, Qi = free_tier
 
 UPDATED=0
@@ -94,7 +93,7 @@ update_agent() {
   fi
 
   if [[ "$role" == "orchestrator" ]]; then
-    # Tao has multi-model: orchestrator + free
+    # Execute-Tao has multi-model: orchestrator + free
     local expected="model:
   - ${new_model}
   - ${MODEL_FREE}"
@@ -157,10 +156,10 @@ while IFS= read -r agent_file; do
   name_lower=$(echo "$name" | tr '[:upper:]' '[:lower:]')
 
   case "$name_lower" in
-    tao)
+    execute-tao|executar-tao)
       update_agent "$agent_file" "orchestrator" "$MODEL_ORCHESTRATOR"
       ;;
-    shen|shen-architect|shen-arquiteto|wu)
+    shen|investigate-shen|investigar-shen|brainstorm-wu)
       update_agent "$agent_file" "complex" "$MODEL_COMPLEX"
       ;;
     di|qi)

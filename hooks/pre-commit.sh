@@ -10,7 +10,7 @@
 
 set -e
 
-CONFIG="tao.config.json"
+CONFIG=".github/tao/tao.config.json"
 ERRORS=0
 
 # ─── Colors ───────────────────────────────────────────────────
@@ -67,6 +67,40 @@ while IFS= read -r file; do
     fi
   fi
 done <<< "$STAGED_FILES"
+
+# ─── Branch protection (LOCK 2) ──────────────────────────────
+CURRENT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+if [ -n "$CURRENT_BRANCH" ]; then
+  MAIN_BRANCH="main"
+  if [ -f "$CONFIG" ]; then
+    MAIN_BRANCH=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    print(c.get('git',{}).get('main_branch','main'))
+except:
+    print('main')
+" "$CONFIG" 2>/dev/null) || MAIN_BRANCH="main"
+  fi
+
+  if [ "$CURRENT_BRANCH" = "$MAIN_BRANCH" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+    echo -e "${RED}✗ BLOCKED: Direct commit to '${CURRENT_BRANCH}' is FORBIDDEN.${NC}"
+    echo -e "${YELLOW}  Switch to dev branch: git checkout dev${NC}"
+    ERRORS=$((ERRORS + 1))
+  fi
+fi
+
+# ─── CONTEXT.md freshness check (R6) ─────────────────────────
+CONTEXT_FILE=".github/tao/CONTEXT.md"
+if [ -f "$CONTEXT_FILE" ]; then
+  if echo "$STAGED_FILES" | grep -qE '\.py$|\.ts$|\.js$|\.php$|\.rb$|\.go$|\.rs$|\.vue$|\.jsx$|\.tsx$'; then
+    if ! echo "$STAGED_FILES" | grep -q "$CONTEXT_FILE"; then
+      echo -e "${YELLOW}⚠  Code files staged but CONTEXT.md not updated (R6 violation)${NC}"
+      echo -e "${YELLOW}   Agent must update .github/tao/CONTEXT.md after every file edit.${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
+fi
 
 # ─── Result ───────────────────────────────────────────────────
 if [ "$ERRORS" -gt 0 ]; then

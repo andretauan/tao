@@ -5,7 +5,7 @@
 # Called by install.sh during setup, or manually.
 # Installs: pre-commit hook (lint + syntax check)
 #
-# Usage: bash scripts/install-hooks.sh
+# Usage: bash .github/tao/scripts/install-hooks.sh
 
 set -e
 
@@ -35,8 +35,8 @@ else
 # TAO pre-commit — runs lint on staged files
 # Installed by install-hooks.sh
 
-if [ -f scripts/pre-commit.sh ]; then
-  bash scripts/pre-commit.sh
+if [ -f .github/tao/scripts/pre-commit.sh ]; then
+  bash .github/tao/scripts/pre-commit.sh
   exit $?
 fi
 
@@ -58,7 +58,7 @@ else
 # TAO post-commit — auto-push if configured
 # Installed by install-hooks.sh
 
-CONFIG="tao.config.json"
+CONFIG=".github/tao/tao.config.json"
 if [ -f "$CONFIG" ]; then
   _git_cfg=$(python3 -c "
 import json

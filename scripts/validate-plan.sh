@@ -6,9 +6,9 @@
 # in the execution plan. Hard blocker: exit 1 if any gap found.
 #
 # Usage:
-#   bash scripts/validate-plan.sh [phase-dir]
-#   bash scripts/validate-plan.sh docs/phases/phase-01
-#   bash scripts/validate-plan.sh docs/brainstorm
+#   bash .github/tao/scripts/validate-plan.sh [phase-dir]
+#   bash .github/tao/scripts/validate-plan.sh docs/phases/phase-01
+#   bash .github/tao/scripts/validate-plan.sh docs/brainstorm
 #
 # If phase-dir is omitted, auto-detects from tao.config.json.
 # Reads: BRIEF.md and PLAN.md from the given directory.
@@ -20,7 +20,7 @@
 set -euo pipefail
 
 WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
-CONFIG_FILE="$WORKSPACE_DIR/tao.config.json"
+CONFIG_FILE="$WORKSPACE_DIR/.github/tao/tao.config.json"
 
 # ─── Colors ─────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -100,7 +100,7 @@ WARNINGS=0
 # ─── V1: BRIEF exists ───────────────────────────────────────────
 if [ -z "$BRIEF_FILE" ]; then
   echo -e "${RED}✗ CRITICAL — BRIEF.md not found in: $PHASE_DIR${NC}"
-  echo -e "  Create a BRIEF.md first (use @Wu for brainstorm)."
+  echo -e "  Create a BRIEF.md first (use @Brainstorm-Wu for brainstorm)."
   echo ""
   echo -e "${RED}${BOLD}🚫 BLOCK — Phase cannot be planned without BRIEF${NC}"
   exit 1
@@ -239,7 +239,7 @@ echo -e "  Must-have artifacts: ${ARTIFACT_COUNT}"
 echo ""
 if [ -z "$PLAN_FILE" ]; then
   echo -e "${RED}✗ CRITICAL — PLAN.md not found in: $PHASE_DIR${NC}"
-  echo -e "  Create a PLAN.md from the BRIEF (use @Wu plan phase)."
+  echo -e "  Create a PLAN.md from the BRIEF (use @Brainstorm-Wu plan phase)."
   BLOCKS=$((BLOCKS + 1))
   # Cannot continue without PLAN
   echo ""

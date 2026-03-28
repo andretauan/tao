@@ -10,7 +10,7 @@
 set -euo pipefail
 
 WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
-CONFIG_FILE="$WORKSPACE_DIR/tao.config.json"
+CONFIG_FILE="$WORKSPACE_DIR/.github/tao/tao.config.json"
 
 # ── Colors ──
 RED='\033[0;31m'
@@ -123,8 +123,8 @@ mkdir -p "$PHASE_DIR/$TASKS_DIR_NAME"
 DATE_NOW=$(date '+%Y-%m-%d %H:%M')
 
 # Escape sed special chars in user-provided values (& / \ are special in sed replacements)
-SAFE_PHASE_NAME=$(printf '%s' "$PHASE_NAME" | sed 's/[&/\]/\\&/g')
-SAFE_PROJECT_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\]/\\&/g')
+SAFE_PHASE_NAME=$(printf '%s' "$PHASE_NAME" | sed 's/[&/\\]/\\&/g')
+SAFE_PROJECT_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\\]/\\&/g')
 
 for template in "$TEMPLATE_DIR"/*; do
   if [ -f "$template" ]; then
@@ -169,7 +169,7 @@ echo ""
 echo -e "${GREEN}Phase ${PHASE_PREFIX}${PHASE_NUM} created successfully.${NC}"
 echo ""
 echo "Next steps:"
-echo "  1. Start brainstorm: use @Wu (or @Brainstorm) agent"
+echo "  1. Start brainstorm: use @Brainstorm-Wu agent"
 echo "  2. Fill brainstorm/BRIEF.md until maturity ≥ 5/7"
 echo "  3. Create PLAN.md + STATUS.md from the BRIEF"
 echo "  4. Run: tao.sh status"

@@ -7,9 +7,9 @@
 # no placeholder residuals, shell scripts syntax-valid.
 #
 # Usage:
-#   bash scripts/validate-execution.sh [phase-dir]
-#   bash scripts/validate-execution.sh docs/phases/phase-01
-#   bash scripts/validate-execution.sh docs/brainstorm
+#   bash .github/tao/scripts/validate-execution.sh [phase-dir]
+#   bash .github/tao/scripts/validate-execution.sh docs/phases/phase-01
+#   bash .github/tao/scripts/validate-execution.sh docs/brainstorm
 #
 # If phase-dir is omitted, auto-detects from tao.config.json.
 # Reads: PLAN.md and STATUS.md from the given directory.
@@ -19,7 +19,7 @@
 set -euo pipefail
 
 WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
-CONFIG_FILE="$WORKSPACE_DIR/tao.config.json"
+CONFIG_FILE="$WORKSPACE_DIR/.github/tao/tao.config.json"
 
 # ─── Colors ─────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -332,6 +332,8 @@ patterns = [
     r"\[SUBSTITUIR\b", r"\[REPLACE\b", r"\[TODO\b",
     r"\[YYYY-MM-DD\]", r"\[XX\]", r"\[Phase Name\]",
     r"\[Your Project\]", r"\[PLACEHOLDER\b",
+    r"\{\{PROJECT_NAME\}\}", r"\{\{PROJECT_DESCRIPTION\}\}",
+    r"\{\{PHASE_NAME\}\}", r"\{\{PHASE_NUMBER\}\}",
 ]
 PAT = re.compile("|".join(patterns))
 
@@ -383,7 +385,30 @@ else
   BLOCKS=$((BLOCKS + PLACEHOLDER_FILE_COUNT))
 fi
 
-# ─── E7: Shell script syntax validation (WARNING) ───────────────
+# ─── E7: CHANGELOG.md — at least one entry after execution ─────
+echo ""
+echo -e "${BOLD}────────────────────────────────────────────${NC}"
+echo -e "${BOLD} CHANGELOG.md Update${NC}"
+echo -e "${BOLD}────────────────────────────────────────────${NC}"
+
+CHANGELOG_FILE="$WORKSPACE_DIR/.github/tao/CHANGELOG.md"
+if [ ! -f "$CHANGELOG_FILE" ]; then
+  echo -e "  ${RED}❌ CHANGELOG.md missing — execution is undocumented${NC}"
+  BLOCKS=$((BLOCKS + 1))
+else
+  _CLOG_ENTRIES=$(grep -cE '^### |^## \[' "$CHANGELOG_FILE" 2>/dev/null || true)
+  _CLOG_ENTRIES=${_CLOG_ENTRIES:-0}
+  _CLOG_DATED=$(grep -cE '[0-9]{4}-[0-9]{2}-[0-9]{2}' "$CHANGELOG_FILE" 2>/dev/null || true)
+  _CLOG_DATED=${_CLOG_DATED:-0}
+  if [ "$_CLOG_DATED" -eq 0 ]; then
+    echo -e "  ${YELLOW}⚠  CHANGELOG.md has no dated entries — add at least one entry after execution${NC}"
+    WARNINGS=$((WARNINGS + 1))
+  else
+    echo -e "  ${GREEN}✅ CHANGELOG.md has ${_CLOG_DATED} dated entries${NC}"
+  fi
+fi
+
+# ─── E8: Shell script syntax validation (WARNING) ───────────────
 echo ""
 echo -e "${BOLD}────────────────────────────────────────────${NC}"
 echo -e "${BOLD} Shell Script Syntax${NC}"

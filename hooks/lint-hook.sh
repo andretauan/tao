@@ -62,7 +62,7 @@ EXT=".$EXT"
 
 # ── Find tao.config.json ──
 WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
-CONFIG_FILE="$WORKSPACE_DIR/tao.config.json"
+CONFIG_FILE="$WORKSPACE_DIR/.github/tao/tao.config.json"
 
 if [ ! -f "$CONFIG_FILE" ]; then
   exit 0
@@ -83,6 +83,13 @@ except:
 
 if [ -z "$LINT_CMD" ]; then
   exit 0
+fi
+
+# ── Sanitize FILE_PATH before shell substitution ──
+# Reject paths containing shell metacharacters that could cause injection
+# via the `bash -c "$LINT_CMD"` call below.
+if [[ "$FILE_PATH" =~ [';|&`$(){}\\<>'] ]]; then
+  exit 0  # Skip linting for paths with unsafe characters — do not execute
 fi
 
 # ── Replace {file} placeholder with actual path ──
