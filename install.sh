@@ -378,8 +378,8 @@ if [ -f "$CONTEXT_FILE" ]; then
     ONBOARD_STATUS="new_project"
   fi
 
-  if grep -q 'status:' "$CONTEXT_FILE" 2>/dev/null; then
-    sed_i "$CONTEXT_FILE" "s/status:.*/status: $ONBOARD_STATUS/"
+  if grep -q '^\*\*Status:' "$CONTEXT_FILE" 2>/dev/null; then
+    sed_i "$CONTEXT_FILE" "s|^\*\*Status:\*\*.*|**Status:** $ONBOARD_STATUS|"
     echo -e "    ${GREEN}✅${NC} CONTEXT.md → status: $ONBOARD_STATUS"
   else
     # Append status line at top after first heading
@@ -436,13 +436,25 @@ if [ ${#SKIPPED[@]} -gt 0 ]; then
 fi
 
 echo ""
-echo -e "  ${BOLD}Next steps:${NC}"
-echo ""
-echo -e "  1. Review ${BOLD}.github/tao/tao.config.json${NC} — customize models, paths, lint commands"
-echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and code patterns"
-echo -e "  3. Edit ${BOLD}.github/tao/CONTEXT.md${NC} — set your first active phase"
-echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
-echo -e "  5. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
-echo ""
-echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
+if [ "$LANG_CHOICE" = "pt-br" ]; then
+  echo -e "  ${BOLD}Próximos passos:${NC}"
+  echo ""
+  echo -e "  1. Revise ${BOLD}.github/tao/tao.config.json${NC} — personalize modelos, caminhos, comandos de lint"
+  echo -e "  2. Edite ${BOLD}CLAUDE.md${NC} — adicione regras e padrões de código do projeto"
+  echo -e "  3. Edite ${BOLD}.github/tao/CONTEXT.md${NC} — defina sua primeira fase ativa"
+  echo -e "  4. No VS Code: ative ${BOLD}chat.useCustomAgentHooks${NC} nas Configurações"
+  echo -e "  5. No Copilot Chat: selecione ${BOLD}@Executar-Tao${NC} e diga ${BOLD}\"executar\"${NC}"
+  echo ""
+  echo -e "  ${BLUE}📖${NC} Leia ${BOLD}TAO/README.pt-br.md${NC} para documentação completa"
+else
+  echo -e "  ${BOLD}Next steps:${NC}"
+  echo ""
+  echo -e "  1. Review ${BOLD}.github/tao/tao.config.json${NC} — customize models, paths, lint commands"
+  echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and code patterns"
+  echo -e "  3. Edit ${BOLD}.github/tao/CONTEXT.md${NC} — set your first active phase"
+  echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
+  echo -e "  5. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
+  echo ""
+  echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
+fi
 echo ""
