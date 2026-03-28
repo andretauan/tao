@@ -446,7 +446,17 @@ Note: `tao.sh` is for **monitoring only**. Execution is done by the agents insid
 
 ---
 
-## 🤝 Contributing
+## � TAO-DNA — Build Your Own
+
+Want to build a TAO-compatible system for **Cursor, Cline, Windsurf, Claude Code**, or any other environment?
+
+[**TAO-DNA.md**](docs/TAO-DNA.md) documents the **universal patterns** behind TAO — IDE-agnostic, tool-agnostic, model-agnostic. It covers the autonomous loop, cognitive separation, model routing, deterministic guardrails, context persistence, injectable knowledge, self-healing pipelines, and structured deliberation. Plus a full translation map showing how each pattern implements on different platforms.
+
+It's not how to _use_ TAO. It's how to _think_ TAO.
+
+---
+
+## �🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 

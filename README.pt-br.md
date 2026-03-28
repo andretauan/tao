@@ -446,7 +446,17 @@ Nota: `tao.sh` é apenas para **monitoramento**. A execução é feita pelos age
 
 ---
 
-## 🤝 Contribuindo
+## � TAO-DNA — Construa o Seu
+
+Quer construir um sistema TAO-compatível para **Cursor, Cline, Windsurf, Claude Code**, ou qualquer outro ambiente?
+
+[**TAO-DNA.md**](docs/TAO-DNA.md) documenta os **padrões universais** por trás do TAO — agnóstico de IDE, ferramentas e modelos. Cobre o loop autônomo, separação cognitiva, roteamento de modelos, guardrails determinísticos, persistência de contexto, conhecimento injetável, pipelines auto-corretivos e deliberação estruturada. Inclui um mapa completo de tradução mostrando como cada padrão se implementa em diferentes plataformas.
+
+Não é como _usar_ o TAO. É como _pensar_ TAO.
+
+---
+
+## �🤝 Contribuindo
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes.
 
