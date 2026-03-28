@@ -2,6 +2,8 @@
 
 # 道 TAO
 
+<img src="docs/tao.png" alt="TAO — From vibe coding to engineering" width="100%" />
+
 **From vibe coding to engineering.**
 
 *You say "execute". TAO picks the task, routes the right model, implements, lints, commits — and loops to the next one. No prompting. No babysitting. No chaos.*

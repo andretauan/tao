@@ -2,6 +2,8 @@
 
 # 道 TAO
 
+<img src="docs/tao.png" alt="TAO — De vibe coding pra engenharia" width="100%" />
+
 **De vibe coding pra engenharia.**
 
 *Você diz "executar". O TAO pega a tarefa, roteia pro modelo certo, implementa, faz lint, comita — e parte pra próxima. Sem prompt. Sem babysitting. Sem caos.*
