@@ -49,6 +49,22 @@ Thank you for your interest in contributing to TAO! This document covers the gui
 - Zero hardcoded project-specific values
 - If you add a new template, update `install.sh` to copy it during installation
 
+### Instruction Files (.instructions.md)
+
+- Instruction files in `templates/shared/` use `applyTo` in YAML frontmatter to target file types
+- All TAO instruction files use the `tao-` prefix to avoid conflicts with user files
+- If you add a new instruction file, update `install.sh` to copy it during installation
+- Test that the `applyTo` glob pattern actually matches the intended files in VS Code
+
+### Skills (SKILL.md)
+
+- Skills follow the [agentskills.io](https://agentskills.io) open standard
+- All TAO skills must have `user-invocable: false` (auto-only enforcement)
+- Skills must exist in both `skills/en/` and `skills/pt-br/` directories
+- Each skill has its own folder: `skills/{lang}/tao-{name}/SKILL.md`
+- Update `skills/{lang}/INDEX.md` when adding or removing skills
+- All TAO skills use the `tao-` prefix to avoid conflicts with project skills
+
 ### Agents (.agent.md)
 
 - YAML frontmatter must be valid

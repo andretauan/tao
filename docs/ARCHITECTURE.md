@@ -45,9 +45,13 @@ After installation, a TAO project contains:
 project/
 ├── CLAUDE.md                            ← Rules for all agents
 ├── .github/
-│   ├── copilot-instructions.md          ← Minimal pointer to CLAUDE.md
+│   ├── copilot-instructions.md          ← Auto-loaded by Copilot — security rules, compliance check, agent routing
 │   ├── instructions/
-│   │   └── tao.instructions.md          ← TAO-specific instructions (auto-loaded)
+│   │   ├── tao.instructions.md          ← TAO-specific instructions (auto-loaded)
+│   │   ├── tao-code.instructions.md     ← Auto-injected on all code files
+│   │   ├── tao-test.instructions.md     ← Auto-injected on test files
+│   │   ├── tao-api.instructions.md      ← Auto-injected on API/route files
+│   │   └── tao-db.instructions.md       ← Auto-injected on DB/migration files
 │   ├── agents/
 │   │   ├── Execute-Tao.agent.md                 ← Orchestrator (Sonnet)
 │   │   ├── Brainstorm-Wu.agent.md                  ← Brainstorm & planning (Opus)
@@ -57,6 +61,22 @@ project/
 │   │   └── Qi.agent.md                 ← Deploy (GPT-4.1) — subagent only
 │   ├── hooks/
 │   │   └── hooks.json                   ← PostToolUse + SessionStart config
+│   ├── skills/                          ← 14 TAO skills (auto-discovered by VS Code)
+│   │   ├── INDEX.md                     ← Skill catalog — R3 bridge
+│   │   ├── tao-onboarding/SKILL.md
+│   │   ├── tao-plan-writing/SKILL.md
+│   │   ├── tao-brainstorm/SKILL.md
+│   │   ├── tao-code-review/SKILL.md
+│   │   ├── tao-security-audit/SKILL.md
+│   │   ├── tao-test-strategy/SKILL.md
+│   │   ├── tao-refactoring/SKILL.md
+│   │   ├── tao-clean-code/SKILL.md
+│   │   ├── tao-architecture-decision/SKILL.md
+│   │   ├── tao-api-design/SKILL.md
+│   │   ├── tao-database-design/SKILL.md
+│   │   ├── tao-git-workflow/SKILL.md
+│   │   ├── tao-debug-investigation/SKILL.md
+│   │   └── tao-performance-audit/SKILL.md
 │   └── tao/
 │       ├── tao.config.json              ← Central config (models, paths, lint, git)
 │       ├── CONTEXT.md                   ← Active phase, state, decisions
@@ -258,7 +278,21 @@ VS Code combines ALL these instruction sources:
 1. `.github/copilot-instructions.md` — **Always on** (all agents/modes)
 2. `CLAUDE.md` — Referenced as workspace instructions
 3. `.agent.md` of the active agent — Content below frontmatter
-4. Hook output — `additionalContext` injected at runtime
+4. `.github/instructions/*.instructions.md` — **File-scoped** via `applyTo` glob patterns
+5. `.github/skills/*/SKILL.md` — **Auto-discovered** by VS Code when context matches
+6. Hook output — `additionalContext` injected at runtime
+
+**Instruction files with `applyTo`:** VS Code automatically injects these when editing matching files — no user action required:
+
+| File | `applyTo` pattern | Scope |
+|------|-------------------|-------|
+| `tao.instructions.md` | `**` | All files — TAO rules, skill routing |
+| `tao-code.instructions.md` | `**/*.{py,ts,js,go,rb,rs,php,...}` | All code files — clean code + OWASP |
+| `tao-test.instructions.md` | `**/*.{test,spec}.*`, `**/test_*` | Test files — test pyramid + AAA |
+| `tao-api.instructions.md` | `**/routes/**`, `**/api/**`, `**/controllers/**` | API files — REST conventions |
+| `tao-db.instructions.md` | `**/*.sql`, `**/models/**`, `**/migrations/**` | DB files — schema + migration safety |
+
+**Skills (auto-only):** All 14 TAO skills have `user-invocable: false`. No `/slash` commands. VS Code auto-discovers them from `.github/skills/` and loads full instructions when the task context matches.
 
 **Consequence:** `copilot-instructions.md` must be **slim** (universal rules only), because it's read by ALL agents including subagents that have their own instructions.
 

@@ -242,7 +242,11 @@ seu-projeto/
 ├── .github/
 │   ├── copilot-instructions.md    # Carregado automaticamente pelo Copilot toda sessão
 │   ├── instructions/
-│   │   └── tao.instructions.md    # Instruções específicas do TAO
+│   │   ├── tao.instructions.md    # Instruções específicas do TAO (sempre carregado)
+│   │   ├── tao-code.instructions.md  # Auto-injetado em todos os arquivos de código
+│   │   ├── tao-test.instructions.md  # Auto-injetado em arquivos de teste
+│   │   ├── tao-api.instructions.md   # Auto-injetado em rotas/controllers
+│   │   └── tao-db.instructions.md    # Auto-injetado em SQL/migrações
 │   ├── agents/                    # 6 arquivos de agente (3 visíveis + 3 subagentes)
 │   ├── hooks/
 │   │   └── hooks.json             # Hooks SessionStart + PostToolUse
@@ -294,30 +298,45 @@ docs/phases/phase-01/
 
 ## 🧠 Biblioteca de Skills
 
-O TAO vem com **14 skills especializadas** — conhecimento expert que o VS Code auto-descobre e carrega sob demanda. Você nunca precisa repetir contexto. O conhecimento certo ativa no momento certo.
+O TAO vem com **14 skills especializadas** + **4 arquivos de instrução** — conhecimento expert que ativa automaticamente. Zero ação do usuário. Nenhum comando pra decorar. O conhecimento certo carrega no momento certo.
 
-**Como funciona:** Skills são pastas com um arquivo `SKILL.md` seguindo o [padrão aberto Agent Skills](https://agentskills.io). O VS Code lê apenas nome e descrição na inicialização (zero overhead). Quando uma tarefa combina, as instruções completas carregam no contexto. Quando não combina, fica em silêncio.
+**Duas camadas de enforcement trabalham juntas:**
 
-| Skill | Tipo | O que faz |
-|-------|------|----------|
-| `tao-onboarding` | /slash + auto | Guia novos usuários pelo setup e primeira execução |
-| `tao-plan-writing` | auto | Decomposição expert de tarefas para PLAN.md |
-| `tao-brainstorm` | auto | Brainstorming IBIS com gate de maturidade |
-| `tao-code-review` | /slash + auto | Review estruturado em 6 eixos (corretude → padrões) |
-| `tao-security-audit` | /slash + auto | Checklist OWASP Top 10 com passos de remediação |
-| `tao-test-strategy` | /slash + auto | Pirâmide de testes, edge cases, metas de cobertura |
-| `tao-refactoring` | /slash + auto | Refatoração segura com checklist pré-voo |
-| `tao-clean-code` | auto | SOLID, DRY, KISS — carregado como conhecimento de fundo |
-| `tao-architecture-decision` | /slash + auto | Template ADR com matriz de análise de trade-offs |
-| `tao-api-design` | /slash + auto | Convenções REST, status codes, paginação, erros |
-| `tao-database-design` | /slash + auto | Padrões de schema, segurança de migration, indexação |
-| `tao-git-workflow` | auto | Convenções de commit TAO e estratégia de branches |
-| `tao-debug-investigation` | /slash + auto | Protocolo hipótese → isolar → corrigir → verificar |
-| `tao-performance-audit` | /slash + auto | Metodologia de profiling e padrões de otimização |
+**Camada 1 — Arquivos de instrução** (`.instructions.md` com padrões `applyTo`):
+O VS Code injeta essas regras em todo arquivo que combina — automaticamente, antes do agente escrever uma única linha:
+
+| Arquivo | Ativa em | O que força |
+|---------|----------|-------------|
+| `tao-code` | Todos os arquivos de código (`.py`, `.ts`, `.go`, etc.) | Código limpo + segurança OWASP + auto-review 6 eixos |
+| `tao-test` | Arquivos de teste (`*.test.*`, `*.spec.*`, `test_*`) | Pirâmide de testes + edge cases + padrão AAA |
+| `tao-api` | Rotas/controllers (`routes/`, `api/`, etc.) | Convenções REST + status codes + formato de erro |
+| `tao-db` | SQL/model/migrações | Regras de schema + estratégia de index + segurança de migration |
+
+**Camada 2 — Skills** (`.github/skills/` com `SKILL.md` seguindo [agentskills.io](https://agentskills.io)):
+Conhecimento expert profundo, auto-descoberto pelo VS Code. Carregado sob demanda quando o contexto combina:
+
+| Skill | O que faz |
+|-------|-----------|
+| `tao-onboarding` | Guia novos usuários pelo setup e primeira execução |
+| `tao-plan-writing` | Decomposição expert de tarefas para PLAN.md |
+| `tao-brainstorm` | Brainstorming IBIS com gate de maturidade |
+| `tao-code-review` | Review estruturado em 6 eixos (corretude → padrões) |
+| `tao-security-audit` | Checklist OWASP Top 10 com passos de remediação |
+| `tao-test-strategy` | Pirâmide de testes, edge cases, metas de cobertura |
+| `tao-refactoring` | Refatoração segura com checklist pré-voo |
+| `tao-clean-code` | SOLID, DRY, KISS — conhecimento de fundo pra todo código |
+| `tao-architecture-decision` | Template ADR com matriz de análise de trade-offs |
+| `tao-api-design` | Convenções REST, status codes, paginação, erros |
+| `tao-database-design` | Padrões de schema, segurança de migration, indexação |
+| `tao-git-workflow` | Convenções de commit TAO e estratégia de branches |
+| `tao-debug-investigation` | Protocolo hipótese → isolar → corrigir → verificar |
+| `tao-performance-audit` | Metodologia de profiling e padrões de otimização |
+
+Todas as 14 skills são **somente auto** (`user-invocable: false`). Nenhum comando `/slash` pra decorar.
 
 **Sem conflitos:** Todas as skills usam o prefixo `tao-`. Suas skills de projeto vivem ao lado sem interferência.
 
-**Adicione as suas:** Crie uma pasta em `.github/skills/nome-da-skill/` com um `SKILL.md`. Aparece no catálogo automaticamente. Veja [agentskills.io](https://agentskills.io) para o formato.
+**Adicione as suas:** Crie uma pasta em `.github/skills/nome-da-skill/` com um `SKILL.md`. Veja [agentskills.io](https://agentskills.io) para o formato.
 
 ---
 

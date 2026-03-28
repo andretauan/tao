@@ -65,6 +65,11 @@ After installation, your project contains:
 | `CLAUDE.md` | Rules for all agents — your project context, stack, conventions |
 | `.github/copilot-instructions.md` | Auto-loaded by Copilot every session — points agents to CLAUDE.md |
 | `.github/instructions/tao.instructions.md` | TAO-specific instructions (auto-loaded by Copilot) |
+| `.github/instructions/tao-code.instructions.md` | Auto-injected on all code files — clean code + OWASP |
+| `.github/instructions/tao-test.instructions.md` | Auto-injected on test files — test pyramid + AAA |
+| `.github/instructions/tao-api.instructions.md` | Auto-injected on API/route files — REST conventions |
+| `.github/instructions/tao-db.instructions.md` | Auto-injected on DB/migration files — schema safety |
+| `.github/skills/` (14 folders) | Auto-discovered skills — expert knowledge loaded on demand |
 | `.github/agents/Execute-Tao.agent.md` | @Execute-Tao — execution orchestrator |
 | `.github/agents/Brainstorm-Wu.agent.md` | @Brainstorm-Wu — brainstorm & planning |
 | `.github/agents/Shen.agent.md` | @Shen — complex worker (subagent, not user-invocable) |
@@ -115,6 +120,9 @@ cp ~/TAO/templates/en/CHANGELOG.md ./.github/tao/CHANGELOG.md
 cp ~/TAO/templates/en/RULES.md ./.github/tao/RULES.md
 mkdir -p .github/instructions
 cp ~/TAO/templates/shared/tao.instructions.md ./.github/instructions/tao.instructions.md
+for f in ~/TAO/templates/shared/tao-*.instructions.md; do
+  cp "$f" ".github/instructions/$(basename "$f")"
+done
 cp ~/TAO/templates/en/copilot-instructions.md ./.github/copilot-instructions.md
 ```
 
@@ -125,7 +133,19 @@ mkdir -p .github/agents
 cp ~/TAO/agents/en/*.agent.md .github/agents/
 ```
 
-4. **Copy hooks and scripts**:
+4. **Copy skills**:
+
+```bash
+mkdir -p .github/skills
+cp ~/TAO/skills/en/INDEX.md .github/skills/INDEX.md
+for skill_dir in ~/TAO/skills/en/tao-*/; do
+  skill_name=$(basename "$skill_dir")
+  mkdir -p ".github/skills/$skill_name"
+  cp "$skill_dir/SKILL.md" ".github/skills/$skill_name/SKILL.md"
+done
+```
+
+5. **Copy hooks and scripts**:
 
 ```bash
 mkdir -p .github/hooks .github/tao/scripts
@@ -145,7 +165,7 @@ cp ~/TAO/scripts/doc-validate.sh .github/tao/scripts/doc-validate.sh
 chmod +x .github/tao/scripts/*.sh
 ```
 
-5. **Copy phase templates**:
+6. **Copy phase templates**:
 
 ```bash
 mkdir -p .github/tao/phases/en .github/tao/phases/shared
@@ -153,13 +173,13 @@ cp ~/TAO/phases/en/*.template .github/tao/phases/en/
 cp ~/TAO/phases/shared/*.template .github/tao/phases/shared/
 ```
 
-6. **Install git hooks**:
+7. **Install git hooks**:
 
 ```bash
 bash .github/tao/scripts/install-hooks.sh
 ```
 
-7. **Enable VS Code hooks** — add `"chat.useCustomAgentHooks": true` to settings.
+8. **Enable VS Code hooks** — add `"chat.useCustomAgentHooks": true` to settings.
 
 </details>
 

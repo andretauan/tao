@@ -39,18 +39,27 @@ If the block is missing, the response is invalid. The agent must stop and restar
 
 ---
 
-### 2. Skill Check (R6)
+### 2. Skill Check (R3)
 
 **When:** Before ANY code-modifying task
-**Enforced by:** Agent instructions in CLAUDE.md
+**Enforced by:** Instruction files with `applyTo` patterns + agent instructions in CLAUDE.md
 
-Before executing a task, the agent must:
-1. Read the skill index (if skills are configured)
-2. Identify skills relevant to the current task
-3. Read each relevant skill file
-4. Apply skill guidance during execution
+TAO uses a **two-layer auto-enforcement** system — no user action required:
 
-**Gate:** No skill read → execution prohibited.
+**Layer 1 — Instruction files** (`.github/instructions/tao-*.instructions.md`):
+VS Code injects these rules automatically based on the file being edited:
+
+| File | Activates on | What it enforces |
+|------|-------------|------------------|
+| `tao-code` | All code files (`.py`, `.ts`, `.go`, etc.) | Clean code + OWASP security + 6-axis self-review |
+| `tao-test` | Test files (`*.test.*`, `*.spec.*`, `test_*`) | Test pyramid + edge cases + AAA pattern |
+| `tao-api` | Route/controller files (`routes/`, `api/`, etc.) | REST conventions + status codes + error format |
+| `tao-db` | SQL/model/migration files | Schema rules + index strategy + migration safety |
+
+**Layer 2 — Skills** (`.github/skills/tao-*/SKILL.md`):
+All 14 TAO skills are `user-invocable: false` (auto-only). VS Code auto-discovers them and loads full instructions when context matches. No `/slash` commands exist.
+
+**Gate:** The compliance check block includes `Skills consulted: [list]`. If empty when skills apply, the response is invalid.
 
 ---
 
