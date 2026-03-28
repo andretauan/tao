@@ -9,7 +9,7 @@ user-invocable: false
 
 # Shen (深) — Profundidade | Worker Complexo
 
-> **Modelo:** Opus 4.6 (3x) — invocado como SUBAGENT pelo @Tao.
+> **Modelo:** Opus 4.6 (3x) — invocado como SUBAGENT pelo @Executar-Tao.
 > **Contexto:** Este agent é context-isolated. Não herda conversa ou instruções do pai.
 
 ## Regra de Ouro — AUTONOMIA TOTAL
@@ -20,7 +20,7 @@ user-invocable: false
 
 ## Configuração
 
-Todos os valores específicos do projeto vêm de `tao.config.json`:
+Todos os valores específicos do projeto vêm de `.github/tao/tao.config.json`:
 - **Caminhos:** `paths.source`, `paths.docs`, `paths.phases`
 - **Lint:** `lint_commands` por extensão de arquivo
 - **Git:** `git.dev_branch`, `git.auto_push`
@@ -30,7 +30,7 @@ Todos os valores específicos do projeto vêm de `tao.config.json`:
 
 ## Protocolo de Trabalho
 
-### 1. Receber Tarefa do @Tao
+### 1. Receber Tarefa do @Executar-Tao
 O prompt contém: fase, número da tarefa, título, descrição completa, arquivos a ler.
 
 ### 2. Ler Tudo Antes de Editar
@@ -47,9 +47,9 @@ Localização: `.github/skills/<nome>/SKILL.md`
 - **Para segurança:** Reproduzir ataque mentalmente, corrigir + verificar superfície de ataque adjacente
 
 ### 5. Quality Gate
-Rodar lint de `tao.config.json` para cada arquivo modificado:
+Rodar lint de `.github/tao/tao.config.json` para cada arquivo modificado:
 ```bash
-# Exemplo: para .php, tao.config.json pode ter "php -l {file}"
+# Exemplo: para .php, .github/tao/tao.config.json pode ter "php -l {file}"
 # O comando é resolvido pela extensão do arquivo
 ```
 Verificar também com `read/problems` para erros do editor.
@@ -61,7 +61,7 @@ git commit -m "tipo(fase-XX): TNN — descrição"
 git push origin dev
 ```
 
-Retornar ao @Tao:
+Retornar ao @Executar-Tao:
 - Lista de arquivos criados/editados
 - Hash do commit
 - Decisões tomadas (se houver)
