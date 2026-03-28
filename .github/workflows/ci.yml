@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  validate:
+    name: Validate Scripts & i18n
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bash syntax check (all .sh files)
+        run: |
+          echo "=== Checking bash syntax ==="
+          errors=0
+          while IFS= read -r f; do
+            if ! bash -n "$f" 2>/dev/null; then
+              echo "FAIL: $f"
+              errors=$((errors + 1))
+            fi
+          done < <(find . -name '*.sh' -type f)
+          echo "Checked $(find . -name '*.sh' -type f | wc -l) files, $errors errors"
+          [ "$errors" -eq 0 ] || exit 1
+
+      - name: i18n sync check (EN ↔ PT-BR)
+        run: |
+          echo "=== Checking i18n sync ==="
+          if [ -f scripts/i18n-diff.sh ]; then
+            bash scripts/i18n-diff.sh
+          else
+            echo "i18n-diff.sh not found, skipping"
+          fi
+
+      - name: Template consistency check
+        run: |
+          echo "=== Checking template pairs ==="
+          errors=0
+          for en_file in templates/en/*; do
+            base=$(basename "$en_file")
+            pt_file="templates/pt-br/$base"
+            if [ ! -f "$pt_file" ]; then
+              echo "MISSING PT-BR: $pt_file (EN: $en_file)"
+              errors=$((errors + 1))
+            fi
+          done
+          for pt_file in templates/pt-br/*; do
+            base=$(basename "$pt_file")
+            en_file="templates/en/$base"
+            if [ ! -f "$en_file" ]; then
+              echo "MISSING EN: $en_file (PT-BR: $pt_file)"
+              errors=$((errors + 1))
+            fi
+          done
+          echo "$errors mismatches found"
+          [ "$errors" -eq 0 ] || exit 1
+
+      - name: Validate tao.config.json.example
+        run: |
+          echo "=== Validating JSON ==="
+          python3 -m json.tool tao.config.json.example > /dev/null
+          echo "tao.config.json.example is valid JSON"

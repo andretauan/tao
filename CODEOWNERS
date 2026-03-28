@@ -1,0 +1,18 @@
+# TAO Framework — Code Owners
+# These owners will be requested for review on PRs.
+
+# Global owner
+* @andretauan
+
+# Agents
+agents/ @andretauan
+
+# Core scripts
+tao.sh @andretauan
+install.sh @andretauan
+hooks/ @andretauan
+scripts/ @andretauan
+
+# Templates
+templates/ @andretauan
+phases/ @andretauan
