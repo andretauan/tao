@@ -1,8 +1,10 @@
 # Getting Started with TAO (道)
 
-**Trace · Align · Operate** — an AI-native development framework for GitHub Copilot Agent Mode.
+**Stop prompting. Start operating.**
 
-TAO gives Copilot a disciplined operating system: think before you code, plan before you build, execute with guardrails. This guide takes you from zero to productive — fast.
+TAO is an AI-native development framework for GitHub Copilot Agent Mode. You say "execute" and TAO runs an autonomous loop: picks the task, routes the right model, implements, lints, commits — and moves to the next one. No babysitting.
+
+This guide takes you from zero to productive — fast.
 
 ---
 
@@ -444,7 +446,29 @@ Select **@Execute-Tao** from the agent dropdown and say:
 execute
 ```
 
-Tao runs an autonomous loop: pick a task, implement it, lint, commit, move to the next one. No questions, no pauses — it works until the phase is complete.
+**This is where TAO shines.** Tao enters an autonomous loop — no questions, no pauses — it works until the phase is complete.
+
+### The Execution Loop
+
+Here's what happens **automatically, in sequence, without stopping**:
+
+```
+ ┌─→ 1. CHECK_PAUSE  → Is .tao-pause present? → STOP
+ │   2. READ_STATUS  → Read STATUS.md → find next ⏳ task
+ │   3. ROUTE         Simple task → Sonnet (1x)
+ │                   Complex task → Opus via @Shen (3x)
+ │                   Database → @Di (free)
+ │                   Git ops → @Qi (free)
+ │   4. READ & IMPLEMENT  Read required files → code → test
+ │   5. QUALITY_GATE → Run linter → fix if failed (3 attempts)
+ │   6. COMMIT       → git add (specific files) → commit → push
+ │   7. ADVANCE      → Mark ⏳ → ✅ in STATUS.md
+ └─← 8. LOOP          Back to step 1 — immediately
+```
+
+The loop runs until every task is ✅ — or you hit the kill switch (`.tao-pause`).
+
+**Phase advancement is automatic.** When all tasks in a phase are done, Tao reports completion and can continue to the next phase if one exists.
 
 For a single task instead of the full loop:
 
@@ -457,39 +481,6 @@ Or a specific one:
 ```
 task 03
 ```
-
-<details>
-<summary>🔄 L3: The execution loop</summary>
-
-Here's what @Execute-Tao does on each iteration:
-
-```
-1. CHECK_PAUSE  → Is .tao-pause present? → STOP
-2. READ_STATUS  → Read STATUS.md → parse task table
-3. PLAN_CHECK   → Does PLAN.md exist? Does BRIEF.md exist?
-                  → If neither: STOP ("use @Brainstorm-Wu to brainstorm")
-4. PICK_TASK    → First ⏳ task in recommended order
-                  → If task needs Opus → route to @Shen subagent
-5. NO ⏳ LEFT   → Phase complete → report → advance
-6. READ_TASK    → Read the full task file
-7. READ_FILES   → Read ALL files listed in "Files to Read"
-8. EXECUTE      → Implement exactly what the task specifies
-9. QUALITY_GATE → Run lint command from tao.config.json
-                  → If fail → fix → re-run (max 3 attempts)
-                  → If 3 fails → rollback → log in progress.txt
-10. COMMIT      → git add <specific files> (never git add -A)
-                  → git commit with standardized message
-                  → git push (if auto_push is true)
-11. MARK_DONE   → STATUS.md: ⏳ → ✅
-                  → progress.txt: append entry with timestamp
-12. LOOP        → Back to step 1 (immediately, no asking)
-```
-
-The loop continues until all tasks are ✅ or a pause file is detected.
-
-**Phase advancement is automatic.** When all tasks in a phase are done, Tao reports completion and can continue to the next phase if one exists.
-
-</details>
 
 <details>
 <summary>🤖 L4: Agent routing matrix</summary>

@@ -8,8 +8,11 @@
 
 ## 1. Overview
 
-TAO (道 — Trace · Align · Operate) is an AI agent orchestration system for autonomous software development using GitHub Copilot's Agent Mode. It provides:
+TAO (道) is an AI agent orchestration system for autonomous software development using GitHub Copilot's Agent Mode. Its core innovation is the **autonomous execution loop**: you say "execute" and TAO picks tasks, routes models, implements, lints, commits — and loops to the next one, without stopping.
 
+Key capabilities:
+
+- **Autonomous execution loop** — continuous task processing without human prompting
 - **Three-layer workflow:** Think → Plan → Execute
 - **Intelligent model routing** via VS Code Custom Agents and YAML frontmatter
 - **Deterministic hooks** (0 LLM cost) for quality gates
@@ -18,15 +21,17 @@ TAO (道 — Trace · Align · Operate) is an AI agent orchestration system for 
 
 ### The Problem TAO Solves
 
-Without TAO: operators manually choose models, switch agents, remember to lint, lose context between sessions, and skip planning.
+Without TAO: you babysit the AI — prompting task by task, manually choosing models, remembering to lint, losing context between sessions, skipping planning.
 
-With TAO: the operator says **"execute"** and the system:
+With TAO: the operator says **"execute"** and the system enters an autonomous loop:
 1. Reads the active phase automatically (SessionStart hook)
-2. Selects the correct model per task (routing matrix)
-3. Delegates complex tasks to Opus via subagent
-4. Runs quality gates automatically (PostToolUse hook)
-5. Commits each task individually
-6. Advances to the next phase when complete
+2. Picks the next pending task from STATUS.md
+3. Selects the correct model per task (routing matrix)
+4. Delegates complex tasks to Opus via subagent
+5. Runs quality gates automatically (PostToolUse hook)
+6. Commits each task individually
+7. **Loops back to step 1 — immediately, without pausing**
+8. Advances to the next phase when all tasks are complete
 
 ---
 
@@ -173,13 +178,20 @@ user-invocable: true                     # false = only callable as subagent
 
 #### Model Fallback
 
-Use an array for automatic fallback:
+Agents define fallback chains for rate-limit resilience:
 ```yaml
 model:
   - Claude Sonnet 4.6 (copilot)
   - GPT-4.1 (copilot)
 ```
-If Sonnet hits rate limits, GPT-4.1 is used automatically.
+If the primary model hits rate limits, VS Code automatically uses the next in the list.
+
+| Agent | Primary | Fallback | Rate-limited behavior |
+|-------|---------|----------|----------------------|
+| @Execute-Tao | Sonnet (1x) | GPT-4.1 (free) | Loop continues at zero cost |
+| @Investigate-Shen | Opus (3x) | Sonnet (1x) | Investigation continues at reduced depth |
+| @Brainstorm-Wu | Opus (3x) | *(none)* | Stops — planning requires Opus quality |
+| @Di, @Qi | GPT-4.1 (free) | — | Never rate-limited |
 
 ### 2.4 Subagents
 

@@ -2,7 +2,9 @@
 name: Investigate-Shen
 description: "Investigation — architectural decisions, complex debugging, security audits. Uses Opus (3x). For direct user invocation outside the Execute-Tao loop."
 argument-hint: "Describe the complex problem or architectural decision."
-model: Claude Opus 4.6 (copilot)
+model:
+  - Claude Opus 4.6 (copilot)
+  - Claude Sonnet 4.6 (copilot)
 tools: [vscode/getProjectSetupInfo, vscode/runCommand, execute/runInTerminal, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, web/fetch, web/githubRepo, vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 agents:
   - Di
