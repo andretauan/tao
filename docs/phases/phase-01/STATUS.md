@@ -66,3 +66,46 @@
 | **TOTAL** | **0/16** | **16** | — |
 
 **Executor breakdown:** Architect (Opus): 4 tasks | Sonnet: 12 tasks
+
+---
+
+## 🎯 PRÓXIMA AÇÃO — Como Executar
+
+> **A próxima tarefa é: T02 — install.sh: auto-detect lint stack**
+
+### Passo a passo:
+
+1. Abra o **Copilot Chat** no VS Code
+2. Selecione o agente **@Executar-Tao** (clique no `@` e escolha)
+3. Digite:
+   ```
+   executar T02
+   ```
+4. O agente vai ler a spec em `docs/phases/phase-01/tasks/02-install-autodetect-lint.md` e implementar
+
+### Após T02 concluída, a próxima será:
+```
+executar T03
+```
+
+### Ordem completa de execução:
+```
+@Executar-Tao → executar T02
+@Executar-Tao → executar T03
+@Executar-Tao → executar T04
+@Executar-Tao → executar T01
+@Executar-Tao → executar T05
+@Executar-Tao → executar T06
+@Executar-Tao → executar T07
+@Executar-Tao → executar T08  (⚠️ este usa Opus — Architect)
+@Executar-Tao → executar T09
+@Executar-Tao → executar T10
+@Executar-Tao → executar T11  (⚠️ este usa Opus — Architect)
+@Executar-Tao → executar T12
+@Executar-Tao → executar T13
+@Executar-Tao → executar T14
+@Executar-Tao → executar T15  (⚠️ este usa Opus — Architect)
+@Executar-Tao → executar T16
+```
+
+> Após T16, todos os testes passando → `git push origin dev` → testar → `git push origin main`
