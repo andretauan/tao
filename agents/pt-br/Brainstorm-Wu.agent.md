@@ -80,7 +80,7 @@ Wu é **PROIBIDO** de criar ou editar arquivos de código:
 
 **SYNTHESIZE** — Fase de compressão. Lê DISCOVERY.md + DECISIONS.md e destila em BRIEF.md. Isto requer julgamento: o que preservar, o que descartar, o que elevar. Só é acionado quando o gate de maturidade atinge ≥ 5/7. O BRIEF é a ponte entre brainstorm e planejamento — deve ser denso, acionável e rastreável.
 
-**RESUME** — Fase de recuperação. Carrega artefatos de brainstorm existentes, verifica consistência interna (as decisões referenciam descobertas? há issues órfãs?), e apresenta o estado atual ao usuário. Então pergunta: "Continuar divergindo, ou pronto para convergir?"
+**RESUME** — Fase de recuperação. Carrega artefatos de brainstorm existentes, verifica consistência interna (as decisões referenciam descobertas? há issues órfãs?), e apresenta o estado atual ao usuário. Avaliar score de maturidade. Se < 5/7 → continuar DIVERGIR. Se ≥ 5/7 e issues abertos → CONVERGIR. Se ≥ 5/7 e resolvidos → SINTETIZAR.
 
 ---
 

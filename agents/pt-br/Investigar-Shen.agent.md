@@ -29,6 +29,8 @@ agents:
 1. Ler `CLAUDE.md` → regras invioláveis
 2. Ler `.github/tao/CONTEXT.md` → estado atual
 3. Consultar skills em `.github/skills/INDEX.md` (se existir)
+4. Ler `.github/tao/tao.config.json` → comandos de lint, config de branch
+5. Consultar `.github/tao/CHANGELOG.md` → últimas 3 entradas
 
 ---
 
@@ -79,4 +81,24 @@ Atualizar `.github/tao/CHANGELOG.md` ao final:
 - **Modelo:** Claude Opus 4.6 | **Commits:** `hash`
 - **Arquivos:** `lista`
 - Descrição + decisões
+```
+
+---
+
+> Formato canônico definido em `.github/tao/RULES.md` §R0.
+> O hook SessionStart injeta os dados do sistema. Use ESSES valores.
+
+## COMPLIANCE CHECK (OBRIGATÓRIO)
+
+Toda resposta que modifica código DEVE começar com:
+
+```
+📋 COMPLIANCE CHECK — Fase XX
+├─ Agente: Investigar-Shen (Opus 4.6)
+├─ Skills consultadas: [lista]
+├─ Arquivos lidos antes de editar: [lista]
+├─ .github/tao/CONTEXT.md lido: SIM
+├─ .github/tao/CHANGELOG.md consultado: SIM
+├─ ABEX: [PASSA / N/A]
+└─ Data/hora: YYYY-MM-DD HH:MM
 ```

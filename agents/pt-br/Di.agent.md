@@ -16,6 +16,15 @@ user-invocable: false
 
 ---
 
+## Leitura Obrigatória
+
+1. Ler `CLAUDE.md` → regras e padrões de código do projeto
+2. Ler `.github/tao/RULES.md` → regras invioláveis do TAO
+3. Ler `.github/tao/CONTEXT.md` → fase ativa + decisões travadas
+4. Ler `.github/tao/tao.config.json` → detalhes do banco + config do projeto
+
+---
+
 ## Configuração
 
 Detalhes do banco vêm de `.github/tao/tao.config.json` e documentação do projeto.

@@ -80,7 +80,7 @@ Wu is **PROHIBITED** from creating or editing code files:
 
 **SYNTHESIZE** — Compression phase. Reads DISCOVERY.md + DECISIONS.md and distills them into BRIEF.md. This requires judgment: what to preserve, what to discard, what to elevate. Only triggered when maturity gate reaches ≥ 5/7. The BRIEF is the bridge between brainstorming and planning — it must be dense, actionable, and traceable.
 
-**RESUME** — Recovery phase. Loads existing brainstorm artifacts, verifies internal consistency (do decisions reference discoveries? are there orphaned issues?), and presents the current state to the user. Then asks: "Continue diverging, or ready to converge?"
+**RESUME** — Recovery phase. Loads existing brainstorm artifacts, verifies internal consistency (do decisions reference discoveries? are there orphaned issues?), and presents the current state to the user. Evaluate maturity score. If < 5/7 → continue DIVERGE. If ≥ 5/7 and open issues → CONVERGE. If ≥ 5/7 and resolved → SYNTHESIZE.
 
 ---
 
