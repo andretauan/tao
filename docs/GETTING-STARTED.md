@@ -8,6 +8,36 @@ This guide takes you from zero to productive — fast.
 
 ---
 
+## Quick Start (5 minutes)
+
+### Prerequisites
+- VS Code with GitHub Copilot (Agent Mode enabled)
+- Git repository initialized
+
+### Steps
+
+1. **Install TAO:**
+   ```bash
+   bash ~/TAO/install.sh
+   ```
+
+2. **Open VS Code Agent Mode:** `Ctrl+Shift+I` (or `Cmd+Shift+I` on Mac)
+
+3. **Start your first task:**
+   ```
+   @Execute-Tao execute
+   ```
+   *(PT-BR: `@Executar-Tao executar`)*
+
+4. **The agent will:**
+   - Read your project's STATUS.md
+   - Pick the next task automatically
+   - Execute with full compliance
+
+That's it. For detailed configuration and customization, read on.
+
+---
+
 ## Prerequisites
 
 Before installing TAO, make sure you have:
