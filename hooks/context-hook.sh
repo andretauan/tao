@@ -164,8 +164,25 @@ if [ -n "$ORPHAN_WARNING" ]; then
   CONTEXT="$CONTEXT$ORPHAN_WARNING"
 fi
 
+# ── Read compliance.require_context_read flag ──
+REQUIRE_CTX_READ="true"
+if [ -f "$CONFIG_FILE" ]; then
+  _ctx_flag=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    val = c.get('compliance', {}).get('require_context_read', True)
+    print('true' if val else 'false')
+except:
+    print('true')
+" "$CONFIG_FILE" 2>/dev/null) || _ctx_flag="true"
+  [ -n "$_ctx_flag" ] && REQUIRE_CTX_READ="$_ctx_flag"
+fi
+
 # ── System-provided compliance data block (D12: hybrid compliance) ──
-COMPLIANCE_BLOCK="
+# Injected only when require_context_read is enabled (default: true)
+if [ "$REQUIRE_CTX_READ" = "true" ]; then
+  COMPLIANCE_BLOCK="
 
 ╔══════════════════════════════════════════════════════════╗
 ║  SYSTEM-PROVIDED COMPLIANCE DATA — DO NOT GUESS THESE   ║
@@ -181,7 +198,8 @@ These values are injected by context-hook.sh (deterministic):
 
 Use THESE EXACT values in your compliance check block.
 Agent subjective assessments (ABEX, reading quality) remain your responsibility."
-CONTEXT="$CONTEXT$COMPLIANCE_BLOCK"
+  CONTEXT="$CONTEXT$COMPLIANCE_BLOCK"
+fi
 
 # ── Output JSON (escape via python3 for safety) ──
 SAFE_CTX=$(printf '%s' "$CONTEXT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null)

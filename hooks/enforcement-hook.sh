@@ -28,6 +28,7 @@ touch "$READS_LOG" "$EDITS_LOG" 2>/dev/null || exit 0
 # ── Read compliance config flags ──
 REQUIRE_R5_CHECK="true"
 REQUIRE_R0_CHECK="true"
+REQUIRE_R3_CHECK="true"
 if [ -f "$CONFIG_FILE" ]; then
   _compliance=$(python3 -c "
 import json, sys
@@ -42,6 +43,8 @@ except:
 " "$CONFIG_FILE" 2>/dev/null) || _compliance=""
   if [ -n "$_compliance" ]; then
     REQUIRE_R0_CHECK=$(echo "$_compliance" | sed -n '1p')
+    REQUIRE_R5_CHECK=$(echo "$_compliance" | sed -n '1p')
+    REQUIRE_R3_CHECK=$(echo "$_compliance" | sed -n '2p')
   fi
 fi
 
