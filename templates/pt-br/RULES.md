@@ -58,20 +58,36 @@ Sonnet é **SEGURO** somente quando:
 
 ## REGRAS INVIOLÁVEIS
 
-### R0 — Compliance Check (FORMATO OBRIGATÓRIO)
+### R0 — Compliance Check (SEQUÊNCIA PRESCRITIVA)
 
-> **Toda resposta que modifique código DEVE começar com este bloco. Sem exceção.**
+> Antes de QUALQUER resposta que modifique código, execute estes passos EM ORDEM.
+> O hook SessionStart injeta dados fornecidos pelo sistema. Use esses valores — NÃO suponha.
+
+**SEQUÊNCIA (todo passo é obrigatório):**
+
+1. **VERIFICAR** o contexto do SessionStart para dados fornecidos pelo sistema (timestamp, fase, skills, lint)
+2. **LER** `.github/tao/CONTEXT.md` — verificar fase, status, decisões travadas
+3. **LER** `.github/tao/CHANGELOG.md` — últimas 3 entradas
+4. **LER** `.github/tao/tao.config.json` — comandos de lint, config de branch
+5. **VERIFICAR** `.github/skills/INDEX.md` — identificar skills que correspondem aos tipos de arquivo a editar
+6. **EMITIR** o bloco de compliance com valores REAIS dos passos 1-5:
 
 ```
-📋 COMPLIANCE CHECK
-├─ Skills consultadas: [lista ou "nenhuma aplicável — justificativa: ..."]
-├─ Arquivos lidos antes de editar: [lista]
+📋 COMPLIANCE CHECK — Fase XX
+├─ Agente: [nome] ([modelo])
+├─ Skills consultadas: [lista do passo 5, ou "nenhuma aplicável — nenhum tipo de arquivo correspondente"]
+├─ Arquivos lidos antes de editar: [lista dos passos 2-4]
 ├─ CONTEXT.md lido: SIM
 ├─ CHANGELOG.md consultado: SIM
-└─ ABEX: [PASSA / N/A]
+├─ ABEX: [PASSA após 3 passadas / N/A se sem alteração de código]
+└─ Timestamp: [dos dados fornecidos pelo sistema, NÃO inventado]
 ```
 
-Este bloco DEVE ser a **PRIMEIRA coisa** da resposta. Se o agente esqueceu: PARE, volte ao início, emita o bloco.
+**PROIBIDO:**
+- Emitir o bloco ANTES de concluir os passos 1-5
+- Usar valores placeholder (00:00, "carregando", "pendente")
+- Omitir qualquer campo
+- Inventar timestamps
 
 ### R1 — Verificação de Sintaxe Obrigatória
 
@@ -86,8 +102,13 @@ Formato: "Audite [lista de arquivos]. Verifique [pontos específicos]." Ver §HA
 
 ### R3 — Skill Check Obrigatório
 
-Antes de QUALQUER tarefa que modifique código: verificar `.github/skills/INDEX.md` (se existir) e ler as skills aplicáveis.
-Sem leitura de skill = execução proibida.
+Antes de QUALQUER tarefa que modifique código:
+1. Identificar as extensões dos arquivos a editar.
+2. Para cada extensão, verificar `.github/skills/INDEX.md` (se existir) — comparar contra os padrões `applyTo` de cada skill.
+   **Algoritmo:** `.php` → verificar skills com `**/*.php` ou `*.php` em applyTo; `.ts` → `**/*.ts`; etc.
+3. Ler o SKILL.md de cada skill correspondente antes de editar.
+
+Sem leitura de skill para extensão correspondente = execução proibida.
 
 ### R4 — Timestamp Obrigatório
 
@@ -114,13 +135,14 @@ Se um arquivo foi tocado → commit. Se não deve ser commitado → justificar e
 
 ## PROTOCOLO ABEX (Quality Gate)
 
-Ao concluir qualquer implementação que modifique código, executar **3 passadas obrigatórias:**
+**Definição:** ABEX = 3 passadas aplicadas após qualquer implementação que modifique código.
+Automatizado via scan regex do `abex-gate.sh`. Resultado: **PASSA** (as 3 limpas) ou **FALHA** (qualquer finding).
 
-| Passada | Mentalidade | O que verificar |
-|---------|-------------|-----------------|
-| **1 — Segurança** | "Sou um atacante" | SQL injection, XSS, CSRF, auth bypass, catch vazio, input não validado, command injection, path traversal |
-| **2 — Usuário** | "Sou um visitante real" | Fluxo de UX, mensagens de erro, acessibilidade, responsividade mobile, edge cases, estados vazios |
-| **3 — Performance** | "Sou auditor de Core Web Vitals" | Queries N+1, tamanho do DOM, CLS, LCP, re-renders desnecessários, loops sem limite, paginação ausente |
+| Passada | Foco | O que verificar |
+|---------|------|-----------------|
+| **1 — Segurança** | OWASP Top 10 | SQL injection, XSS, CSRF, auth bypass, catch vazio, input não validado, command injection, path traversal |
+| **2 — Segurança do Usuário** | Saída + fronteiras de entrada | Escaping de output, validação de input, mensagens de erro, estados vazios, edge cases |
+| **3 — Performance** | Eficiência em runtime | Sem queries N+1 óbvias, sem ops bloqueantes, sem loops sem limite, paginação ausente |
 
 **Sem ABEX = tarefa não concluída.** Reportar findings por severidade: CRITICAL → HIGH → MEDIUM → INFO.
 

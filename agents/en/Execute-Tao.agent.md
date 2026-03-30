@@ -435,6 +435,9 @@ the next session. If you forget, the next session will see an R2 orphan warning.
 
 ---
 
+> Canonical format defined in `.github/tao/RULES.md` §R0.
+> SessionStart hook provides system data. Use THOSE values.
+
 ## COMPLIANCE CHECK (MANDATORY)
 
 Every response that modifies code MUST begin with:

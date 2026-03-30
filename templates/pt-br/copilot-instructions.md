@@ -86,13 +86,4 @@ Se `.tao-pause` existir na raiz → **STOP IMEDIATO**
 
 ## COMPLIANCE CHECK
 
-Toda resposta que modifique código DEVE começar com:
-
-```
-📋 COMPLIANCE CHECK
-├─ Skills consultadas: [lista ou "nenhuma aplicável"]
-├─ Arquivos lidos antes de editar: [lista]
-├─ .github/tao/CONTEXT.md lido: SIM
-├─ .github/tao/CHANGELOG.md consultado: SIM
-└─ ABEX: [PASSA / N/A]
-```
+Formato e sequência de execução do compliance check: ver `.github/tao/RULES.md` §R0.

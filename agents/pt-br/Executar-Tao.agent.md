@@ -434,6 +434,9 @@ próxima sessão. Se esquecer, a próxima sessão verá um aviso de R2 órfão.
 
 ---
 
+> Formato canônico definido em `.github/tao/RULES.md` §R0.
+> O hook SessionStart injeta os dados do sistema. Use ESSES valores.
+
 ## COMPLIANCE CHECK (OBRIGATÓRIO)
 
 Toda resposta que modifica código DEVE começar com:

@@ -86,13 +86,4 @@ If `.tao-pause` exists at project root → **IMMEDIATE STOP**
 
 ## COMPLIANCE CHECK
 
-Every code-modifying response MUST start with:
-
-```
-📋 COMPLIANCE CHECK
-├─ Skills consulted: [list or "none applicable"]
-├─ Files read before editing: [list]
-├─ .github/tao/CONTEXT.md read: YES
-├─ .github/tao/CHANGELOG.md consulted: YES
-└─ ABEX: [PASS / N/A]
-```
+Compliance check format and execution sequence: see `.github/tao/RULES.md` §R0.

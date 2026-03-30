@@ -58,20 +58,36 @@ Sonnet is **SAFE** only when:
 
 ## INVIOLABLE RULES
 
-### R0 — Compliance Check (MANDATORY FORMAT)
+### R0 — Compliance Check (PRESCRIPTIVE SEQUENCE)
 
-> **Every response that modifies code MUST begin with this block. No exceptions.**
+> Before ANY code-modifying response, execute these steps IN ORDER.
+> The SessionStart hook injects system-provided data. Use those values — DO NOT guess.
+
+**SEQUENCE (every step mandatory):**
+
+1. **CHECK** SessionStart context for system-provided data (timestamp, phase, skills, lint)
+2. **READ** `.github/tao/CONTEXT.md` — verify phase, status, locked decisions
+3. **READ** `.github/tao/CHANGELOG.md` — last 3 entries
+4. **READ** `.github/tao/tao.config.json` — lint commands, branch config
+5. **CHECK** `.github/skills/INDEX.md` — identify skills matching the file types you will edit
+6. **EMIT** compliance block with REAL values from steps 1-5:
 
 ```
-📋 COMPLIANCE CHECK
-├─ Skills consulted: [list or "none applicable — justification: ..."]
-├─ Files read before editing: [list]
+📋 COMPLIANCE CHECK — Phase XX
+├─ Agent: [name] ([model])
+├─ Skills consulted: [list from step 5, or "none applicable — no matching file types"]
+├─ Files read before editing: [list from steps 2-4]
 ├─ CONTEXT.md read: YES
 ├─ CHANGELOG.md consulted: YES
-└─ ABEX: [PASS / N/A]
+├─ ABEX: [PASS after 3 passes / N/A if no code changes]
+└─ Timestamp: [from system-provided data, NOT invented]
 ```
 
-This block MUST be the **FIRST thing** in the response. If the agent forgot: STOP, go back, emit the block.
+**PROHIBITED:**
+- Emitting the block BEFORE completing steps 1-5
+- Using placeholder values (00:00, "loading", "pending")
+- Omitting any field
+- Guessing timestamps
 
 ### R1 — Syntax Check Mandatory
 
@@ -86,8 +102,13 @@ Format: "Audit [file list]. Verify [specific points]." See §HANDOFF below.
 
 ### R3 — Skill Check Mandatory
 
-Before ANY task that modifies code: check `.github/skills/INDEX.md` (if it exists) and read applicable skill(s).
-No skill read = execution prohibited.
+Before ANY task that modifies code:
+1. Identify file extensions of files you will edit.
+2. For each extension, check `.github/skills/INDEX.md` (if it exists) — match against each skill's `applyTo` patterns.
+   **Algorithm:** `.php` → check skills with `**/*.php` or `*.php` in applyTo; `.ts` → `**/*.ts`; etc.
+3. Read the SKILL.md of each matching skill before editing.
+
+No skill read for a matching extension = execution prohibited.
 
 ### R4 — Timestamp Mandatory
 
@@ -114,13 +135,14 @@ If a file was touched → commit. If it should not be committed → justify in C
 
 ## ABEX PROTOCOL (Quality Gate)
 
-After completing any implementation that modifies code, run **3 mandatory passes:**
+**Definition:** ABEX = 3 passes applied after any code-modifying implementation.
+Automated via `abex-gate.sh` regex scan. Result: **PASS** (all 3 clean) or **FAIL** (any finding).
 
-| Pass | Mindset | What to check |
-|------|---------|---------------|
-| **1 — Security** | "I am an attacker" | SQL injection, XSS, CSRF, auth bypass, empty catch blocks, unvalidated input, command injection, path traversal |
-| **2 — User** | "I am a real user" | UX flow, error messages, accessibility, mobile responsiveness, edge cases, empty states |
-| **3 — Performance** | "I am a Core Web Vitals auditor" | N+1 queries, DOM size, CLS, LCP, unnecessary re-renders, unbounded loops, missing pagination |
+| Pass | Focus | What to check |
+|------|-------|---------------|
+| **1 — Security** | OWASP Top 10 | SQL injection, XSS, CSRF, auth bypass, empty catch blocks, unvalidated input, command injection, path traversal |
+| **2 — User Safety** | Output + input boundaries | Output escaping, input validation, error messages, empty states, edge cases |
+| **3 — Performance** | Runtime efficiency | No obvious N+1 queries, no blocking ops, no unbounded loops, missing pagination |
 
 **No ABEX = task not completed.** Report findings by severity: CRITICAL → HIGH → MEDIUM → INFO.
 
