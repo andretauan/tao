@@ -4,6 +4,8 @@
 # ═══════════════════════════════════════════════════════════════
 # Modular pipeline: reads tao.config.json for lint commands,
 # runs syntax check on staged files by extension.
+# Enforces: LOCK 2 (branch), LOCK 3 (destructive), LOCK 5 (pause),
+#           R4 (timestamp), R6 (context freshness), ABEX (security).
 #
 # Called by .git/hooks/pre-commit (installed by install-hooks.sh).
 # Exit 0 = allow commit, Exit 1 = block commit.
@@ -11,6 +13,7 @@
 set -e
 
 CONFIG=".github/tao/tao.config.json"
+WORKSPACE_DIR="${TAO_WORKSPACE_DIR:-$(pwd)}"
 ERRORS=0
 
 # ─── Colors ───────────────────────────────────────────────────
@@ -18,6 +21,13 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
+
+# ─── LOCK 5: .tao-pause check ────────────────────────────────
+if [ -f "$WORKSPACE_DIR/.tao-pause" ] || [ -f ".tao-pause" ]; then
+  echo -e "${RED}✗ BLOQUEADO / BLOCKED: .tao-pause existe — todas as operações pausadas (LOCK 5).${NC}"
+  echo -e "${YELLOW}  Remova o arquivo .tao-pause para retomar. / Remove .tao-pause to resume.${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
 
 # ─── Get staged files ────────────────────────────────────────
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
@@ -100,6 +110,69 @@ if [ -f "$CONTEXT_FILE" ]; then
       ERRORS=$((ERRORS + 1))
     fi
   fi
+fi
+
+# ─── LOCK 3: Destructive pattern scan ────────────────────────
+DESTRUCTIVE=$(git diff --cached -U0 2>/dev/null | grep -E '^\+.*(DROP\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\s+TABLE|DELETE\s+FROM\s+\S+\s*;|rm\s+-rf\s+/)' | grep -v '^+++' | head -5 || true)
+if [ -n "$DESTRUCTIVE" ]; then
+  echo -e "${RED}✗ BLOQUEADO / BLOCKED: Padrão destrutivo no código (LOCK 3):${NC}"
+  echo "$DESTRUCTIVE" | head -3
+  echo -e "${YELLOW}  Remova comandos destrutivos antes de commitar.${NC}"
+  ERRORS=$((ERRORS + 1))
+fi
+
+# ─── R4: Timestamp validation for CHANGELOG.md ───────────────
+if echo "$STAGED_FILES" | grep -q "CHANGELOG.md"; then
+  CHANGELOG_FILE=$(echo "$STAGED_FILES" | grep "CHANGELOG.md" | head -1)
+  if [ -f "$CHANGELOG_FILE" ]; then
+    LATEST_DATE=$(grep -oE '\[20[0-9]{2}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}\]' "$CHANGELOG_FILE" 2>/dev/null | head -1 || true)
+    if [ -z "$LATEST_DATE" ]; then
+      echo -e "${YELLOW}⚠  CHANGELOG.md staged sem timestamp [YYYY-MM-DD HH:MM] (R4)${NC}"
+      echo -e "${YELLOW}   / CHANGELOG.md staged without [YYYY-MM-DD HH:MM] timestamp${NC}"
+      ERRORS=$((ERRORS + 1))
+    fi
+  fi
+fi
+
+# ─── ABEX security scan (L0 enforcement) ─────────────────────
+ABEX_ENABLED="true"
+if [ -f "$CONFIG" ]; then
+  ABEX_ENABLED=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    val = c.get('compliance', {}).get('abex_enabled', True)
+    print('true' if val else 'false')
+except:
+    print('true')
+" "$CONFIG" 2>/dev/null) || ABEX_ENABLED="true"
+fi
+
+# Locate abex-gate.sh relative to this script or installed location
+ABEX_SCRIPT=""
+for candidate in \
+  "$WORKSPACE_DIR/.github/tao/scripts/abex-gate.sh" \
+  "$(dirname "$0")/../../scripts/abex-gate.sh" \
+  ".github/tao/scripts/abex-gate.sh"; do
+  if [ -x "$candidate" ]; then
+    ABEX_SCRIPT="$candidate"
+    break
+  fi
+done
+
+if [ "$ABEX_ENABLED" = "true" ] && [ -n "$ABEX_SCRIPT" ]; then
+  while IFS= read -r staged_file; do
+    [ ! -f "$staged_file" ] && continue
+    case "$staged_file" in
+      *.py|*.js|*.ts|*.jsx|*.tsx|*.php|*.rb|*.go|*.rs|*.java|*.c|*.cpp|*.cs)
+        if ! bash "$ABEX_SCRIPT" "$staged_file" > /dev/null 2>&1; then
+          echo -e "${RED}✗ ABEX: Problema de segurança / Security issue em: ${staged_file}${NC}"
+          bash "$ABEX_SCRIPT" "$staged_file" 2>&1 | grep -E '^\[BLOCK\]' | head -3
+          ERRORS=$((ERRORS + 1))
+        fi
+        ;;
+    esac
+  done <<< "$STAGED_FILES"
 fi
 
 # ─── Result ───────────────────────────────────────────────────
