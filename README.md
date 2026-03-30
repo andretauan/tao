@@ -58,9 +58,9 @@ No more prompt-by-prompt babysitting. One command runs the entire phase.
 
 ### 🔒 Bulletproof Quality
 
-Every commit passes through pre-commit linting, compliance checks, and a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). **Nothing ships without being thoroughly analyzed.**
+Every commit passes through pre-commit linting, compliance checks, and a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). Enforcement is layered: L0 git hooks block violations at commit time, L1 agent hooks provide real-time feedback during sessions, and L2 instruction guidelines cover subjective quality criteria. **~98% enforcement coverage through deterministic automation** — the remaining ~2% requires agent judgment.
 
-The guardrails are code-enforced — bash scripts that block bad commits. Not honor-system. Not "please remember to lint." Code that doesn't pass, doesn't ship. Period.
+The guardrails are code-enforced — bash scripts that block bad commits. Not honor-system. Not "please remember to lint." Code that doesn’t pass the automated gates, doesn’t ship.
 
 ### 💰 60% Cost Reduction
 

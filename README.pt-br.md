@@ -58,9 +58,9 @@ Chega de ficar babysitting prompt por prompt. Um comando roda a fase inteira.
 
 ### 🔒 Qualidade Blindada
 
-Cada commit passa por lint no pre-commit, checks de compliance, e uma auditoria forense em 3 passes (integridade estrutural, consistência cross-file, completude de documentação). **Nada vai pro repo sem ser severamente analisado.**
+Cada commit passa por lint no pre-commit, checks de compliance, e uma auditoria forense em 3 passes (integridade estrutural, consistência cross-file, completude de documentação). A aplicação é em camadas: L0 git hooks bloqueiam violações no commit, L1 agent hooks fornecem feedback em tempo real durante sessões, e L2 guidelines de instrução cobrem critérios qualitativos subjetivos. **~98% de cobertura via automação determinística** — os ~2% restantes requerem julgamento do agente.
 
-Os guardrails são enforced por código — scripts bash que bloqueiam commits ruins. Não é sistema de honra. Não é "lembra de fazer lint". Código que não passa, não entra. Ponto.
+Os guardrails são enforced por código — scripts bash que bloqueiam commits ruins. Não é sistema de honra. Não é "lembra de fazer lint". Código que não passa pelos gates automáticos, não entra.
 
 ### 💰 60% de Redução de Custo
 
@@ -458,7 +458,29 @@ Não é como _usar_ o TAO. É como _pensar_ TAO.
 
 ---
 
-## �🤝 Contribuindo
+## 🛠️ Troubleshooting
+
+### Hooks não disparam
+- Verifique que `.vscode/settings.json` tem `"chat.useCustomAgentHooks": true`
+- Verifique se a versão do VS Code suporta hooks do Agent Mode
+
+### Compliance check ausente
+- Garanta que `tao.instructions.md` está carregado (verifique `.github/instructions/`)
+- Verifique que o agent mode está ativo (não o chat regular do Copilot)
+
+### Erros de lint no commit
+- Verifique que `lint_commands` em `tao.config.json` aponta para ferramentas instaladas
+- Execute lint manualmente: `bash .github/tao/scripts/install-hooks.sh`
+
+### Agente ignora regras
+- Os hooks pre-commit capturam violações no momento do commit
+- Se o agente pular o compliance check, o commit é rejeitado
+- Problemas persistentes: abra uma [issue](https://github.com/andretauan/TAO/issues)
+
+---
+
+## 🤝 Contribuindo
+
 
 Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes.
 
