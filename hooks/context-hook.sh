@@ -118,8 +118,40 @@ if [ -f "$PROGRESS_FILE" ]; then
   LAST_ENTRIES=$(grep '^\[' "$PROGRESS_FILE" 2>/dev/null | tail -3 | tr '\n' ' | ' || echo "")
 fi
 
+# ── Real timestamp (R4) ──
+REAL_TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
+
+# ── Skills list (R3) ──
+SKILLS_LIST="none configured"
+INDEX_FILE="$WORKSPACE_DIR/.github/skills/INDEX.md"
+if [ -f "$INDEX_FILE" ]; then
+  RAW_SKILLS=$(grep -oE 'tao-[a-z-]+' "$INDEX_FILE" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || echo "")
+  [ -n "$RAW_SKILLS" ] && SKILLS_LIST="$RAW_SKILLS"
+fi
+
+# ── Lint status ──
+LINT_STATUS="NONE — not configured"
+if [ -f "$CONFIG_FILE" ]; then
+  LINT_EXTS=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    exts = list(c.get('lint_commands', {}).keys())
+    print(', '.join(exts) if exts else 'NONE')
+except:
+    print('unknown')
+" "$CONFIG_FILE" 2>/dev/null) || LINT_EXTS="unknown"
+  [ -n "$LINT_EXTS" ] && LINT_STATUS="$LINT_EXTS"
+fi
+
+# ── Hooks active (hooks.json present?) ──
+HOOKS_STATUS="INACTIVE — hooks.json missing"
+if [ -f "$WORKSPACE_DIR/.github/hooks/hooks.json" ]; then
+  HOOKS_STATUS="active"
+fi
+
 # ── Build context string ──
-CONTEXT="${PROJECT_NAME} Context | Phase: ${PHASE_PADDED} | Branch: ${BRANCH} | Tasks: ${DONE} done, ${PENDING} pending | Paused: ${PAUSED}"
+CONTEXT="${PROJECT_NAME} Context | Phase: ${PHASE_PADDED} | Branch: ${BRANCH} | Tasks: ${DONE} done, ${PENDING} pending | Paused: ${PAUSED} | Timestamp: ${REAL_TIMESTAMP}"
 if [ -n "$LAST_ENTRIES" ]; then
   CONTEXT="$CONTEXT | Recent: $LAST_ENTRIES"
 fi
@@ -131,6 +163,25 @@ fi
 if [ -n "$ORPHAN_WARNING" ]; then
   CONTEXT="$CONTEXT$ORPHAN_WARNING"
 fi
+
+# ── System-provided compliance data block (D12: hybrid compliance) ──
+COMPLIANCE_BLOCK="
+
+╔══════════════════════════════════════════════════════════╗
+║  SYSTEM-PROVIDED COMPLIANCE DATA — DO NOT GUESS THESE   ║
+╚══════════════════════════════════════════════════════════╝
+These values are injected by context-hook.sh (deterministic):
+  Timestamp:  ${REAL_TIMESTAMP}
+  Phase:      ${PHASE_PADDED}
+  Branch:     ${BRANCH}
+  Skills:     ${SKILLS_LIST}
+  Lint:       ${LINT_STATUS}
+  Hooks:      ${HOOKS_STATUS}
+  Paused:     ${PAUSED}
+
+Use THESE EXACT values in your compliance check block.
+Agent subjective assessments (ABEX, reading quality) remain your responsibility."
+CONTEXT="$CONTEXT$COMPLIANCE_BLOCK"
 
 # ── Output JSON (escape via python3 for safety) ──
 SAFE_CTX=$(printf '%s' "$CONTEXT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null)
