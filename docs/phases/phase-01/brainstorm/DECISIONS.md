@@ -19,6 +19,8 @@
 | D8 | How to handle Wu rate-limit | Clear error message, no model fallback | Decided |
 | D9 | How to fix economic claims | Qualify 60% to execution-only, document full cycle | Decided |
 | D10 | How to scope this work | TAO repo only, test in tao-test, all dev branch | Decided |
+| D11 | How to enforce rules beyond text | Layered defense: L0 (pre-commit) + L1 (hooks) + L2 (text) | Decided |
+| D12 | How to handle compliance data | Hybrid: hooks inject objective data, agent reports subjective | Decided |
 
 ---
 
@@ -228,3 +230,45 @@
 **Decision:** P1 — TAO repo only, reinstall to tao-test for testing
 **Rationale:** TAO is the single source. Changes are made there. Testing is done by running install.sh on tao-test (or fresh dir).
 **Invalidaria se:** TAO gains a development mode where changes in TAO are live-linked to projects.
+
+---
+
+### Issue D11 — How to enforce rules beyond text instructions
+
+**Positions:**
+1. **Better text only** — rewrite all agent instructions to be clearer, add more emphasis, add "INVIOLÁVEL" markers
+2. **Full code enforcement** — move ALL rules into bash scripts that block/reject, eliminate text rules entirely
+3. **Layered defense (L0+L1+L2)** — pre-commit hooks (100% deterministic) + PostToolUse/SessionStart hooks (~95%) + improved text (~80%)
+
+**Arguments:**
+- For P1: Lowest effort. No new scripts needed. Maintains the current architecture.
+- Against P1: Scientific audit proved text instructions fail ~30% of the time. More emphasis doesn't change the fundamental problem — LLMs can ignore any text, no matter how strongly worded.
+- For P2: Maximum enforcement. If everything is code, nothing is optional.
+- Against P2: Some rules are inherently subjective (brainstorm quality, IBIS depth, ABEX thoroughness). You can't write a bash script to verify "was this brainstorm deep enough?" Also, massive scope for v1.
+- For P3: Moves enforceable rules to code (L0/L1) while keeping text for subjective rules. Each layer compensates for the others' gaps.
+- Against P3: More complex architecture. Three layers to maintain. Risk of desync between what code enforces and what text says.
+
+**Decision:** P3 — Layered defense (L0+L1+L2)
+**Rationale:** The audit revealed 40 gaps. Of these, ~60% are deterministic (can be enforced by code), ~25% are semi-deterministic (hooks can warn/inject), and ~15% are inherently subjective. A single enforcement strategy can't cover all three. The layered approach achieves ~98% coverage: L0 blocks at commit (no choice), L1 warns in real-time (hard to ignore), L2 guides subjective judgment (best available). The ~2% remaining gap covers irreducibly subjective criteria like "was the brainstorm thorough?"
+**Invalidaria se:** VS Code Copilot gains a native "rule enforcement" API that can programmatically block agent actions — then L1 text-based warnings could become L1 code-based blocks, potentially collapsing L1 into L0.
+
+---
+
+### Issue D12 — How to handle compliance check data (template vs pre-computed)
+
+**Positions:**
+1. **Pre-computed by hooks** — context-hook.sh generates the entire compliance check block, agent just pastes it
+2. **Agent self-reports everything** — current approach, agent fills in all fields
+3. **Hybrid** — hooks inject objective data (timestamp, phase, skills, lint status), agent reports subjective assessments (ABEX, reading quality)
+
+**Arguments:**
+- For P1: Maximum objectivity. Agent can't lie about what hooks detected.
+- Against P1: Hooks can't assess subjective criteria. "Were skills read carefully?" isn't detectable by bash. Also, compliance check timing matters — some data only exists AFTER the agent starts working, not at SessionStart.
+- For P2: Agent has full context — it knows what it read, what it checked.
+- Against P2: Proven failure mode. Scientific audit showed agents claiming "CONTEXT.md lido: SIM" without reading it. Self-reporting is unreliable for objective facts.
+- For P3: Best of both. Objective facts are injected by code (can't be fabricated). Subjective assessments remain agent-reported with clear formatting (easy to audit).
+- Against P3: Requires coordination between hook output format and agent prompt expectations. If the hook changes format, the agent's compliance template may mismatch.
+
+**Decision:** P3 — Hybrid compliance
+**Rationale:** The context-hook.sh already injects a dashboard at SessionStart. Expanding this to include pre-computed compliance data (timestamp, phase number, available skills, lint tool status) eliminates the most common fabrication points. The agent then adds its subjective assessments (ABEX result, quality judgment) which are auditable but not pre-computable. Mismatches between hook data and agent claims become immediately visible.
+**Invalidaria se:** A mechanism to programmatically verify ALL agent claims emerges (e.g., tool call logging that proves which files were read) — then P1 becomes feasible.

@@ -159,3 +159,101 @@ What happens when Opus is rate-limited and user tries to brainstorm.
 
 ### Decision: Clear error message (safer than fallback)
 Adding a Sonnet fallback to Wu changes the fundamental quality guarantee. Better to show a clear, helpful message.
+
+---
+
+## Topic 8: Enforcement Architecture — The 40-Gap Audit
+
+> Added: 2025-07-15 — @Brainstorm-Wu (Opus)
+> Source: Rigorous re-audit of ALL TAO source files after discovering text rules fail ~30% of the time.
+
+### What was explored
+After scientific audit revealed 16 systematic failures (F01-F16), user asked: "como garantir, 100%, de maneira FORÇADA e inflexível?" This led to a complete re-audit of all hooks, scripts, agents, templates, and install flow — specifically to identify what CAN be code-enforced vs what MUST remain text.
+
+### Chain of reasoning
+
+**Premise:** LLMs are probabilistic. Text rules → ~70% compliance. More emphasis? Still ~70%. The ONLY way to increase compliance is to move enforcement from text (L2) to code (L0/L1).
+
+**Key insight:** Pre-commit hooks are the ultimate enforcement point because:
+1. They run DETERMINISTICALLY (bash, not LLM)
+2. Commit FAILS if hook fails — model HAS to fix
+3. Model can't bypass them (no `--no-verify` allowed by LOCK 6)
+
+**Architecture designed:**
+- **L0 (pre-commit/commit-msg/pre-push):** 100% enforcement. If code says NO, commit/push fails. Period.
+- **L1 (PostToolUse/SessionStart hooks):** ~95% enforcement. Fires after every tool call. Can warn strongly, inject context. Model SEES the warning. Can't block but creates friction.
+- **L2 (improved text):** ~70-80%. Unified, non-contradictory, prescriptive sequence. Better than before but still probabilistic.
+
+### Findings — 40 Gaps Identified
+
+**Category: L0 — Pre-commit gaps (G01-G08)**
+| Gap | What's missing | Impact |
+|-----|----------------|--------|
+| G01 | No destructive command scan (rm -rf, DROP TABLE, etc.) | LOCK 3 exists only in text |
+| G02 | No `.tao-pause` check | LOCK 5 exists only in text |
+| G03 | ABEX is prompt-only, no code check at commit time | Security claims unenforceable |
+| G04 | No commit message format validation | LOCK 6 format rule is text-only |
+| G05 | No pre-push hook exists at all | LOCK 2 "never push main" and "never force push" are text-only |
+| G06 | No timestamp validation for R4 | CONTEXT.md could have stale timestamps |
+| G07 | install-hooks.sh doesn't install commit-msg or pre-push | Only pre-commit + post-commit installed |
+| G08 | `abex-gate.sh` doesn't exist yet | D5 decided to create it but it was never implemented |
+
+**Category: L1 — PostToolUse/SessionStart gaps (G09-G18)**
+| Gap | What's missing | Impact |
+|-----|----------------|--------|
+| G09 | context-hook.sh injects no real timestamp | Dashboard has no R4 data |
+| G10 | context-hook.sh doesn't inject available skills | R3 skill check is impossible without data |
+| G11 | context-hook.sh doesn't inject compliance pre-computed values | Agent fabricates objective facts |
+| G12 | enforcement-hook.sh R5 is warning-only | Agent can edit unread files and just see a warning |
+| G13 | enforcement-hook.sh doesn't read `compliance.*` config flags | tao.config.json compliance section is decorative |
+| G14 | No terminal command interception in enforcement-hook | rm -rf in terminal isn't caught by PostToolUse |
+| G15 | No ABEX PostToolUse hook exists | Security checks only happen if agent self-reports |
+| G16 | lint-hook.sh doesn't verify tool exists | Missing lint tool → silent pass |
+| G17 | No onboarding detection in hooks | First run with no config → confusing error |
+| G18 | context-hook.sh doesn't inject lint status | User has no visibility into lint health |
+
+**Category: L2 — Text instruction gaps (G19-G28)**
+| Gap | What's missing | Impact |
+|-----|----------------|--------|
+| G19 | Compliance check format differs across 12 agent/instruction files | Agent picks random format, some fields wrong |
+| G20 | RULES.md says "sempre push" but config says auto_push:false | Contradiction → agent picks one randomly |
+| G21 | RULES.md doesn't mention novo_projeto exception | Agent stuck on "never ask" when onboarding needed |
+| G22 | ABEX description differs between RULES.md and Executar-Tao agents | Agent does 1-pass or 3-pass randomly |
+| G23 | CONTEXT.md template has broken placeholders | context-hook fails to parse phase number |
+| G24 | INDEX.md descriptions are truncated | Agent can't match skills correctly |
+| G25 | Agent reading lists differ across 12 files | Some agents miss RULES.md, some miss CHANGELOG |
+| G26 | R3 skill check has no matching algorithm | "Check INDEX.md" but no HOW to match skills |
+| G27 | Compliance check has no prescriptive SEQUENCE | Agent may report "SIM" without actually doing step |
+| G28 | Wu agent has no rate-limit handling | Hits Opus limits silently, may degrade to Sonnet |
+
+**Category: Install gaps (G29-G36)**
+| Gap | What's missing | Impact |
+|-----|----------------|--------|
+| G29 | lint-hook.sh doesn't verify tool exists | Configured tool missing → silent pass |
+| G30 | Q5 UX confusing (option number vs command name) | User selects "1" but sees "phpstan analyse" written |
+| G31 | No phase-01 creation during install | First run has nothing to execute |
+| G32 | No .vscode/settings.json created | Hooks silently don't fire |
+| G33 | lint_commands may be empty without warning | All quality gates disabled |
+| G34 | No .gitignore for TAO artifacts | .tao-pause, *.local files committed |
+| G35 | No actionable output after install | User doesn't know what to do next |
+| G36 | No onboarding flow in agents | Agent says "executar" but has no config |
+
+**Category: Documentation gaps (G37-G40)**
+| Gap | What's missing | Impact |
+|-----|----------------|--------|
+| G37 | README overpromises ("100% compliance") | Expectations don't match reality |
+| G38 | No troubleshooting section | Vibe coder stuck on common issues |
+| G39 | GETTING-STARTED.md has no quick path | Too much detail before first action |
+| G40 | ECONOMICS.md lacks full-cycle costs | Only per-query costs, misleading |
+
+### Dead ends explored
+- **Full AST enforcement:** Considered running proper static analysis (ESLint security plugin, Bandit, phpstan --level=max) inside pre-commit. Rejected: too project-specific, TAO can't know which tools/configs to use. The lightweight regex approach (abex-gate.sh) catches TOP 5 patterns without project-specific setup.
+- **Agent action logging:** Considered creating a PostToolUse hook that logs every tool call to a file for forensic analysis. Deferred: useful but not blocking — enforcement is more valuable than auditability for v1.
+- **100% enforcement target:** Mathematically impossible with LLMs in the loop. ~2% of rules are irreducibly subjective (brainstorm depth, IBIS quality, documentation thoroughness). These can be mitigated by model selection (Opus for judgment tasks) but never eliminated.
+
+### References
+- All hook files: `hooks/pre-commit.sh`, `hooks/enforcement-hook.sh`, `hooks/context-hook.sh`, `hooks/lint-hook.sh`, `hooks/install-hooks.sh`
+- All scripts: `scripts/validate-*.sh`, `scripts/forensic-audit.sh`, `scripts/faudit.sh`, `scripts/doc-validate.sh`
+- All agents: `agents/pt-br/*.agent.md`, `agents/en/*.agent.md`
+- Config: `tao.config.json.example`
+- Install: `install.sh`
