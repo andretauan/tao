@@ -155,13 +155,90 @@ read -r -p "    Dev branch name [dev]: " INPUT_BRANCH
 DEV_BRANCH="${INPUT_BRANCH:-dev}"
 echo -e "    → ${GREEN}$DEV_BRANCH${NC}"
 
-# Q5: Lint stack
+# Q5: Lint stack — auto-detect from project files
 echo ""
-echo -e "    ${BOLD}Primary stack for lint${NC} — file extension to enable in pre-commit hook"
-echo -e "    Options: ${GREEN}.php${NC} | ${GREEN}.py${NC} | ${GREEN}.ts${NC} | ${GREEN}.js${NC} | ${GREEN}.rb${NC} | ${GREEN}.go${NC} | ${GREEN}.rs${NC} | ${GREEN}none${NC}"
-read -r -p "    Primary stack [none]: " INPUT_LINT
-LINT_STACK="${INPUT_LINT:-none}"
-echo -e "    → ${GREEN}$LINT_STACK${NC}"
+echo -e "    ${BOLD}Detecting lint stack...${NC}"
+LINT_CMDS_JSON="{}"
+
+_detect_lint() {
+  local -a _pairs=()
+  # PHP
+  if [ -f "${TARGET_DIR}/vendor/bin/phpstan" ]; then
+    _pairs+=(".php|./vendor/bin/phpstan analyse {file}")
+  elif [ -f "${TARGET_DIR}/vendor/bin/phpcs" ]; then
+    _pairs+=(".php|vendor/bin/phpcs --standard=PSR12 {file}")
+  elif [ -f "${TARGET_DIR}/vendor/bin/pint" ]; then
+    _pairs+=(".php|./vendor/bin/pint --test {file}")
+  fi
+  # JavaScript/TypeScript
+  if [ -f "${TARGET_DIR}/node_modules/.bin/eslint" ]; then
+    _pairs+=(".js|npx eslint {file}")
+    _pairs+=(".ts|npx eslint {file}")
+  fi
+  if [ -f "${TARGET_DIR}/node_modules/.bin/tsc" ] || [ -f "${TARGET_DIR}/tsconfig.json" ]; then
+    _pairs+=(".ts|npx tsc --noEmit")
+  fi
+  # Python
+  if command -v ruff &>/dev/null && ([ -f "${TARGET_DIR}/pyproject.toml" ] || [ -f "${TARGET_DIR}/setup.cfg" ]); then
+    _pairs+=(".py|ruff check {file}")
+  elif command -v flake8 &>/dev/null && ([ -f "${TARGET_DIR}/.flake8" ] || [ -f "${TARGET_DIR}/setup.cfg" ]); then
+    _pairs+=(".py|flake8 {file}")
+  elif [ -f "${TARGET_DIR}/requirements.txt" ] || [ -f "${TARGET_DIR}/pyproject.toml" ]; then
+    _pairs+=(".py|python3 -m py_compile {file}")
+  fi
+  # Go
+  if [ -f "${TARGET_DIR}/go.mod" ]; then
+    _pairs+=(".go|go vet ./...")
+  fi
+  # Rust
+  if [ -f "${TARGET_DIR}/Cargo.toml" ]; then
+    _pairs+=(".rs|cargo check")
+  fi
+  # Ruby
+  if [ -f "${TARGET_DIR}/Gemfile" ]; then
+    _pairs+=(".rb|ruby -c {file}")
+  fi
+
+  if [ ${#_pairs[@]} -eq 0 ]; then
+    echo -e "    ${YELLOW}⚠️  No lint tools detected automatically.${NC}"
+    echo -e "    Enter lint extension=command pairs (e.g. .py=python3 -m py_compile {file}) or press Enter to skip:"
+    read -r -p "    Lint commands [skip]: " _manual_input
+    if [ -n "$_manual_input" ]; then
+      # Build simple single-entry from manual input
+      _ext="${_manual_input%%=*}"
+      _cmd="${_manual_input#*=}"
+      LINT_CMDS_JSON=$(python3 -c "import json; print(json.dumps({'$_ext': '$_cmd'}))" 2>/dev/null || echo "{}")
+    fi
+  else
+    echo -e "    ${GREEN}✅ Detected lint tools:${NC}"
+    for _p in "${_pairs[@]}"; do
+      echo -e "    ${GREEN}   - ${_p%%|*}: ${_p##*|}${NC}"
+    done
+    echo ""
+    read -r -p "    Accept detected configuration? [Y/n]: " _confirm
+    if [[ "$_confirm" =~ ^[Nn]$ ]]; then
+      echo -e "    Enter lint extension=command pairs or press Enter for detected:"
+      read -r -p "    [keep detected]: " _override
+      if [ -n "$_override" ]; then
+        _ext="${_override%%=*}"
+        _cmd="${_override#*=}"
+        LINT_CMDS_JSON=$(python3 -c "import json; print(json.dumps({'$_ext': '$_cmd'}))" 2>/dev/null || echo "{}")
+      fi
+    fi
+    if [ "$LINT_CMDS_JSON" = "{}" ] && [ ${#_pairs[@]} -gt 0 ]; then
+      # Build JSON from detected pairs
+      LINT_CMDS_JSON=$(python3 -c "
+import json
+pairs = [p.split('|',1) for p in $(printf '%s\n' "${_pairs[@]}" | python3 -c "import sys,json; print(json.dumps([l.rstrip() for l in sys.stdin]))" 2>/dev/null || echo "[]")]
+print(json.dumps(dict(pairs)))
+" 2>/dev/null)
+      [ -z "$LINT_CMDS_JSON" ] || [ "$LINT_CMDS_JSON" = "null" ] && LINT_CMDS_JSON="{}"
+    fi
+  fi
+  unset _pairs
+}
+_detect_lint
+echo -e "    → ${GREEN}lint_commands: $LINT_CMDS_JSON${NC}"
 
 # ═══════════════════════════════════════════════════════════════
 # STEP 2 — Generate tao.config.json
@@ -179,22 +256,6 @@ else
     PHASE_PREFIX="fase-"
   else
     PHASE_PREFIX="phase-"
-  fi
-
-  # Build lint command
-  LINT_CMD_VAL=""
-  if [ "$LINT_STACK" != "none" ]; then
-    case "$LINT_STACK" in
-      .php) LINT_CMD_VAL="php -l {file}" ;;
-      .py)  LINT_CMD_VAL="python3 -m py_compile {file}" ;;
-      .ts)  LINT_CMD_VAL="npx tsc --noEmit" ;;
-      .js)  LINT_CMD_VAL="node --check {file}" ;;
-      .rb)  LINT_CMD_VAL="ruby -c {file}" ;;
-      .go)  LINT_CMD_VAL="go vet {file}" ;;
-      .rs)  LINT_CMD_VAL="cargo check" ;;
-      *)    warn "Unknown stack '$LINT_STACK' — lint_commands left empty"
-            LINT_STACK="none" ;;
-    esac
   fi
 
   # Write config using python3 for proper JSON escaping
@@ -222,7 +283,7 @@ config = {
         'phases': 'docs/phases/',
         'phase_prefix': sys.argv[5]
     },
-    'lint_commands': {},
+    'lint_commands': json.loads(sys.argv[6]),
     'commit_scopes': [],
     'compliance': {
         'require_skill_check': True,
@@ -235,12 +296,10 @@ config = {
         'script': '.github/tao/scripts/doc-sync.sh'
     }
 }
-if sys.argv[6] != 'none':
-    config['lint_commands'][sys.argv[6]] = sys.argv[7]
-with open(sys.argv[8], 'w') as f:
+with open(sys.argv[7], 'w') as f:
     json.dump(config, f, indent=2, ensure_ascii=False)
     f.write('\n')
-" "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "$LINT_STACK" "${LINT_CMD_VAL:-}" "$CONFIG_FILE"
+" "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "${LINT_CMDS_JSON:-{}}" "$CONFIG_FILE"
   if [ -f "$CONFIG_FILE" ]; then
     installed ".github/tao/tao.config.json"
   else
