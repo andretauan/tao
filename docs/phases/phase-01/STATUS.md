@@ -17,7 +17,7 @@
 
 | # | Task | Complexity | Executor | Status | Gaps Fixed |
 |---|------|------------|----------|--------|------------|
-| T04 | Create abex-gate.sh security scanner | High | Architect | ⏳ | G06 |
+| T04 | Create abex-gate.sh security scanner | High | Architect | ✅ | G06 |
 | T01 | Expand pre-commit.sh: destructive scan + pause + ABEX + timestamp | Medium | Sonnet | ⏳ | G03,G04,G05,G06 |
 | T02 | Create commit-msg.sh + update install-hooks.sh | Low | Sonnet | ⏳ | G01 |
 | T03 | Create pre-push.sh + update install-hooks.sh | Low | Sonnet | ⏳ | G02,G07,G22,G39 |
