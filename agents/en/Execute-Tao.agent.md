@@ -37,6 +37,20 @@ agents:
 
 ## TRIGGER: "execute", "executar", "continue"
 
+### PRE-FLIGHT — Configuration Check (BEFORE any task)
+
+1. Check if `.github/tao/tao.config.json` exists
+   - **If NO** → enter ONBOARDING mode:
+     - Inform: "⚠️ TAO is not configured in this project."
+     - Instruct: "Run in terminal: `bash /path/to/TAO/install.sh`"
+     - Follow up: "Then come back and say: @Execute-Tao execute"
+     - **STOP** — do NOT execute tasks without configuration.
+   - **If YES** → verify basic integrity:
+     - `dev_branch` set? If not → warn: "Set git.dev_branch in tao.config.json"
+     - Phases directory exists? If not → warn: "Run install.sh or create the phases directory"
+     - `lint_commands` empty? → warn: "Configure lint_commands in tao.config.json for quality checks"
+     - All warnings are informational — do NOT stop if config exists
+
 ### STEP 0 — DISCOVER ACTIVE PHASE
 Read `.github/tao/CONTEXT.md` → field "Active Phase" → extract number.
 

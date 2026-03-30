@@ -37,6 +37,20 @@ agents:
 
 ## TRIGGER: "executar", "continuar"
 
+### PRÉ-VOO — Verificação de Configuração (ANTES de qualquer tarefa)
+
+1. Verificar se `.github/tao/tao.config.json` existe
+   - **Se NÃO** → entrar em modo ONBOARDING:
+     - Informar: "⚠️ TAO não está configurado neste projeto."
+     - Instruir: "Execute no terminal: `bash /caminho/para/TAO/install.sh`"
+     - Continuar: "Depois volte e diga: @Executar-Tao executar"
+     - **STOP** — NÃO executar tarefas sem configuração.
+   - **Se SIM** → verificar integridade básica:
+     - `dev_branch` definido? Se não → avisar: "Defina git.dev_branch em tao.config.json"
+     - Diretório de fases existe? Se não → avisar: "Execute install.sh ou crie o diretório de fases"
+     - `lint_commands` vazio? → avisar: "Configure lint_commands em tao.config.json para verificação de qualidade"
+     - Todos os avisos são informativos — NÃO parar se config existir
+
 ### PASSO 0 — DESCOBRIR FASE ATIVA
 Ler `.github/tao/CONTEXT.md` → campo "Fase Ativa" → extrair número.
 
