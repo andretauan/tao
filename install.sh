@@ -437,6 +437,78 @@ if [ -d "$PHASE_TMPL_SHARED" ]; then
 fi
 
 # ═══════════════════════════════════════════════════════════════
+# STEP 6c — Create initial phase directory (phase-01 / fase-01)
+# ═══════════════════════════════════════════════════════════════
+step "Creating initial phase directory"
+
+_phases_sub="docs/phases"
+_p_prefix="phase-"
+if [ "$LANG_CHOICE" = "pt-br" ]; then
+  _phases_sub="docs/phases"
+  _p_prefix="fase-"
+fi
+INITIAL_PHASE_DIR="$TARGET_DIR/$_phases_sub/${_p_prefix}01"
+
+if [ -d "$INITIAL_PHASE_DIR" ]; then
+  skipped "$_phases_sub/${_p_prefix}01/"
+else
+  mkdir -p "$INITIAL_PHASE_DIR/brainstorm" "$INITIAL_PHASE_DIR/tasks"
+  # Copy language-specific phase templates
+  for tmpl in "$TAO_DIR/phases/$LANG_CHOICE"/*.template; do
+    [ -f "$tmpl" ] || continue
+    _dest="$INITIAL_PHASE_DIR/$(basename "${tmpl%.template}")"
+    [ ! -f "$_dest" ] && cp "$tmpl" "$_dest"
+  done
+  # progress.txt
+  [ ! -f "$INITIAL_PHASE_DIR/progress.txt" ] && touch "$INITIAL_PHASE_DIR/progress.txt"
+  installed "$_phases_sub/${_p_prefix}01/"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6d — Create .vscode/settings.json (enable agent hooks)
+# ═══════════════════════════════════════════════════════════════
+step "Configuring VS Code settings"
+
+VSCODE_DIR="$TARGET_DIR/.vscode"
+VSCODE_SETTINGS="$VSCODE_DIR/settings.json"
+
+mkdir -p "$VSCODE_DIR"
+if [ ! -f "$VSCODE_SETTINGS" ]; then
+  cat > "$VSCODE_SETTINGS" << 'VSSETTINGS'
+{
+  "chat.useCustomAgentHooks": true
+}
+VSSETTINGS
+  installed ".vscode/settings.json"
+elif grep -q '"chat.useCustomAgentHooks"' "$VSCODE_SETTINGS" 2>/dev/null; then
+  skipped ".vscode/settings.json (already configured)"
+else
+  echo -e "    ${YELLOW}⚠️${NC}  .vscode/settings.json exists — add ${BOLD}\"chat.useCustomAgentHooks\": true${NC} manually"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6e — Update .gitignore with TAO entries
+# ═══════════════════════════════════════════════════════════════
+step "Updating .gitignore"
+
+GITIGNORE_FILE="$TARGET_DIR/.gitignore"
+TAO_GITIGNORE_MARKER="# TAO Framework"
+
+if [ -f "$GITIGNORE_FILE" ] && grep -q "$TAO_GITIGNORE_MARKER" "$GITIGNORE_FILE" 2>/dev/null; then
+  skipped ".gitignore (TAO entries already present)"
+else
+  {
+    echo ""
+    echo "# TAO Framework"
+    echo ".tao-pause"
+    echo ".gsd-pause"
+    echo ".tao-session/"
+    echo "*.tao.local"
+  } >> "$GITIGNORE_FILE"
+  installed ".gitignore (TAO entries added)"
+fi
+
+# ═══════════════════════════════════════════════════════════════
 # STEP 7 — Install git hooks
 # ═══════════════════════════════════════════════════════════════
 step "Installing git hooks"
@@ -535,9 +607,9 @@ if [ "$LANG_CHOICE" = "pt-br" ]; then
   echo ""
   echo -e "  1. Revise ${BOLD}.github/tao/tao.config.json${NC} — personalize modelos, caminhos, comandos de lint"
   echo -e "  2. Edite ${BOLD}CLAUDE.md${NC} — adicione regras e padrões de código do projeto"
-  echo -e "  3. Edite ${BOLD}.github/tao/CONTEXT.md${NC} — defina sua primeira fase ativa"
-  echo -e "  4. No VS Code: ative ${BOLD}chat.useCustomAgentHooks${NC} nas Configurações"
-  echo -e "  5. No Copilot Chat: selecione ${BOLD}@Executar-Tao${NC} e diga ${BOLD}\"executar\"${NC}"
+  echo -e "  3. Abra o VS Code: ${BOLD}chat.useCustomAgentHooks${NC} está habilitado em .vscode/settings.json"
+  echo -e "  4. No Copilot Chat: selecione ${BOLD}@Executar-Tao${NC} e diga ${BOLD}\"executar\"${NC}"
+  echo -e "  5. O agente vai ler STATUS.md e iniciar a primeira tarefa automaticamente"
   echo ""
   echo -e "  ${BLUE}📖${NC} Leia ${BOLD}TAO/README.pt-br.md${NC} para documentação completa"
 else
@@ -545,9 +617,9 @@ else
   echo ""
   echo -e "  1. Review ${BOLD}.github/tao/tao.config.json${NC} — customize models, paths, lint commands"
   echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and code patterns"
-  echo -e "  3. Edit ${BOLD}.github/tao/CONTEXT.md${NC} — set your first active phase"
-  echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
-  echo -e "  5. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
+  echo -e "  3. Open VS Code: ${BOLD}chat.useCustomAgentHooks${NC} is enabled via .vscode/settings.json"
+  echo -e "  4. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
+  echo -e "  5. The agent will read STATUS.md and start the first task automatically"
   echo ""
   echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
 fi
