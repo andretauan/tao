@@ -146,6 +146,10 @@ Automatizado via scan regex do `abex-gate.sh`. Resultado: **PASSA** (as 3 limpas
 
 **Sem ABEX = tarefa não concluída.** Reportar findings por severidade: CRITICAL → HIGH → MEDIUM → INFO.
 
+**Automação:** `abex-gate.sh` realiza detecção automática de padrões para a Passada 1 (Segurança). Roda automaticamente via hook pre-commit e hook PostToolUse. Os agentes realizam as 3 passadas manuais para revisão aprofundada. O scan automatizado captura padrões óbvios; a revisão manual captura issues sutis.
+
+**Automação:** `abex-gate.sh` realiza detecção automática de padrões para a Passada 1 (Segurança). Roda automaticamente via hook pre-commit e hook PostToolUse. Os agentes realizam as 3 passadas manuais para revisão aprofundada. O scan automatizado captura padrões óbvios; a revisão manual captura issues sutis.
+
 ---
 
 ## SECURITY LOCKS
@@ -198,7 +202,7 @@ tipo(escopo): descrição curta em imperativo
 - Modo imperativo: "adicionar feature" não "adicionada feature"
 - Máximo 72 caracteres no assunto
 - Nunca `git add -A` — sempre `git add <arquivos-específicos>`
-- Sempre `git push origin dev` após cada commit
+- Push de acordo com `git.auto_push` em `.github/tao/tao.config.json`. Se `auto_push: true`, push após cada commit. Se `false`, apenas commit — push quando pronto.
 
 ---
 
@@ -271,6 +275,9 @@ Toda sessão que modifica código DEVE encerrar com um bloco de handoff.
 - **Respeite o que CONTEXT.md diz.** Se diz "fase concluída", NÃO procure mais trabalho.
 - **NUNCA sugira próximos passos proativamente.** Quem define prioridades é o usuário.
 - **NUNCA pergunte "posso fazer X?" ou "quer que eu faça Y?".** Execute o que foi pedido. Ponto.
+
+**Exceção:** Quando o status do CONTEXT.md for `novo_projeto`, o agente @Executar-Tao PODE fazer UMA pergunta para identificar o escopo do projeto (ver fluxo de onboarding). Esta é a ÚNICA exceção e ocorre UMA VEZ por projeto.
+
 - **Ao encerrar sessão:** relate SOMENTE o que foi feito. Sem conselhos não solicitados.
 
 ---
@@ -291,5 +298,5 @@ Toda sessão que modifica código DEVE encerrar com um bloco de handoff.
 - [ ] Handoff gerado (ver §HANDOFF)
 - [ ] Lint/compile check em TODOS os arquivos modificados (R1)
 - [ ] Commit atômico com mensagem padronizada
-- [ ] `git push origin dev` após cada commit
+- [ ] Push para dev se `git.auto_push: true` (verificar .github/tao/tao.config.json)
 - [ ] `git status` verificado — PROIBIDO encerrar com arquivos não commitados (R7)

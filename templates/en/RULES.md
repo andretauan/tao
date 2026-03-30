@@ -146,6 +146,8 @@ Automated via `abex-gate.sh` regex scan. Result: **PASS** (all 3 clean) or **FAI
 
 **No ABEX = task not completed.** Report findings by severity: CRITICAL → HIGH → MEDIUM → INFO.
 
+**Automation:** `abex-gate.sh` performs automated pattern detection for Pass 1 (Security). Runs automatically via pre-commit hook and PostToolUse hook. Agents perform the 3 manual passes for thorough review. The automated scan catches obvious patterns; the manual review catches subtle issues.
+
 ---
 
 ## SECURITY LOCKS
@@ -198,7 +200,7 @@ type(scope): short imperative description
 - Imperative mood: "add feature" not "added feature"
 - Max 72 chars in subject line
 - Never `git add -A` — always `git add <specific-files>`
-- Always `git push origin dev` after every commit
+- Push according to `git.auto_push` in `.github/tao/tao.config.json`. If `auto_push: true`, push after every commit. If `false`, commit only — push when ready.
 
 ---
 
@@ -271,6 +273,9 @@ Every session that modifies code MUST end with a handoff block.
 - **Respect what CONTEXT.md says.** If it says "phase complete," do NOT look for more work.
 - **NEVER suggest next steps proactively.** The user defines priorities.
 - **NEVER ask "can I do X?" or "want me to do Y?".** Execute what was asked. Period.
+
+**Exception:** When CONTEXT.md status is `new_project`, the @Execute-Tao agent MAY ask ONE question to identify the project scope (see onboarding flow). This is the ONLY exception and fires ONCE per project lifetime.
+
 - **When ending a session:** report ONLY what was done. No unsolicited advice.
 
 ---
@@ -291,5 +296,5 @@ Every session that modifies code MUST end with a handoff block.
 - [ ] Handoff generated (see §HANDOFF)
 - [ ] Lint/compile check on ALL modified files (R1)
 - [ ] Atomic commit with standardized message
-- [ ] `git push origin dev` after each commit
+- [ ] Push to dev if `git.auto_push: true` (check .github/tao/tao.config.json)
 - [ ] `git status` verified — PROHIBITED to end with uncommitted files (R7)
