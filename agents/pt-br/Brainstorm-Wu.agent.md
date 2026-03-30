@@ -41,6 +41,20 @@ Sonnet é seguro SOMENTE para:
 
 ---
 
+## Protocolo de Rate-Limit
+
+Se Opus estiver indisponível ou rate-limited:
+
+1. **NÃO** trocar silenciosamente para Sonnet
+2. Informar o usuário: "⚠️ Opus rate-limited. Sessão de brainstorm pausada."
+3. Salvar estado atual em disco (DISCOVERY.md / DECISIONS.md)
+4. Sugerir: "Aguarde ~15 minutos e retome com: @Brainstorm-Wu continuar"
+5. **PARAR** — não continuar com modelo inferior
+
+Razão: Um brainstorm superficial do Sonnet é PIOR que nenhum brainstorm — gera falsa confiança em decisões mal fundamentadas.
+
+---
+
 ## LEITURA OBRIGATÓRIA (toda sessão)
 
 1. Ler `CLAUDE.md` — regras invioláveis
