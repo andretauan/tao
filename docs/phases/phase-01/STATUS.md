@@ -56,7 +56,7 @@
 |---|------|------------|----------|--------|------------|
 | T18 | README (EN+PT-BR): qualify claims + troubleshooting | Medium | Architect | ✅ | G34,G35 |
 | T19 | GETTING-STARTED.md: Quick Path | Low | Sonnet | ✅ | G36 |
-| T20 | ECONOMICS.md: full-cycle costs | Medium | Sonnet | ⏳ | G34 |
+| T20 | ECONOMICS.md: full-cycle costs | Medium | Sonnet | ✅ | G34 |
 | T21 | Wu agents (EN+PT-BR): rate-limit message | Low | Sonnet | ⏳ | G37 |
 
 ## GROUP P5-VERIFY — Verification
@@ -77,7 +77,7 @@
 | P1-HOOKS — L1 Hooks | 0/4 | 4 | T05-T08 |
 | P2-TEXT — L2 Instructions | 0/5 | 5 | T09-T13 |
 | P3-INSTALL — Onboarding | 0/4 | 4 | T14-T17 |
-| P4-DOCS — Documentation | 2/4 | 2 | T20-T21 |
+| P4-DOCS — Documentation | 3/4 | 1 | T21 |
 | P5-VERIFY — Verification | 0/3 | 3 | T22-T24 |
 | **TOTAL** | **0/24** | **24** | — |
 
