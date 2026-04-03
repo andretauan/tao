@@ -48,13 +48,13 @@ Issue-Based Information System (IBIS) estrutura a discussão em:
 
 ## Portão de Maturidade (7 critérios)
 Marque 1 ponto para cada:
-1. ✅ Questão claramente definida (não vaga)
-2. ✅ Pelo menos 2 posições exploradas
-3. ✅ Cada posição tem prós E contras
-4. ✅ Trade-offs são explícitos (não escondidos)
-5. ✅ Decisão é justificada com racional
-6. ✅ Riscos da abordagem escolhida são reconhecidos
-7. ✅ Próximos passos acionáveis são listados
+1. ✅ Problema/objetivo está claro (DISCOVERY tem seção "Problema Central" definida)
+2. ✅ Alternativas foram exploradas (≥ 2 abordagens significativamente diferentes registradas)
+3. ✅ Trade-offs foram avaliados (≥ 1 issue IBIS em DECISIONS com positions + arguments)
+4. ✅ Decisões têm condição de invalidação (toda decisão tem "Invalidaria se")
+5. ✅ Documentos de referência relevantes consultados (registrado em DISCOVERY §Referências)
+6. ✅ Escopo está definido (o que ENTRA e o que NÃO entra explicitamente declarados)
+7. ✅ Padrões do codebase existente considerados (padrões do progress.txt da fase anterior integrados)
 
 **Mínimo para prosseguir: 5/7**
 

@@ -48,13 +48,13 @@ Issue-Based Information System (IBIS) structures discussion into:
 
 ## Maturity Gate (7 criteria)
 Score 1 point for each:
-1. ✅ Issue is clearly defined (not vague)
-2. ✅ At least 2 positions explored
-3. ✅ Each position has both pros and cons
-4. ✅ Trade-offs are explicit (not hidden)
-5. ✅ Decision is justified with rationale
-6. ✅ Risks of chosen approach are acknowledged
-7. ✅ Actionable next steps are listed
+1. ✅ Problem/objective is clear (DISCOVERY has a "Core Problem" section defined)
+2. ✅ Alternatives were explored (≥ 2 meaningfully different approaches registered)
+3. ✅ Trade-offs were evaluated (≥ 1 IBIS issue in DECISIONS with positions + arguments)
+4. ✅ Decisions have invalidation conditions (every decision has "Would invalidate if")
+5. ✅ Relevant reference docs consulted (registered in DISCOVERY §References)
+6. ✅ Scope is defined (what's IN and what's OUT explicitly stated)
+7. ✅ Existing codebase patterns considered (patterns from previous phase progress.txt integrated)
 
 **Minimum to proceed: 5/7**
 

@@ -15,6 +15,16 @@
         "type": "command",
         "command": "./.github/tao/scripts/abex-hook.sh",
         "timeout": 10
+      },
+      {
+        "type": "command",
+        "command": "./.github/tao/scripts/brainstorm-hook.sh",
+        "timeout": 10
+      },
+      {
+        "type": "command",
+        "command": "./.github/tao/scripts/plan-hook.sh",
+        "timeout": 10
       }
     ],
     "SessionStart": [

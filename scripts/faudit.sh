@@ -606,6 +606,50 @@ if [ -d "$WORKSPACE_DIR/.git" ]; then
   fi
 fi
 
+# P3-J: DEBUG=True/true in config or source files
+_debug_hits=$(find "$WORKSPACE_DIR" -type f \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/vendor/*" \
+  ! -path "*/templates/*" ! -name "faudit.sh" \
+  \( -name "*.py" -o -name "*.json" -o -name "*.yml" -o -name "*.yaml" \
+     -o -name "*.env" -o -name "*.cfg" -o -name "*.ini" -o -name "*.toml" \) \
+  -exec grep -lE '^\s*DEBUG\s*[=:]\s*(True|true|1)\b' {} + 2>/dev/null | head -5)
+if [ -z "$_debug_hits" ]; then
+  ok "No DEBUG=True/true found in config files"
+else
+  warn "DEBUG=True/true found in config files — verify not intended for production:"
+  echo "$_debug_hits" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
+# P3-K: console.log/print of sensitive data patterns
+_log_secret=$(find "$WORKSPACE_DIR" -type f \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/vendor/*" \
+  ! -path "*/templates/*" ! -name "faudit.sh" \
+  \( -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) \
+  -exec grep -lE '(console\.log|print)\s*\(.*\b(password|secret|token|api_key|private_key)\b' {} + 2>/dev/null | head -5)
+if [ -z "$_log_secret" ]; then
+  ok "No console.log/print of sensitive variable names detected"
+else
+  warn "Potential sensitive data in log output:"
+  echo "$_log_secret" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
+# P3-L: Files with overly permissive permissions (777)
+_perm_hits=$(find "$WORKSPACE_DIR" -maxdepth 3 -type f -perm -o+w \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" \
+  \( -name "*.sh" -o -name "*.env" -o -name "*.key" -o -name "*.pem" \) 2>/dev/null | head -5)
+if [ -z "$_perm_hits" ]; then
+  ok "No world-writable sensitive files (.sh, .env, .key, .pem)"
+else
+  warn "World-writable sensitive files found — tighten permissions:"
+  echo "$_perm_hits" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
 P3_BLOCKS=$CURRENT_BLOCKS
 P3_WARN=$CURRENT_WARN
 

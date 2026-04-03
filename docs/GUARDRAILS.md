@@ -233,11 +233,13 @@ These are hard limits that agents cannot override:
 
 | Lock | Rule |
 |---|---|
-| **Scope** | Agents only modify project source, CONTEXT.md, CHANGELOG.md, docs |
-| **Branch** | Only dev branch. Never push to main, force push, or hard reset |
-| **Destructive** | Never `rm -rf`, `DROP TABLE/DATABASE`, `TRUNCATE`, `DELETE` without WHERE |
-| **Schema** | Any `CREATE/ALTER TABLE` → STOP → document SQL → checkpoint |
-| **External** | Zero HTTP requests outside localhost. No package downloads without approval |
+| **LOCK 1 — Scope** | Agents only modify project source, CONTEXT.md, CHANGELOG.md, docs |
+| **LOCK 2 — Branch** | Only dev branch. Never push to main, force push (`-f`, `--force`, `--force-with-lease`), or hard reset |
+| **LOCK 3 — Destructive** | Never `rm -rf`, `DROP TABLE/DATABASE`, `TRUNCATE`, `DELETE` without WHERE |
+| **LOCK 4 — Schema** | Any `CREATE/ALTER TABLE` → STOP → document SQL → checkpoint |
+| **LOCK 5 — Pause** | If `.tao-pause` exists at project root → immediate STOP, report status |
+| **LOCK 6 — Commit** | Commit messages must follow `type(scope): description` format. `--no-verify` is FORBIDDEN |
+| **LOCK 7 — External** | Zero HTTP requests outside localhost. No package downloads without approval |
 
 ---
 

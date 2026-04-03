@@ -223,9 +223,9 @@ scan_file() {
   check_pattern "BLOCK" "Command Injection — unsanitized shell execution" "$file" \
     'os\.system\s*\(\s*[a-zA-Z_$]|subprocess\.[a-zA-Z_]+\s*\([^)]*\+[^)]*\)|shell_exec\s*\(\s*\$|system\s*\(\s*\$'
 
-  # Hardcoded Secrets
+  # Hardcoded Secrets (requires assignment context + min 8 chars to reduce false positives)
   check_pattern "BLOCK" "Hardcoded Secret — password/api_key/token/secret in source" "$file" \
-    'password\s*=\s*["'"'"'][^"'"'"']{4,}|api_key\s*=\s*["'"'"'][^"'"'"']+|secret\s*=\s*["'"'"'][^"'"'"']{4,}|token\s*=\s*["'"'"'][^"'"'"']{4,}|AWS_SECRET\s*=\s*["'"'"']|private_key\s*=\s*["'"'"']'
+    'password\s*=\s*["'"'"'][^"'"'"']{8,}|api_key\s*=\s*["'"'"'][^"'"'"']{8,}|secret\s*=\s*["'"'"'][^"'"'"']{8,}|token\s*=\s*["'"'"'][^"'"'"']{8,}|AWS_SECRET\s*=\s*["'"'"']|private_key\s*=\s*["'"'"']|AKIA[0-9A-Z]{16}'
 
   # ════════════════════════════════════════════════════════════
   # WARN patterns

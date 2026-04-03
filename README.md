@@ -58,9 +58,9 @@ No more prompt-by-prompt babysitting. One command runs the entire phase.
 
 ### 🔒 Bulletproof Quality
 
-Every commit passes through pre-commit linting, compliance checks, and a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). Enforcement is layered: L0 git hooks block violations at commit time, L1 agent hooks provide real-time feedback during sessions, and L2 instruction guidelines cover subjective quality criteria. **~98% enforcement coverage through deterministic automation** — the remaining ~2% requires agent judgment.
+Every commit passes through pre-commit linting, compliance checks, and when all phase tasks are complete, a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). Enforcement is layered: L0 git hooks block violations at commit time (linting, force-push, plan/brainstorm validation), L1 agent hooks provide real-time deterministic feedback during sessions (read-before-edit, dangerous command detection, auto-lint), and L2 instruction guidelines cover subjective quality criteria (model routing, ABEX scoring). **~75% of enforcement rules are deterministic (L0 + L1)** — the remaining ~25% relies on agent compliance with instructions.
 
-The guardrails are code-enforced — bash scripts that block bad commits. Not honor-system. Not "please remember to lint." Code that doesn’t pass the automated gates, doesn’t ship.
+The guardrails are code-enforced — bash scripts that block bad commits and inject warnings in real-time. L0 and L1 are not honor-system. Not "please remember to lint." Code that doesn't pass the automated gates, doesn't ship. L2 rules (model routing, quality scoring) depend on agent instruction-following.
 
 ### 💰 60% Cost Reduction
 
@@ -472,8 +472,25 @@ It's not how to _use_ TAO. It's how to _think_ TAO.
 - Run lint manually: `bash .github/tao/scripts/install-hooks.sh`
 
 ### Agent ignores rules
-- Pre-commit hooks capture violations at commit time
-- If the agent skips the compliance check, the commit is rejected
+
+Enforcement varies by layer:
+
+| Violation | Layer | Enforcement |
+|---|---|---|
+| Bad commit message format | **L0** | `commit-msg.sh` rejects the commit |
+| Push to main/force push | **L0** | `pre-push.sh` blocks the push |
+| Invalid brainstorm/plan | **L0** | `pre-commit.sh` blocks the commit |
+| Missing lint on commit | **L0** | `pre-commit.sh` runs lint automatically |
+| `.tao-pause` active | **L0** | `pre-commit.sh` blocks all commits |
+| Edit without reading first | **L1** | `enforcement-hook.sh` injects R5 violation warning |
+| Dangerous terminal command | **L1** | `enforcement-hook.sh` injects LOCK violation warning |
+| `--no-verify` in terminal | **L1** | `enforcement-hook.sh` injects LOCK 6 warning |
+| Auto-lint on every edit | **L1** | `lint-hook.sh` runs lint automatically |
+| Model routing (cost) | **L2** | Agent instruction — not deterministic |
+| ABEX quality scoring | **L2** | Agent instruction — not deterministic |
+
+**L0 = blocked deterministically.** L1 = warning injected in real-time. L2 = depends on agent compliance.
+
 - Persistent issues: open an [issue](https://github.com/andretauan/TAO/issues)
 
 ---

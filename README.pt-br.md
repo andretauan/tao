@@ -58,9 +58,9 @@ Chega de ficar babysitting prompt por prompt. Um comando roda a fase inteira.
 
 ### 🔒 Qualidade Blindada
 
-Cada commit passa por lint no pre-commit, checks de compliance, e uma auditoria forense em 3 passes (integridade estrutural, consistência cross-file, completude de documentação). A aplicação é em camadas: L0 git hooks bloqueiam violações no commit, L1 agent hooks fornecem feedback em tempo real durante sessões, e L2 guidelines de instrução cobrem critérios qualitativos subjetivos. **~98% de cobertura via automação determinística** — os ~2% restantes requerem julgamento do agente.
+Cada commit passa por lint no pre-commit, checks de compliance, e quando todas as tarefas da fase estão completas, uma auditoria forense em 3 passes (integridade estrutural, consistência cross-file, completude de documentação). A aplicação é em camadas: L0 git hooks bloqueiam violações no commit (linting, force-push, validação de plano/brainstorm), L1 agent hooks fornecem feedback determinístico em tempo real durante sessões (ler-antes-de-editar, detecção de comandos perigosos, auto-lint), e L2 guidelines de instrução cobrem critérios qualitativos subjetivos (roteamento de modelo, pontuação ABEX). **~75% das regras de enforcement são determinísticas (L0 + L1)** — os ~25% restantes dependem da compliance do agente com as instruções.
 
-Os guardrails são enforced por código — scripts bash que bloqueiam commits ruins. Não é sistema de honra. Não é "lembra de fazer lint". Código que não passa pelos gates automáticos, não entra.
+Os guardrails são enforced por código — scripts bash que bloqueiam commits ruins e injetam warnings em tempo real. L0 e L1 não são sistema de honra. Não é "lembra de fazer lint". Código que não passa pelos gates automáticos, não entra. Regras L2 (roteamento de modelo, pontuação de qualidade) dependem do agente seguir as instruções.
 
 ### 💰 60% de Redução de Custo
 
@@ -473,8 +473,25 @@ Não é como _usar_ o TAO. É como _pensar_ TAO.
 - Execute lint manualmente: `bash .github/tao/scripts/install-hooks.sh`
 
 ### Agente ignora regras
-- Os hooks pre-commit capturam violações no momento do commit
-- Se o agente pular o compliance check, o commit é rejeitado
+
+O enforcement varia por camada:
+
+| Violação | Camada | Enforcement |
+|---|---|---|
+| Formato de commit inválido | **L0** | `commit-msg.sh` rejeita o commit |
+| Push para main/force push | **L0** | `pre-push.sh` bloqueia o push |
+| Brainstorm/plano inválido | **L0** | `pre-commit.sh` bloqueia o commit |
+| Falta lint no commit | **L0** | `pre-commit.sh` roda lint automaticamente |
+| `.tao-pause` ativo | **L0** | `pre-commit.sh` bloqueia todos os commits |
+| Editar sem ler antes | **L1** | `enforcement-hook.sh` injeta warning R5 |
+| Comando perigoso no terminal | **L1** | `enforcement-hook.sh` injeta warning LOCK |
+| `--no-verify` no terminal | **L1** | `enforcement-hook.sh` injeta warning LOCK 6 |
+| Auto-lint em cada edição | **L1** | `lint-hook.sh` roda lint automaticamente |
+| Roteamento de modelo (custo) | **L2** | Instrução do agente — não determinístico |
+| Pontuação ABEX de qualidade | **L2** | Instrução do agente — não determinístico |
+
+**L0 = bloqueado deterministicamente.** L1 = warning injetado em tempo real. L2 = depende da compliance do agente.
+
 - Problemas persistentes: abra uma [issue](https://github.com/andretauan/TAO/issues)
 
 ---
