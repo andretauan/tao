@@ -457,7 +457,26 @@ Want to build a TAO-compatible system for **Cursor, Cline, Windsurf, Claude Code
 It's not how to _use_ TAO. It's how to _think_ TAO.
 
 ---
+## 🛠️ Troubleshooting
 
+### Hooks not firing
+- Check that `.vscode/settings.json` has `"chat.useCustomAgentHooks": true`
+- Check that your VS Code version supports Agent Mode hooks
+
+### Compliance check missing
+- Ensure `tao.instructions.md` is loaded (check `.github/instructions/`)
+- Verify agent mode is active (not regular Copilot chat)
+
+### Lint errors on commit
+- Check that `lint_commands` in `tao.config.json` points to installed tools
+- Run lint manually: `bash .github/tao/scripts/install-hooks.sh`
+
+### Agent ignores rules
+- Pre-commit hooks capture violations at commit time
+- If the agent skips the compliance check, the commit is rejected
+- Persistent issues: open an [issue](https://github.com/andretauan/TAO/issues)
+
+---
 ## �🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

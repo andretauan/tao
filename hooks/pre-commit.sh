@@ -30,7 +30,7 @@ if [ -f "$WORKSPACE_DIR/.tao-pause" ] || [ -f ".tao-pause" ]; then
 fi
 
 # ─── Get staged files ────────────────────────────────────────
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null || true)
 
 if [ -z "$STAGED_FILES" ]; then
   exit 0

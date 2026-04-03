@@ -63,7 +63,7 @@
 
 | # | Task | Complexity | Executor | Status | Gaps Fixed |
 |---|------|------------|----------|--------|------------|
-| T22 | Bilingual smoke test: fresh install + first execution | High | Architect | ⏳ | — |
+| T22 | Bilingual smoke test: fresh install + first execution | High | Architect | ✅ | — |
 | T23 | Regression check: existing projects | Medium | Sonnet | ⏳ | — |
 | T24 | Enforcement test: L0/L1 hooks block violations | High | Architect | ⏳ | — |
 
