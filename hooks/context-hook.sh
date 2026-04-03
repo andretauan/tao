@@ -41,9 +41,20 @@ if [ -f "$PREV_STARTED" ] && [ ! -f "$HANDOFF_FILE" ]; then
   ORPHAN_WARNING=" | ⚠️ R2: Previous session (${PREV_TS}) ended WITHOUT handoff — audit trail broken"
 fi
 
-# Clean session state for new session
-rm -f "$SESSION_DIR/reads.log" "$SESSION_DIR/edits.log" "$SESSION_DIR/started" 2>/dev/null || true
+# Clean OLD session state (scoped to avoid race condition with concurrent sessions)
+OLD_SESSION_ID=""
+if [ -f "$SESSION_DIR/session_id" ]; then
+  OLD_SESSION_ID=$(cat "$SESSION_DIR/session_id" 2>/dev/null || true)
+fi
+if [ -n "$OLD_SESSION_ID" ]; then
+  rm -f "$SESSION_DIR/reads.${OLD_SESSION_ID}.log" "$SESSION_DIR/edits.${OLD_SESSION_ID}.log" 2>/dev/null || true
+fi
+rm -f "$SESSION_DIR/started" 2>/dev/null || true
 mkdir -p "$SESSION_DIR" 2>/dev/null || true
+
+# Generate unique session ID and persist it
+SESSION_ID="$$-$(date +%s)"
+echo "$SESSION_ID" > "$SESSION_DIR/session_id" 2>/dev/null || true
 
 # Mark session start
 date '+%Y-%m-%d %H:%M' > "$SESSION_DIR/started" 2>/dev/null || true

@@ -21,8 +21,17 @@ SESSION_DIR="$WORKSPACE_DIR/.tao-session"
 # ── Initialize session directory (idempotent) ──
 mkdir -p "$SESSION_DIR" 2>/dev/null || exit 0
 
-READS_LOG="$SESSION_DIR/reads.log"
-EDITS_LOG="$SESSION_DIR/edits.log"
+# Read current session ID for scoped log files (avoids race condition)
+SESSION_ID=""
+if [ -f "$SESSION_DIR/session_id" ]; then
+  SESSION_ID=$(cat "$SESSION_DIR/session_id" 2>/dev/null || true)
+fi
+if [ -z "$SESSION_ID" ]; then
+  SESSION_ID="default"
+fi
+
+READS_LOG="$SESSION_DIR/reads.${SESSION_ID}.log"
+EDITS_LOG="$SESSION_DIR/edits.${SESSION_ID}.log"
 touch "$READS_LOG" "$EDITS_LOG" 2>/dev/null || exit 0
 
 # ── Read compliance config flags ──

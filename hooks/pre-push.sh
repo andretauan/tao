@@ -28,8 +28,8 @@ except:
 " "$CONFIG" 2>/dev/null) || MAIN_BRANCH="main"
 fi
 
-# ─── Detect --force via parent process args ──────────────────
-if ps -o args= -p $PPID 2>/dev/null | grep -qE '\-\-force|--force-with-lease'; then
+# ─── Detect --force / -f via parent process args ─────────────
+if ps -o args= -p $PPID 2>/dev/null | grep -qE '\s-f\b|\s--force\b|\s--force-with-lease\b'; then
   echo ""
   echo -e "${RED}✗ BLOQUEADO / BLOCKED: Force push é PROIBIDO (LOCK 2).${NC}"
   echo -e "${YELLOW}  git push --force e --force-with-lease são proibidos pelo TAO.${NC}"
