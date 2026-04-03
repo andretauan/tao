@@ -41,9 +41,20 @@ if [ -f "$PREV_STARTED" ] && [ ! -f "$HANDOFF_FILE" ]; then
   ORPHAN_WARNING=" | ⚠️ R2: Previous session (${PREV_TS}) ended WITHOUT handoff — audit trail broken"
 fi
 
-# Clean session state for new session
-rm -f "$SESSION_DIR/reads.log" "$SESSION_DIR/edits.log" "$SESSION_DIR/started" 2>/dev/null || true
+# Clean OLD session state (scoped to avoid race condition with concurrent sessions)
+OLD_SESSION_ID=""
+if [ -f "$SESSION_DIR/session_id" ]; then
+  OLD_SESSION_ID=$(cat "$SESSION_DIR/session_id" 2>/dev/null || true)
+fi
+if [ -n "$OLD_SESSION_ID" ]; then
+  rm -f "$SESSION_DIR/reads.${OLD_SESSION_ID}.log" "$SESSION_DIR/edits.${OLD_SESSION_ID}.log" 2>/dev/null || true
+fi
+rm -f "$SESSION_DIR/started" 2>/dev/null || true
 mkdir -p "$SESSION_DIR" 2>/dev/null || true
+
+# Generate unique session ID and persist it
+SESSION_ID="$$-$(date +%s)"
+echo "$SESSION_ID" > "$SESSION_DIR/session_id" 2>/dev/null || true
 
 # Mark session start
 date '+%Y-%m-%d %H:%M' > "$SESSION_DIR/started" 2>/dev/null || true
@@ -118,8 +129,40 @@ if [ -f "$PROGRESS_FILE" ]; then
   LAST_ENTRIES=$(grep '^\[' "$PROGRESS_FILE" 2>/dev/null | tail -3 | tr '\n' ' | ' || echo "")
 fi
 
+# ── Real timestamp (R4) ──
+REAL_TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
+
+# ── Skills list (R3) ──
+SKILLS_LIST="none configured"
+INDEX_FILE="$WORKSPACE_DIR/.github/skills/INDEX.md"
+if [ -f "$INDEX_FILE" ]; then
+  RAW_SKILLS=$(grep -oE 'tao-[a-z-]+' "$INDEX_FILE" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || echo "")
+  [ -n "$RAW_SKILLS" ] && SKILLS_LIST="$RAW_SKILLS"
+fi
+
+# ── Lint status ──
+LINT_STATUS="NONE — not configured"
+if [ -f "$CONFIG_FILE" ]; then
+  LINT_EXTS=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    exts = list(c.get('lint_commands', {}).keys())
+    print(', '.join(exts) if exts else 'NONE')
+except:
+    print('unknown')
+" "$CONFIG_FILE" 2>/dev/null) || LINT_EXTS="unknown"
+  [ -n "$LINT_EXTS" ] && LINT_STATUS="$LINT_EXTS"
+fi
+
+# ── Hooks active (hooks.json present?) ──
+HOOKS_STATUS="INACTIVE — hooks.json missing"
+if [ -f "$WORKSPACE_DIR/.github/hooks/hooks.json" ]; then
+  HOOKS_STATUS="active"
+fi
+
 # ── Build context string ──
-CONTEXT="${PROJECT_NAME} Context | Phase: ${PHASE_PADDED} | Branch: ${BRANCH} | Tasks: ${DONE} done, ${PENDING} pending | Paused: ${PAUSED}"
+CONTEXT="${PROJECT_NAME} Context | Phase: ${PHASE_PADDED} | Branch: ${BRANCH} | Tasks: ${DONE} done, ${PENDING} pending | Paused: ${PAUSED} | Timestamp: ${REAL_TIMESTAMP}"
 if [ -n "$LAST_ENTRIES" ]; then
   CONTEXT="$CONTEXT | Recent: $LAST_ENTRIES"
 fi
@@ -130,6 +173,43 @@ if [ -n "$HANDOFF_CTX" ]; then
 fi
 if [ -n "$ORPHAN_WARNING" ]; then
   CONTEXT="$CONTEXT$ORPHAN_WARNING"
+fi
+
+# ── Read compliance.require_context_read flag ──
+REQUIRE_CTX_READ="true"
+if [ -f "$CONFIG_FILE" ]; then
+  _ctx_flag=$(python3 -c "
+import json, sys
+try:
+    c = json.load(open(sys.argv[1]))
+    val = c.get('compliance', {}).get('require_context_read', True)
+    print('true' if val else 'false')
+except:
+    print('true')
+" "$CONFIG_FILE" 2>/dev/null) || _ctx_flag="true"
+  [ -n "$_ctx_flag" ] && REQUIRE_CTX_READ="$_ctx_flag"
+fi
+
+# ── System-provided compliance data block (D12: hybrid compliance) ──
+# Injected only when require_context_read is enabled (default: true)
+if [ "$REQUIRE_CTX_READ" = "true" ]; then
+  COMPLIANCE_BLOCK="
+
+╔══════════════════════════════════════════════════════════╗
+║  SYSTEM-PROVIDED COMPLIANCE DATA — DO NOT GUESS THESE   ║
+╚══════════════════════════════════════════════════════════╝
+These values are injected by context-hook.sh (deterministic):
+  Timestamp:  ${REAL_TIMESTAMP}
+  Phase:      ${PHASE_PADDED}
+  Branch:     ${BRANCH}
+  Skills:     ${SKILLS_LIST}
+  Lint:       ${LINT_STATUS}
+  Hooks:      ${HOOKS_STATUS}
+  Paused:     ${PAUSED}
+
+Use THESE EXACT values in your compliance check block.
+Agent subjective assessments (ABEX, reading quality) remain your responsibility."
+  CONTEXT="$CONTEXT$COMPLIANCE_BLOCK"
 fi
 
 # ── Output JSON (escape via python3 for safety) ──

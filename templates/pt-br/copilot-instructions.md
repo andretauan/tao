@@ -82,17 +82,12 @@ Se `.tao-pause` existir na raiz → **STOP IMEDIATO**
 - Mensagem: `tipo(fase-XX): TNN — descrição curta`
 - 1 commit = 1 tarefa
 
+### LOCK 7 — EXTERNO
+- NUNCA fazer requisições HTTP externas sem aprovação explícita
+- NUNCA instalar pacotes ou acessar serviços não definidos no projeto
+
 ---
 
 ## COMPLIANCE CHECK
 
-Toda resposta que modifique código DEVE começar com:
-
-```
-📋 COMPLIANCE CHECK
-├─ Skills consultadas: [lista ou "nenhuma aplicável"]
-├─ Arquivos lidos antes de editar: [lista]
-├─ .github/tao/CONTEXT.md lido: SIM
-├─ .github/tao/CHANGELOG.md consultado: SIM
-└─ ABEX: [PASSA / N/A]
-```
+Formato e sequência de execução do compliance check: ver `.github/tao/RULES.md` §R0.

@@ -16,6 +16,15 @@ user-invocable: false
 
 ---
 
+## Mandatory Reading
+
+1. Read `CLAUDE.md` → project rules and code patterns
+2. Read `.github/tao/RULES.md` → TAO inviolable rules
+3. Read `.github/tao/CONTEXT.md` → active phase + locked decisions
+4. Read `.github/tao/tao.config.json` → database details + project config
+
+---
+
 ## Configuration
 
 Database details come from `.github/tao/tao.config.json` and project documentation.

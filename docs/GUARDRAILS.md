@@ -76,7 +76,7 @@ Three mandatory review passes after each implementation:
 | **2 — User** | "I'm a real visitor" | UX flow, copy quality, accessibility, mobile responsiveness |
 | **3 — Performance** | "I'm a Core Web Vitals auditor" | N+1 queries, DOM size, CLS, LCP, unnecessary re-renders |
 
-ABEX is judgment-based (not a script) — it's a protocol in the agent's instructions, not an automated tool. The agent performs the three passes mentally and reports findings.
+ABEX operates at two levels: (1) automated pattern scanning via `abex-gate.sh` + `abex-hook.sh` for deterministic security detection (L0/L1), and (2) agent judgment — three manual review passes covering Security, User Safety, and Performance (L2). The automated scan catches obvious patterns; the agent performs the three mental passes for thorough review.
 
 ---
 
@@ -186,7 +186,7 @@ Sonnet is **allowed** to:
 - Execute a validated plan
 - Commit, push, format, changelog
 
-#### BRIEF Maturity Gate (7/7)
+#### BRIEF Maturity Gate (7 criteria, ≥5 required)
 
 A BRIEF.md (plan input) is only valid when at least 5 of 7 criteria are met:
 
@@ -233,11 +233,13 @@ These are hard limits that agents cannot override:
 
 | Lock | Rule |
 |---|---|
-| **Scope** | Agents only modify project source, CONTEXT.md, CHANGELOG.md, docs |
-| **Branch** | Only dev branch. Never push to main, force push, or hard reset |
-| **Destructive** | Never `rm -rf`, `DROP TABLE/DATABASE`, `TRUNCATE`, `DELETE` without WHERE |
-| **Schema** | Any `CREATE/ALTER TABLE` → STOP → document SQL → checkpoint |
-| **External** | Zero HTTP requests outside localhost. No package downloads without approval |
+| **LOCK 1 — Scope** | Agents only modify project source, CONTEXT.md, CHANGELOG.md, docs |
+| **LOCK 2 — Branch** | Only dev branch. Never push to main, force push (`-f`, `--force`, `--force-with-lease`), or hard reset |
+| **LOCK 3 — Destructive** | Never `rm -rf`, `DROP TABLE/DATABASE`, `TRUNCATE`, `DELETE` without WHERE |
+| **LOCK 4 — Schema** | Any `CREATE/ALTER TABLE` → STOP → document SQL → checkpoint |
+| **LOCK 5 — Pause** | If `.tao-pause` exists at project root → immediate STOP, report status |
+| **LOCK 6 — Commit** | Commit messages must follow `type(scope): description` format. `--no-verify` is FORBIDDEN |
+| **LOCK 7 — External** | Zero HTTP requests outside localhost. No package downloads without approval |
 
 ---
 

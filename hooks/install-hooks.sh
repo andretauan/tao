@@ -3,7 +3,7 @@
 # install-hooks.sh — Install git hooks for TAO projects
 # ═══════════════════════════════════════════════════════════════
 # Called by install.sh during setup, or manually.
-# Installs: pre-commit hook (lint + syntax check)
+# Installs: pre-commit, commit-msg, pre-push, post-commit
 #
 # Usage: bash .github/tao/scripts/install-hooks.sh
 
@@ -86,6 +86,52 @@ fi
 HOOK
   chmod +x "$POST_COMMIT" 2>/dev/null || true
   echo -e "${GREEN}✅ Post-commit hook installed (auto-push)${NC}"
+fi
+
+# ─── Install commit-msg (format validation) ──────────────────
+COMMIT_MSG_HOOK="$HOOKS_DIR/commit-msg"
+
+if [ -f "$COMMIT_MSG_HOOK" ] && ! grep -q "TAO commit-msg" "$COMMIT_MSG_HOOK" 2>/dev/null; then
+  echo -e "${YELLOW}⚠  Commit-msg hook already exists (not TAO). Skipping.${NC}"
+  echo -e "   To override, remove $COMMIT_MSG_HOOK and re-run."
+else
+  cat > "$COMMIT_MSG_HOOK" << 'HOOK'
+#!/usr/bin/env bash
+# TAO commit-msg — validate commit message format (LOCK 6)
+# Installed by install-hooks.sh
+
+if [ -f .github/tao/scripts/commit-msg.sh ]; then
+  bash .github/tao/scripts/commit-msg.sh "$1"
+  exit $?
+fi
+
+exit 0
+HOOK
+  chmod +x "$COMMIT_MSG_HOOK" 2>/dev/null || true
+  echo -e "${GREEN}✅ Commit-msg hook installed (format validation)${NC}"
+fi
+
+# ─── Install pre-push (branch protection) ────────────────────
+PRE_PUSH="$HOOKS_DIR/pre-push"
+
+if [ -f "$PRE_PUSH" ] && ! grep -q "TAO pre-push" "$PRE_PUSH" 2>/dev/null; then
+  echo -e "${YELLOW}⚠  Pre-push hook already exists (not TAO). Skipping.${NC}"
+  echo -e "   To override, remove $PRE_PUSH and re-run."
+else
+  cat > "$PRE_PUSH" << 'HOOK'
+#!/usr/bin/env bash
+# TAO pre-push — block push to main + force push (LOCK 2)
+# Installed by install-hooks.sh
+
+if [ -f .github/tao/scripts/pre-push.sh ]; then
+  bash .github/tao/scripts/pre-push.sh "$@"
+  exit $?
+fi
+
+exit 0
+HOOK
+  chmod +x "$PRE_PUSH" 2>/dev/null || true
+  echo -e "${GREEN}✅ Pre-push hook installed (branch protection)${NC}"
 fi
 
 echo -e "${GREEN}Git hooks installation complete.${NC}"

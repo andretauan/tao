@@ -9,7 +9,7 @@
 
 ## Active Phase
 
-**Phase:** [XX — Phase Name]
+**Phase:** 01 — Pending Definition
 **Status:** new_project
 
 > When `status: new_project`, agents should:
@@ -39,9 +39,9 @@
 
 ---
 
-## Open Pendencies
+## Open Issues
 
-- [ ] [Pendency 1] — [context]
+- [ ] [Issue 1] — [context]
 
 ---
 

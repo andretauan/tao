@@ -111,11 +111,11 @@ if [ ! -f "$DECISIONS_FILE" ]; then
   info "Wu must create DECISIONS.md with D{N} entries following IBIS protocol."
 else
   _dec_count=$(python3 -c "
-import re
-text = open('$DECISIONS_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 decisions = set(re.findall(r'\bD(\d+)\b', text))
 print(len(decisions))
-" 2>/dev/null || echo "0")
+" "$DECISIONS_FILE" 2>/dev/null || echo "0")
 
   _has_positions=$(grep -ciE 'position|posição|argument|argumento|pro:|con:' "$DECISIONS_FILE" 2>/dev/null || echo "0")
 
@@ -183,10 +183,10 @@ print(f'{checked}/{total}')
 
   # Check BRIEF references decisions
   _brief_decisions=$(python3 -c "
-import re
-text = open('$BRIEF_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 print(len(set(re.findall(r'\bD(\d+)\b', text))))
-" 2>/dev/null || echo "0")
+" "$BRIEF_FILE" 2>/dev/null || echo "0")
 
   if [ "$_brief_decisions" = "0" ]; then
     warn "BRIEF.md does not reference any D{N} decisions"
@@ -201,9 +201,9 @@ echo -e "${BOLD}── V4: Cross-reference — DECISIONS ↔ BRIEF ─${NC}"
 
 if [ -f "$DECISIONS_FILE" ] && [ -f "$BRIEF_FILE" ]; then
   _cross_result=$(python3 -c "
-import re
-dec_text = open('$DECISIONS_FILE').read()
-brief_text = open('$BRIEF_FILE').read()
+import re, sys
+dec_text = open(sys.argv[1]).read()
+brief_text = open(sys.argv[2]).read()
 
 dec_ids = sorted(set(int(x) for x in re.findall(r'\bD(\d+)\b', dec_text)))
 brief_ids = set(int(x) for x in re.findall(r'\bD(\d+)\b', brief_text))
@@ -213,7 +213,7 @@ if missing:
     print('MISSING:' + ','.join(missing))
 else:
     print('OK:' + str(len(dec_ids)))
-" 2>/dev/null || echo "ERROR")
+" "$DECISIONS_FILE" "$BRIEF_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_cross_result" in
     OK:*)

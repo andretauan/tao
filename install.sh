@@ -155,13 +155,90 @@ read -r -p "    Dev branch name [dev]: " INPUT_BRANCH
 DEV_BRANCH="${INPUT_BRANCH:-dev}"
 echo -e "    → ${GREEN}$DEV_BRANCH${NC}"
 
-# Q5: Lint stack
+# Q5: Lint stack — auto-detect from project files
 echo ""
-echo -e "    ${BOLD}Primary stack for lint${NC} — file extension to enable in pre-commit hook"
-echo -e "    Options: ${GREEN}.php${NC} | ${GREEN}.py${NC} | ${GREEN}.ts${NC} | ${GREEN}.js${NC} | ${GREEN}.rb${NC} | ${GREEN}.go${NC} | ${GREEN}.rs${NC} | ${GREEN}none${NC}"
-read -r -p "    Primary stack [none]: " INPUT_LINT
-LINT_STACK="${INPUT_LINT:-none}"
-echo -e "    → ${GREEN}$LINT_STACK${NC}"
+echo -e "    ${BOLD}Detecting lint stack...${NC}"
+LINT_CMDS_JSON="{}"
+
+_detect_lint() {
+  local -a _pairs=()
+  # PHP
+  if [ -f "${TARGET_DIR}/vendor/bin/phpstan" ]; then
+    _pairs+=(".php|./vendor/bin/phpstan analyse {file}")
+  elif [ -f "${TARGET_DIR}/vendor/bin/phpcs" ]; then
+    _pairs+=(".php|vendor/bin/phpcs --standard=PSR12 {file}")
+  elif [ -f "${TARGET_DIR}/vendor/bin/pint" ]; then
+    _pairs+=(".php|./vendor/bin/pint --test {file}")
+  fi
+  # JavaScript/TypeScript
+  if [ -f "${TARGET_DIR}/node_modules/.bin/eslint" ]; then
+    _pairs+=(".js|npx eslint {file}")
+    _pairs+=(".ts|npx eslint {file}")
+  fi
+  if [ -f "${TARGET_DIR}/node_modules/.bin/tsc" ] || [ -f "${TARGET_DIR}/tsconfig.json" ]; then
+    _pairs+=(".ts|npx tsc --noEmit")
+  fi
+  # Python
+  if command -v ruff &>/dev/null && ([ -f "${TARGET_DIR}/pyproject.toml" ] || [ -f "${TARGET_DIR}/setup.cfg" ]); then
+    _pairs+=(".py|ruff check {file}")
+  elif command -v flake8 &>/dev/null && ([ -f "${TARGET_DIR}/.flake8" ] || [ -f "${TARGET_DIR}/setup.cfg" ]); then
+    _pairs+=(".py|flake8 {file}")
+  elif [ -f "${TARGET_DIR}/requirements.txt" ] || [ -f "${TARGET_DIR}/pyproject.toml" ]; then
+    _pairs+=(".py|python3 -m py_compile {file}")
+  fi
+  # Go
+  if [ -f "${TARGET_DIR}/go.mod" ]; then
+    _pairs+=(".go|go vet ./...")
+  fi
+  # Rust
+  if [ -f "${TARGET_DIR}/Cargo.toml" ]; then
+    _pairs+=(".rs|cargo check")
+  fi
+  # Ruby
+  if [ -f "${TARGET_DIR}/Gemfile" ]; then
+    _pairs+=(".rb|ruby -c {file}")
+  fi
+
+  if [ ${#_pairs[@]} -eq 0 ]; then
+    echo -e "    ${YELLOW}⚠️  No lint tools detected automatically.${NC}"
+    echo -e "    Enter lint extension=command pairs (e.g. .py=python3 -m py_compile {file}) or press Enter to skip:"
+    read -r -p "    Lint commands [skip]: " _manual_input
+    if [ -n "$_manual_input" ]; then
+      # Build simple single-entry from manual input
+      _ext="${_manual_input%%=*}"
+      _cmd="${_manual_input#*=}"
+      LINT_CMDS_JSON=$(python3 -c "import json; print(json.dumps({'$_ext': '$_cmd'}))" 2>/dev/null || echo "{}")
+    fi
+  else
+    echo -e "    ${GREEN}✅ Detected lint tools:${NC}"
+    for _p in "${_pairs[@]}"; do
+      echo -e "    ${GREEN}   - ${_p%%|*}: ${_p##*|}${NC}"
+    done
+    echo ""
+    read -r -p "    Accept detected configuration? [Y/n]: " _confirm
+    if [[ "$_confirm" =~ ^[Nn]$ ]]; then
+      echo -e "    Enter lint extension=command pairs or press Enter for detected:"
+      read -r -p "    [keep detected]: " _override
+      if [ -n "$_override" ]; then
+        _ext="${_override%%=*}"
+        _cmd="${_override#*=}"
+        LINT_CMDS_JSON=$(python3 -c "import json; print(json.dumps({'$_ext': '$_cmd'}))" 2>/dev/null || echo "{}")
+      fi
+    fi
+    if [ "$LINT_CMDS_JSON" = "{}" ] && [ ${#_pairs[@]} -gt 0 ]; then
+      # Build JSON from detected pairs
+      LINT_CMDS_JSON=$(python3 -c "
+import json
+pairs = [p.split('|',1) for p in $(printf '%s\n' "${_pairs[@]}" | python3 -c "import sys,json; print(json.dumps([l.rstrip() for l in sys.stdin]))" 2>/dev/null || echo "[]")]
+print(json.dumps(dict(pairs)))
+" 2>/dev/null)
+      [ -z "$LINT_CMDS_JSON" ] || [ "$LINT_CMDS_JSON" = "null" ] && LINT_CMDS_JSON="{}"
+    fi
+  fi
+  unset _pairs
+}
+_detect_lint
+echo -e "    → ${GREEN}lint_commands: $LINT_CMDS_JSON${NC}"
 
 # ═══════════════════════════════════════════════════════════════
 # STEP 2 — Generate tao.config.json
@@ -179,22 +256,6 @@ else
     PHASE_PREFIX="fase-"
   else
     PHASE_PREFIX="phase-"
-  fi
-
-  # Build lint command
-  LINT_CMD_VAL=""
-  if [ "$LINT_STACK" != "none" ]; then
-    case "$LINT_STACK" in
-      .php) LINT_CMD_VAL="php -l {file}" ;;
-      .py)  LINT_CMD_VAL="python3 -m py_compile {file}" ;;
-      .ts)  LINT_CMD_VAL="npx tsc --noEmit" ;;
-      .js)  LINT_CMD_VAL="node --check {file}" ;;
-      .rb)  LINT_CMD_VAL="ruby -c {file}" ;;
-      .go)  LINT_CMD_VAL="go vet {file}" ;;
-      .rs)  LINT_CMD_VAL="cargo check" ;;
-      *)    warn "Unknown stack '$LINT_STACK' — lint_commands left empty"
-            LINT_STACK="none" ;;
-    esac
   fi
 
   # Write config using python3 for proper JSON escaping
@@ -222,7 +283,7 @@ config = {
         'phases': 'docs/phases/',
         'phase_prefix': sys.argv[5]
     },
-    'lint_commands': {},
+    'lint_commands': json.loads(sys.argv[6]),
     'commit_scopes': [],
     'compliance': {
         'require_skill_check': True,
@@ -231,16 +292,13 @@ config = {
         'abex_enabled': True
     },
     'doc_sync': {
-        'enabled': False,
-        'script': '.github/tao/scripts/doc-sync.sh'
+        'enabled': False
     }
 }
-if sys.argv[6] != 'none':
-    config['lint_commands'][sys.argv[6]] = sys.argv[7]
-with open(sys.argv[8], 'w') as f:
+with open(sys.argv[7], 'w') as f:
     json.dump(config, f, indent=2, ensure_ascii=False)
     f.write('\n')
-" "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "$LINT_STACK" "${LINT_CMD_VAL:-}" "$CONFIG_FILE"
+" "$PROJECT_NAME" "$PROJECT_DESC" "$LANG_CHOICE" "$DEV_BRANCH" "$PHASE_PREFIX" "${LINT_CMDS_JSON:-{}}" "$CONFIG_FILE"
   if [ -f "$CONFIG_FILE" ]; then
     installed ".github/tao/tao.config.json"
   else
@@ -341,6 +399,10 @@ safe_copy_exec "$TAO_DIR/hooks/context-hook.sh"    "$TARGET_DIR/.github/tao/scri
 safe_copy_exec "$TAO_DIR/hooks/enforcement-hook.sh" "$TARGET_DIR/.github/tao/scripts/enforcement-hook.sh" ".github/tao/scripts/enforcement-hook.sh"
 safe_copy_exec "$TAO_DIR/hooks/install-hooks.sh"   "$TARGET_DIR/.github/tao/scripts/install-hooks.sh"   ".github/tao/scripts/install-hooks.sh"
 safe_copy_exec "$TAO_DIR/hooks/pre-commit.sh"      "$TARGET_DIR/.github/tao/scripts/pre-commit.sh"      ".github/tao/scripts/pre-commit.sh"
+safe_copy_exec "$TAO_DIR/hooks/abex-hook.sh"       "$TARGET_DIR/.github/tao/scripts/abex-hook.sh"       ".github/tao/scripts/abex-hook.sh"
+safe_copy_exec "$TAO_DIR/hooks/commit-msg.sh"      "$TARGET_DIR/.github/tao/scripts/commit-msg.sh"      ".github/tao/scripts/commit-msg.sh"
+safe_copy_exec "$TAO_DIR/hooks/pre-push.sh"        "$TARGET_DIR/.github/tao/scripts/pre-push.sh"        ".github/tao/scripts/pre-push.sh"
+safe_copy_exec "$TAO_DIR/scripts/abex-gate.sh"     "$TARGET_DIR/.github/tao/scripts/abex-gate.sh"       ".github/tao/scripts/abex-gate.sh"
 safe_copy_exec "$TAO_DIR/scripts/validate-plan.sh"      "$TARGET_DIR/.github/tao/scripts/validate-plan.sh"      ".github/tao/scripts/validate-plan.sh"
 safe_copy_exec "$TAO_DIR/scripts/validate-execution.sh"  "$TARGET_DIR/.github/tao/scripts/validate-execution.sh"  ".github/tao/scripts/validate-execution.sh"
 safe_copy_exec "$TAO_DIR/scripts/new-phase.sh"           "$TARGET_DIR/.github/tao/scripts/new-phase.sh"           ".github/tao/scripts/new-phase.sh"
@@ -371,6 +433,82 @@ if [ -d "$PHASE_TMPL_SHARED" ]; then
   for tmpl in "$PHASE_TMPL_SHARED/"*; do
     [ -f "$tmpl" ] && safe_copy "$tmpl" "$PHASE_TARGET/shared/$(basename "$tmpl")" ".github/tao/phases/shared/$(basename "$tmpl")"
   done
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6c — Create initial phase directory (phase-01 / fase-01)
+# ═══════════════════════════════════════════════════════════════
+step "Creating initial phase directory"
+
+_phases_sub="docs/phases"
+_p_prefix="phase-"
+if [ "$LANG_CHOICE" = "pt-br" ]; then
+  _phases_sub="docs/phases"
+  _p_prefix="fase-"
+fi
+INITIAL_PHASE_DIR="$TARGET_DIR/$_phases_sub/${_p_prefix}01"
+
+if [ -d "$INITIAL_PHASE_DIR" ]; then
+  skipped "$_phases_sub/${_p_prefix}01/"
+else
+  _tasks_dir="tasks"
+  if [ "$LANG_CHOICE" = "pt-br" ]; then
+    _tasks_dir="tarefas"
+  fi
+  mkdir -p "$INITIAL_PHASE_DIR/brainstorm" "$INITIAL_PHASE_DIR/$_tasks_dir"
+  # Copy language-specific phase templates
+  for tmpl in "$TAO_DIR/phases/$LANG_CHOICE"/*.template; do
+    [ -f "$tmpl" ] || continue
+    _dest="$INITIAL_PHASE_DIR/$(basename "${tmpl%.template}")"
+    [ ! -f "$_dest" ] && cp "$tmpl" "$_dest"
+  done
+  # progress.txt
+  [ ! -f "$INITIAL_PHASE_DIR/progress.txt" ] && touch "$INITIAL_PHASE_DIR/progress.txt"
+  installed "$_phases_sub/${_p_prefix}01/"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6d — Create .vscode/settings.json (enable agent hooks)
+# ═══════════════════════════════════════════════════════════════
+step "Configuring VS Code settings"
+
+VSCODE_DIR="$TARGET_DIR/.vscode"
+VSCODE_SETTINGS="$VSCODE_DIR/settings.json"
+
+mkdir -p "$VSCODE_DIR"
+if [ ! -f "$VSCODE_SETTINGS" ]; then
+  cat > "$VSCODE_SETTINGS" << 'VSSETTINGS'
+{
+  "chat.useCustomAgentHooks": true
+}
+VSSETTINGS
+  installed ".vscode/settings.json"
+elif grep -q '"chat.useCustomAgentHooks"' "$VSCODE_SETTINGS" 2>/dev/null; then
+  skipped ".vscode/settings.json (already configured)"
+else
+  echo -e "    ${YELLOW}⚠️${NC}  .vscode/settings.json exists — add ${BOLD}\"chat.useCustomAgentHooks\": true${NC} manually"
+fi
+
+# ═══════════════════════════════════════════════════════════════
+# STEP 6e — Update .gitignore with TAO entries
+# ═══════════════════════════════════════════════════════════════
+step "Updating .gitignore"
+
+GITIGNORE_FILE="$TARGET_DIR/.gitignore"
+TAO_GITIGNORE_MARKER="# TAO Framework"
+
+if [ -f "$GITIGNORE_FILE" ] && grep -q "$TAO_GITIGNORE_MARKER" "$GITIGNORE_FILE" 2>/dev/null; then
+  skipped ".gitignore (TAO entries already present)"
+else
+  {
+    echo ""
+    echo "# TAO Framework"
+    echo ".tao-pause"
+    echo ".gsd-pause"
+    echo ".tao-session/"
+    echo "*.tao.local"
+  } >> "$GITIGNORE_FILE"
+  installed ".gitignore (TAO entries added)"
 fi
 
 # ═══════════════════════════════════════════════════════════════
@@ -472,9 +610,9 @@ if [ "$LANG_CHOICE" = "pt-br" ]; then
   echo ""
   echo -e "  1. Revise ${BOLD}.github/tao/tao.config.json${NC} — personalize modelos, caminhos, comandos de lint"
   echo -e "  2. Edite ${BOLD}CLAUDE.md${NC} — adicione regras e padrões de código do projeto"
-  echo -e "  3. Edite ${BOLD}.github/tao/CONTEXT.md${NC} — defina sua primeira fase ativa"
-  echo -e "  4. No VS Code: ative ${BOLD}chat.useCustomAgentHooks${NC} nas Configurações"
-  echo -e "  5. No Copilot Chat: selecione ${BOLD}@Executar-Tao${NC} e diga ${BOLD}\"executar\"${NC}"
+  echo -e "  3. Abra o VS Code: ${BOLD}chat.useCustomAgentHooks${NC} está habilitado em .vscode/settings.json"
+  echo -e "  4. No Copilot Chat: selecione ${BOLD}@Executar-Tao${NC} e diga ${BOLD}\"executar\"${NC}"
+  echo -e "  5. O agente vai ler STATUS.md e iniciar a primeira tarefa automaticamente"
   echo ""
   echo -e "  ${BLUE}📖${NC} Leia ${BOLD}TAO/README.pt-br.md${NC} para documentação completa"
 else
@@ -482,9 +620,9 @@ else
   echo ""
   echo -e "  1. Review ${BOLD}.github/tao/tao.config.json${NC} — customize models, paths, lint commands"
   echo -e "  2. Edit ${BOLD}CLAUDE.md${NC} — add project-specific rules and code patterns"
-  echo -e "  3. Edit ${BOLD}.github/tao/CONTEXT.md${NC} — set your first active phase"
-  echo -e "  4. In VS Code: enable ${BOLD}chat.useCustomAgentHooks${NC} in Settings"
-  echo -e "  5. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
+  echo -e "  3. Open VS Code: ${BOLD}chat.useCustomAgentHooks${NC} is enabled via .vscode/settings.json"
+  echo -e "  4. In Copilot Chat: select ${BOLD}@Execute-Tao${NC} and say ${BOLD}\"execute\"${NC}"
+  echo -e "  5. The agent will read STATUS.md and start the first task automatically"
   echo ""
   echo -e "  ${BLUE}📖${NC} Read ${BOLD}TAO/README.md${NC} for full documentation"
 fi

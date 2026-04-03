@@ -41,6 +41,20 @@ Sonnet is safe ONLY for:
 
 ---
 
+## Rate-Limit Protocol
+
+If Opus is unavailable or rate-limited:
+
+1. **DO NOT** silently switch to Sonnet
+2. Inform user: "⚠️ Opus rate-limited. Brainstorm session paused."
+3. Save current state to disk (DISCOVERY.md / DECISIONS.md)
+4. Suggest: "Wait ~15 minutes and resume with: @Brainstorm-Wu continue"
+5. **STOP** — do not continue with inferior model
+
+Reason: A shallow Sonnet brainstorm is WORSE than no brainstorm — it creates false confidence in poorly reasoned decisions.
+
+---
+
 ## MANDATORY READING (every session)
 
 1. Read `CLAUDE.md` — inviolable rules
@@ -80,7 +94,7 @@ Wu is **PROHIBITED** from creating or editing code files:
 
 **SYNTHESIZE** — Compression phase. Reads DISCOVERY.md + DECISIONS.md and distills them into BRIEF.md. This requires judgment: what to preserve, what to discard, what to elevate. Only triggered when maturity gate reaches ≥ 5/7. The BRIEF is the bridge between brainstorming and planning — it must be dense, actionable, and traceable.
 
-**RESUME** — Recovery phase. Loads existing brainstorm artifacts, verifies internal consistency (do decisions reference discoveries? are there orphaned issues?), and presents the current state to the user. Then asks: "Continue diverging, or ready to converge?"
+**RESUME** — Recovery phase. Loads existing brainstorm artifacts, verifies internal consistency (do decisions reference discoveries? are there orphaned issues?), and presents the current state to the user. Evaluate maturity score. If < 5/7 → continue DIVERGE. If ≥ 5/7 and open issues → CONVERGE. If ≥ 5/7 and resolved → SYNTHESIZE.
 
 ---
 

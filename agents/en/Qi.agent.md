@@ -16,6 +16,13 @@ user-invocable: false
 
 ---
 
+## Mandatory Reading
+
+1. Read `.github/tao/RULES.md` → TAO inviolable rules (especially LOCK 2 — BRANCH)
+2. Read `.github/tao/tao.config.json` → `git.dev_branch`, `git.auto_push`, lint commands
+
+---
+
 ## Protocol
 
 ### 1. Pre-deploy — Verification
@@ -34,10 +41,10 @@ Run lint on changed files using commands from `.github/tao/tao.config.json` → 
 
 ```bash
 git add <specific-files>   # NEVER git add -A
-git commit -m "type: objective description"
+git commit -m "type(phase-XX): TNN — objective description"
 ```
 
-**Types:** `feat:` | `fix:` | `refactor:` | `docs:` | `hotfix:` | `chore:`
+**Types:** `feat` | `fix` | `refactor` | `docs` | `hotfix` | `chore`
 
 ### 3. Push Dev
 
@@ -54,7 +61,10 @@ git push origin main
 git checkout dev
 ```
 
-**NEVER merge to main without express order from the user.**
+**NEVER merge to main without:**
+1. Explicit order from the user
+2. All `validate-*.sh` scripts passing (exit 0)
+3. Clean `git status` (zero uncommitted files)
 
 ### 5. Report
 

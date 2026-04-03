@@ -15,7 +15,7 @@ agents:
 
 # Executar-Tao (道) — O Caminho | Orquestrador
 
-> **Modelo:** Sonnet 4.6 (1x premium request) — orquestra tarefas, invoca Shen como subagent para trabalho complexo.
+> **Modelo:** Sonnet 4.6 (primário, 1x premium request) — GPT-4.1 como fallback automático quando rate-limited. Orquestra tarefas, invoca Shen como subagent para trabalho complexo.
 > **Config:** Todos os valores específicos do projeto vêm de `.github/tao/tao.config.json`.
 
 ## Regra de Ouro — AUTONOMIA TOTAL
@@ -36,6 +36,20 @@ agents:
 ---
 
 ## TRIGGER: "executar", "continuar"
+
+### PRÉ-VOO — Verificação de Configuração (ANTES de qualquer tarefa)
+
+1. Verificar se `.github/tao/tao.config.json` existe
+   - **Se NÃO** → entrar em modo ONBOARDING:
+     - Informar: "⚠️ TAO não está configurado neste projeto."
+     - Instruir: "Execute no terminal: `bash /caminho/para/TAO/install.sh`"
+     - Continuar: "Depois volte e diga: @Executar-Tao executar"
+     - **STOP** — NÃO executar tarefas sem configuração.
+   - **Se SIM** → verificar integridade básica:
+     - `dev_branch` definido? Se não → avisar: "Defina git.dev_branch em tao.config.json"
+     - Diretório de fases existe? Se não → avisar: "Execute install.sh ou crie o diretório de fases"
+     - `lint_commands` vazio? → avisar: "Configure lint_commands em tao.config.json para verificação de qualidade"
+     - Todos os avisos são informativos — NÃO parar se config existir
 
 ### PASSO 0 — DESCOBRIR FASE ATIVA
 Ler `.github/tao/CONTEXT.md` → campo "Fase Ativa" → extrair número.
@@ -78,8 +92,16 @@ LOOP {
     → se exit 0 (PASS): continuar para PLAN_GATE
     → se exit 1 (BLOCK): AUTO-CORRIGIR (NUNCA PARAR):
       brainstorm_fix_attempt = 0
+      total_brainstorm_attempts = 0
+      MAX_BRAINSTORM_TOTAL = 9
       BRAINSTORM_FIX_LOOP {
         brainstorm_fix_attempt += 1
+        total_brainstorm_attempts += 1
+        → SE total_brainstorm_attempts > MAX_BRAINSTORM_TOTAL:
+          → HARD STOP — registrar no progress.txt:
+            "CIRCUIT BREAKER: Validação do brainstorm falhou após {MAX_BRAINSTORM_TOTAL} tentativas totais. Intervenção manual necessária."
+          → Marcar fase como ⚠️ BLOCKED no STATUS.md
+          → PARAR loop — reportar ao usuário
         → INVOCAR Wu como subagent:
           "BRAINSTORM_GATE falhou. Output do validador: [output completo].
            Corrigir artefatos do brainstorm:
@@ -103,8 +125,16 @@ LOOP {
                     → se exit 0 (PASS): continuar
                     → se exit 1 (BLOCK): AUTO-CORRIGIR (NUNCA PARAR):
                       plan_fix_attempt = 0
+                      total_plan_attempts = 0
+                      MAX_PLAN_TOTAL = 9
                       PLAN_FIX_LOOP {
                         plan_fix_attempt += 1
+                        total_plan_attempts += 1
+                        → SE total_plan_attempts > MAX_PLAN_TOTAL:
+                          → HARD STOP — registrar no progress.txt:
+                            "CIRCUIT BREAKER: Validação do plano falhou após {MAX_PLAN_TOTAL} tentativas totais. Intervenção manual necessária."
+                          → Marcar fase como ⚠️ BLOCKED no STATUS.md
+                          → PARAR loop — reportar ao usuário
                         → INVOCAR Shen como subagent:
                           "PLAN_GATE falhou. Output do validador: [output completo].
                            Corrigir PLAN.md para cobrir todas as decisões do BRIEF.md.
@@ -133,10 +163,19 @@ LOOP {
 
      ```
      gate_attempt = 0
+     total_gate_attempts = 0
      MAX_GATE_RETRIES = 3
+     MAX_GATE_TOTAL = 9
 
      GATE_LOOP {
        gate_attempt += 1
+       total_gate_attempts += 1
+
+       → SE total_gate_attempts > MAX_GATE_TOTAL:
+         → HARD STOP — registrar no progress.txt:
+           "CIRCUIT BREAKER: Pipeline de gates falhou após {MAX_GATE_TOTAL} tentativas totais. Intervenção manual necessária."
+         → Marcar fase como ⚠️ BLOCKED no STATUS.md
+         → PARAR loop — reportar ao usuário
 
        ── PASSO A: GATES DETERMINÍSTICOS (scripts — rápido, grátis, pega issues de superfície) ──
 
@@ -433,6 +472,9 @@ O `context-hook.sh` (SessionStart) injetará automaticamente este handoff na
 próxima sessão. Se esquecer, a próxima sessão verá um aviso de R2 órfão.
 
 ---
+
+> Formato canônico definido em `.github/tao/RULES.md` §R0.
+> O hook SessionStart injeta os dados do sistema. Use ESSES valores.
 
 ## COMPLIANCE CHECK (OBRIGATÓRIO)
 

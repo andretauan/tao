@@ -122,9 +122,9 @@ mkdir -p "$PHASE_DIR/$TASKS_DIR_NAME"
 # ── Copy and substitute templates ──
 DATE_NOW=$(date '+%Y-%m-%d %H:%M')
 
-# Escape sed special chars in user-provided values (& / \ are special in sed replacements)
-SAFE_PHASE_NAME=$(printf '%s' "$PHASE_NAME" | sed 's/[&/\\]/\\&/g')
-SAFE_PROJECT_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\\]/\\&/g')
+# Escape sed special chars in user-provided values (& / \ | are special in sed replacements/delimiters)
+SAFE_PHASE_NAME=$(printf '%s' "$PHASE_NAME" | sed 's/[&/\\|]/\\&/g')
+SAFE_PROJECT_NAME=$(printf '%s' "$PROJECT_NAME" | sed 's/[&/\\|]/\\&/g')
 
 for template in "$TEMPLATE_DIR"/*; do
   if [ -f "$template" ]; then

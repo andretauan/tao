@@ -75,25 +75,57 @@ try:
     with open(sys.argv[1]) as f:
         cfg = json.load(f)
     cmds = cfg.get('lint_commands', {})
-    cmd = cmds.get(sys.argv[2], '')
-    print(cmd)
+    if not cmds:
+        print('__EMPTY__')
+    else:
+        cmd = cmds.get(sys.argv[2], '')
+        print(cmd)
 except:
     print('')
 " "$CONFIG_FILE" "$EXT" 2>/dev/null)
+
+if [ "$LINT_CMD" = "__EMPTY__" ]; then
+  # Warn agent that no lint_commands are configured (only once — on .md or .json edits skip)
+  case "$EXT" in
+    .md|.json|.txt|.yaml|.yml) exit 0 ;;
+  esac
+  WARN_MSG=$(printf '%s' "⚠️ TAO lint: lint_commands is empty in .github/tao/tao.config.json. No lint check performed. Configure lint tools in tao.config.json → lint_commands." | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null)
+  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":%s}}\n' "$WARN_MSG"
+  exit 0
+fi
 
 if [ -z "$LINT_CMD" ]; then
   exit 0
 fi
 
+# ── Validate lint command from config (prevent injection via malicious config) ──
+if [[ "$LINT_CMD" =~ [';|&`$\<>'] ]] || [[ "$LINT_CMD" == *$'\n'* ]]; then
+  exit 0  # Skip: unsafe characters in lint_commands config
+fi
+
 # ── Sanitize FILE_PATH before shell substitution ──
 # Reject paths containing shell metacharacters that could cause injection
 # via the `bash -c "$LINT_CMD"` call below.
-if [[ "$FILE_PATH" =~ [';|&`$(){}\\<>'] ]]; then
+if [[ "$FILE_PATH" =~ [';|&`$(){}\\<>'] ]] || [[ "$FILE_PATH" == *$'\n'* ]] || [[ "$FILE_PATH" == *$'\r'* ]]; then
   exit 0  # Skip linting for paths with unsafe characters — do not execute
 fi
 
 # ── Replace {file} placeholder with actual path ──
 LINT_CMD="${LINT_CMD//\{file\}/$FILE_PATH}"
+
+# ── Verify tool exists before running ──
+_lint_tool=$(echo "$LINT_CMD" | awk '{print $1}')
+# Handle npx → check second arg
+if [ "$_lint_tool" = "npx" ]; then
+  _lint_tool=$(echo "$LINT_CMD" | awk '{print $2}')
+fi
+# Strip any path prefix for command -v check
+_lint_bin="${_lint_tool##*/}"
+if ! command -v "$_lint_bin" &>/dev/null && [ ! -x "$_lint_tool" ]; then
+  SKIP_MSG=$(printf '%s' "⚠️ TAO lint: tool '${_lint_bin}' not found — skipping lint for ${FILE_PATH}. Install it or update lint_commands in tao.config.json." | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null)
+  printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":%s}}\n' "$SKIP_MSG"
+  exit 0
+fi
 
 # ── Run lint ──
 LINT_EXIT=0

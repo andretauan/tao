@@ -135,9 +135,7 @@ with open(filepath, 'r') as f:
     lines = f.readlines()
 with open(filepath, 'w') as f:
     for line in lines:
-        if line.startswith('model:') and not line.strip().startswith('model:'):
-            f.write(line)
-        elif line.startswith('model:'):
+        if line.startswith('model:'):
             f.write('model: ' + new_model + '\n')
         else:
             f.write(line)

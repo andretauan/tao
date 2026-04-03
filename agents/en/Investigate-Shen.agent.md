@@ -13,7 +13,7 @@ agents:
 
 # Investigate-Shen (深) — Depth | Senior Specialist
 
-> **Model:** Opus 4.6 (3x) — for direct user access outside the @Execute-Tao loop.
+> **Model:** Opus 4.6 (primary, 3x) — Sonnet 4.6 as automatic fallback when rate-limited. For direct user access outside the @Execute-Tao loop.
 > The @Execute-Tao loop uses Shen (subagent) for complex tasks within the loop.
 > This agent is for when the user needs Opus **directly**.
 
@@ -29,6 +29,8 @@ agents:
 1. Read `CLAUDE.md` → inviolable rules
 2. Read `.github/tao/CONTEXT.md` → current state
 3. Consult skills in `.github/skills/INDEX.md` (if exists)
+4. Read `.github/tao/tao.config.json` → lint commands, branch config
+5. Consult `.github/tao/CHANGELOG.md` → last 3 entries
 
 ---
 
@@ -79,4 +81,24 @@ Update `.github/tao/CHANGELOG.md` at the end:
 - **Model:** Claude Opus 4.6 | **Commits:** `hash`
 - **Files:** `list`
 - Description + decisions
+```
+
+---
+
+> Canonical format defined in `.github/tao/RULES.md` §R0.
+> SessionStart hook provides system data. Use THOSE values.
+
+## COMPLIANCE CHECK (MANDATORY)
+
+Every response that modifies code MUST begin with:
+
+```
+📋 COMPLIANCE CHECK — Phase XX
+├─ Agent: Investigate-Shen (Opus 4.6)
+├─ Skills consulted: [list]
+├─ Files read before editing: [list]
+├─ .github/tao/CONTEXT.md read: YES
+├─ .github/tao/CHANGELOG.md consulted: YES
+├─ ABEX: [PASS / N/A]
+└─ Date/time: YYYY-MM-DD HH:MM
 ```

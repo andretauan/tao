@@ -102,7 +102,7 @@ fi
 
 # P1-C: tao.config.json existe e é JSON válido?
 if [ -f "$CONFIG_FILE" ]; then
-  if python3 -c "import json; json.load(open('$CONFIG_FILE'))" 2>/dev/null; then
+  if python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$CONFIG_FILE" 2>/dev/null; then
     ok "tao.config.json exists and is valid JSON"
   else
     fail "tao.config.json exists but is INVALID JSON — agents cannot read config"
@@ -256,13 +256,13 @@ except:
     # P2-D: PLAN e STATUS têm o mesmo número de tasks?
     if [ -n "$PLAN_FILE" ]; then
       _plan_count=$(python3 -c "
-import re
-text = open('$PLAN_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 print(len(set(re.findall(r'\bT(\d+)\b', text))))
-" 2>/dev/null || echo "0")
+" "$PLAN_FILE" 2>/dev/null || echo "0")
       _status_count=$(python3 -c "
-import re
-text = open('$STATUS_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 ids = set()
 for line in text.splitlines():
     if '|' not in line: continue
@@ -270,7 +270,7 @@ for line in text.splitlines():
     if cols and re.match(r'^T?\d+$', cols[0]):
         ids.add(cols[0])
 print(len(ids))
-" 2>/dev/null || echo "0")
+" "$STATUS_FILE" 2>/dev/null || echo "0")
       if [ "$_plan_count" = "$_status_count" ] && [ "$_plan_count" != "0" ]; then
         ok "PLAN tasks (${_plan_count}) == STATUS tasks (${_status_count})"
       elif [ "$_plan_count" = "0" ]; then
@@ -291,15 +291,15 @@ print(len(ids))
   done
   if [ -n "$BRIEF_FILE" ]; then
     _mat=$(python3 -c "
-import re
-text = open('$BRIEF_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 mat = re.search(r'(?:Maturity|Maturidade)[^\n]*\n(.*?)(?=\n---|\n## |\Z)', text, re.DOTALL|re.IGNORECASE)
 if mat:
     checked = len(re.findall(r'- \[x\]', mat.group(1), re.IGNORECASE))
     print(checked)
 else:
     print(-1)
-" 2>/dev/null || echo "-1")
+" "$BRIEF_FILE" 2>/dev/null || echo "-1")
     if [ "$_mat" = "-1" ]; then
       warn "BRIEF.md has no maturity checklist"
     elif [ "$_mat" -ge 5 ]; then
@@ -335,10 +335,10 @@ else:
       info "Wu must save IBIS decisions (D1, D2, ...) with positions and arguments"
     else
       _decs_count=$(python3 -c "
-import re
-text = open('$_decs_file').read()
+import re, sys
+text = open(sys.argv[1]).read()
 print(len(set(re.findall(r'\bD(\d+)\b', text))))
-" 2>/dev/null || echo "0")
+" "$_decs_file" 2>/dev/null || echo "0")
       if [ "$_decs_count" = "0" ]; then
         fail "DECISIONS.md has no D{N} entries — decisions not recorded"
       else
@@ -513,29 +513,29 @@ fi
 # P3-D: auto_push não empurra para main
 if [ -f "$CONFIG_FILE" ]; then
   _auto_push=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     print(str(c.get('git',{}).get('auto_push', False)).lower())
 except:
     print('unknown')
-" 2>/dev/null || echo "unknown")
+" "$CONFIG_FILE" 2>/dev/null || echo "unknown")
   _main_branch=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     print(c.get('git',{}).get('main_branch','main'))
 except:
     print('main')
-" 2>/dev/null || echo "main")
+" "$CONFIG_FILE" 2>/dev/null || echo "main")
   _dev_branch=$(python3 -c "
-import json
+import json, sys
 try:
-    c = json.load(open('$CONFIG_FILE'))
+    c = json.load(open(sys.argv[1]))
     print(c.get('git',{}).get('dev_branch','dev'))
 except:
     print('dev')
-" 2>/dev/null || echo "dev")
+" "$CONFIG_FILE" 2>/dev/null || echo "dev")
 
   if [ "$_auto_push" = "true" ] && [ "$_dev_branch" = "$_main_branch" ]; then
     fail "auto_push=true AND dev_branch==main_branch — agents will auto-push to main"
@@ -606,6 +606,50 @@ if [ -d "$WORKSPACE_DIR/.git" ]; then
   fi
 fi
 
+# P3-J: DEBUG=True/true in config or source files
+_debug_hits=$(find "$WORKSPACE_DIR" -type f \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/vendor/*" \
+  ! -path "*/templates/*" ! -name "faudit.sh" \
+  \( -name "*.py" -o -name "*.json" -o -name "*.yml" -o -name "*.yaml" \
+     -o -name "*.env" -o -name "*.cfg" -o -name "*.ini" -o -name "*.toml" \) \
+  -exec grep -lE '^\s*DEBUG\s*[=:]\s*(True|true|1)\b' {} + 2>/dev/null | head -5)
+if [ -z "$_debug_hits" ]; then
+  ok "No DEBUG=True/true found in config files"
+else
+  warn "DEBUG=True/true found in config files — verify not intended for production:"
+  echo "$_debug_hits" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
+# P3-K: console.log/print of sensitive data patterns
+_log_secret=$(find "$WORKSPACE_DIR" -type f \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" ! -path "*/vendor/*" \
+  ! -path "*/templates/*" ! -name "faudit.sh" \
+  \( -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) \
+  -exec grep -lE '(console\.log|print)\s*\(.*\b(password|secret|token|api_key|private_key)\b' {} + 2>/dev/null | head -5)
+if [ -z "$_log_secret" ]; then
+  ok "No console.log/print of sensitive variable names detected"
+else
+  warn "Potential sensitive data in log output:"
+  echo "$_log_secret" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
+# P3-L: Files with overly permissive permissions (777)
+_perm_hits=$(find "$WORKSPACE_DIR" -maxdepth 3 -type f -perm -o+w \
+  ! -path "*/.git/*" ! -path "*/node_modules/*" \
+  \( -name "*.sh" -o -name "*.env" -o -name "*.key" -o -name "*.pem" \) 2>/dev/null | head -5)
+if [ -z "$_perm_hits" ]; then
+  ok "No world-writable sensitive files (.sh, .env, .key, .pem)"
+else
+  warn "World-writable sensitive files found — tighten permissions:"
+  echo "$_perm_hits" | while IFS= read -r line; do
+    echo -e "     ${YELLOW}$line${NC}"
+  done
+fi
+
 P3_BLOCKS=$CURRENT_BLOCKS
 P3_WARN=$CURRENT_WARN
 
@@ -638,7 +682,7 @@ if [ "$TOTAL_BLOCKS" -eq 0 ] && [ "$TOTAL_WARN" -eq 0 ]; then
 elif [ "$TOTAL_BLOCKS" -eq 0 ]; then
   echo -e "${GREEN}${BOLD}  ✅ FAUDIT: ALL 3 PASSES${NC} ${YELLOW}(${TOTAL_WARN} warning(s))${NC}"
 else
-  echo -e "${RED}${BOLD}  🚫 FAUDIT: BLOCKED — ${TOTAL_BLOCKS} issue(s) across ${TOTAL_BLOCKS} pass(es)${NC}"
+  echo -e "${RED}${BOLD}  🚫 FAUDIT: BLOCKED — ${TOTAL_BLOCKS} issue(s) found${NC}"
   echo ""
   echo -e "  ${YELLOW}Fix all BLOCK items before proceeding to documentation validation.${NC}"
   echo -e "  ${YELLOW}Rerun: bash .github/tao/scripts/faudit.sh [phase-dir]${NC}"

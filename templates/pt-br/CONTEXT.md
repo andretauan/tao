@@ -9,7 +9,7 @@
 
 ## Fase Ativa
 
-**Fase:** [XX — Nome da Fase]
+**Fase:** 01 — Definição Pendente
 **Status:** novo_projeto
 
 > Quando `status: novo_projeto`, agentes devem:

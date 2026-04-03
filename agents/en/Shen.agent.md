@@ -18,6 +18,15 @@ user-invocable: false
 
 ---
 
+## Mandatory Reading
+
+1. Read `CLAUDE.md` → project rules and code patterns
+2. Read `.github/tao/RULES.md` → TAO inviolable rules
+3. Read `.github/tao/CONTEXT.md` → active phase + locked decisions
+4. Read `.github/tao/tao.config.json` → paths, lint, branch, models
+
+---
+
 ## Configuration
 
 All project-specific values come from `.github/tao/tao.config.json`:
@@ -65,6 +74,28 @@ Return to @Execute-Tao:
 - List of files created/edited
 - Commit hash
 - Decisions made (if any)
+
+---
+
+---
+
+> Canonical format defined in `.github/tao/RULES.md` §R0.
+> SessionStart hook provides system data. Use THOSE values.
+
+## COMPLIANCE CHECK (MANDATORY)
+
+Every response that modifies code MUST begin with:
+
+```
+📋 COMPLIANCE CHECK — Phase XX
+├─ Agent: Shen (Opus 4.6)
+├─ Skills consulted: [list]
+├─ Files read before editing: [list]
+├─ .github/tao/CONTEXT.md read: YES
+├─ .github/tao/CHANGELOG.md consulted: YES
+├─ ABEX: [PASS / N/A]
+└─ Date/time: YYYY-MM-DD HH:MM
+```
 
 ---
 

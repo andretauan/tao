@@ -87,13 +87,4 @@ TAO skills are auto-loaded by VS Code based on context. The instruction files `t
 
 ## COMPLIANCE CHECK
 
-Every code-modifying response MUST start with:
-
-```
-📋 COMPLIANCE CHECK
-├─ Skills consulted: [list or "none applicable"]
-├─ Files read before editing: [list]
-├─ CONTEXT.md read: YES
-├─ CHANGELOG.md consulted: YES
-└─ ABEX: [PASS / N/A]
-```
+Compliance check format and execution sequence: see `.github/tao/RULES.md` §R0.

@@ -196,3 +196,30 @@ This is intentional. Planning requires Opus-level reasoning — a plan generated
 3. **Batch DB tasks** — @Di uses the free tier, so DB operations cost nothing
 4. **Let hooks lint** — 0 cost, catches errors before the LLM needs to fix them
 5. **Review STATUS.md executor column** — ensure complex tasks are marked correctly so Shen handles them instead of Tao struggling and wasting turns
+
+---
+
+## Full-Cycle Cost Estimates
+
+### Typical Phase Cost (16-task phase)
+
+| Stage | Agent | Model | Queries | Est. Cost |
+|-------|-------|-------|---------|-----------|
+| Brainstorm | Wu | Opus | 3-5 | $1.50-2.50 |
+| Planning | Wu | Opus | 2-3 | $1.00-1.50 |
+| Execution | Tao | Sonnet | 16-32 | $0.80-1.60 |
+| Verification | Tao | Sonnet | 3-5 | $0.15-0.25 |
+| **Total** | | | **24-45** | **$3.45-5.85** |
+
+### Cost Optimization Tips
+
+1. **Wu (Opus) is expensive but prevents rewrite cycles.** A $2 brainstorm saves $10+ in rework.
+2. **Sonnet handles execution efficiently.** Don't use Opus for task execution.
+3. **Batch small tasks.** Grouping related changes in one session reduces context-loading overhead.
+4. **Rate limits matter.** Opus has lower rate limits — plan brainstorm sessions to avoid hitting them.
+
+### When NOT to Use TAO
+
+- Single-file bug fixes (overhead > value)
+- Prototyping / throwaway code
+- Projects with < 3 files
