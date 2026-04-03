@@ -383,6 +383,10 @@ O ABEX opera em dois níveis:
 1. **Automatizado** — `abex-gate.sh` faz detecção de padrões de segurança via regex (SQL injection, XSS, secrets hardcoded, etc.) via hook pre-commit e PostToolUse. Determinístico.
 2. **Julgamento do agente** — três passadas manuais de revisão (Segurança, Segurança do Usuário, Performance) realizadas pelo agente após cada tarefa. Baseado em instrução (L2).
 
+### Auditoria Forense
+
+Quando todas as tarefas da fase estão completas, o gate do `pre-commit.sh` executa o `faudit.sh` — uma auditoria forense que varre cada arquivo commitado procurando padrões de segurança, completude de documentação e integridade estrutural. É uma varredura final que captura problemas que commits individuais possam ter perdido.
+
 ---
 
 ## 💰 Economia de Modelos

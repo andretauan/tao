@@ -381,6 +381,10 @@ ABEX operates at two levels:
 1. **Automated** — `abex-gate.sh` performs regex-based security pattern detection (SQL injection, XSS, hardcoded secrets, etc.) via pre-commit hook and PostToolUse hook. Deterministic.
 2. **Agent judgment** — three manual review passes (Security, User Safety, Performance) performed by the agent after each task. Instruction-based (L2).
 
+### Forensic Audit
+
+When all phase tasks are complete, the `pre-commit.sh` gate runs `faudit.sh` — a forensic audit that scans every committed file for security patterns, documentation completeness, and structural integrity. This is a final sweep that catches issues individual task commits may have missed.
+
 ---
 
 ## 💰 Model Economics
