@@ -143,14 +143,14 @@ CURRENT_BLOCKS=0; CURRENT_WARN=0
 if [ -n "$STATUS_FILE" ] && [ -n "$TASKS_DIR" ] && [ -d "$TASKS_DIR" ]; then
   _missing_tasks=0
   _done_ids=$(python3 -c "
-import re
-text = open('$STATUS_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 for line in text.splitlines():
     if '|' not in line or '✅' not in line: continue
     cols = [c.strip() for c in line.split('|') if c.strip()]
     if cols and re.match(r'^T?\d+$', cols[0]):
         print(cols[0].lstrip('T').zfill(2))
-" 2>/dev/null || true)
+" "$STATUS_FILE" 2>/dev/null || true)
   if [ -n "$_done_ids" ]; then
     while IFS= read -r tid; do
       [ -z "$tid" ] && continue
@@ -174,8 +174,8 @@ if [ -n "$PLAN_FILE" ]; then
   _art_missing=0
   _art_total=0
   _artifacts=$(python3 -c "
-import re, os
-text = open('$PLAN_FILE').read()
+import re, os, sys
+text = open(sys.argv[1]).read()
 # Find file paths in tree blocks (├── or └── lines) or backtick references
 tree = re.findall(r'[├└]── (.+?)$', text, re.MULTILINE)
 refs = re.findall(r'\x60([a-zA-Z0-9_./-]+\.[a-z]{1,6})\x60', text)
@@ -189,7 +189,7 @@ for f in tree + refs:
     if f not in seen:
         seen.add(f)
         print(f)
-" 2>/dev/null || true)
+" "$PLAN_FILE" 2>/dev/null || true)
   if [ -n "$_artifacts" ]; then
     while IFS= read -r art; do
       [ -z "$art" ] && continue
@@ -240,7 +240,7 @@ if [ -n "$_json_files" ]; then
   _j_ok=0
   while IFS= read -r jf; do
     [ -z "$jf" ] && continue
-    if python3 -c "import json; json.load(open('$jf'))" 2>/dev/null; then
+    if python3 -c "import json, sys; json.load(open(sys.argv[1]))" "$jf" 2>/dev/null; then
       _j_ok=$((_j_ok + 1))
     else
       fail "Invalid JSON: ${jf#$WORKSPACE_DIR/}"
@@ -391,10 +391,10 @@ CURRENT_BLOCKS=0; CURRENT_WARN=0
 # R2-A: STATUS task count matches PLAN task count
 if [ -n "$PLAN_FILE" ] && [ -n "$STATUS_FILE" ]; then
   _sync_result=$(python3 -c "
-import re
+import re, sys
 
-plan_text = open('$PLAN_FILE').read()
-status_text = open('$STATUS_FILE').read()
+plan_text = open(sys.argv[1]).read()
+status_text = open(sys.argv[2]).read()
 
 plan_ids = set(re.findall(r'\bT(\d+)\b', plan_text))
 status_ids = set()
@@ -421,7 +421,7 @@ else:
     if only_status:
         issues.append('In STATUS but not PLAN: ' + ','.join(sorted(only_status)))
     print('MISMATCH:' + ' | '.join(issues))
-" 2>/dev/null || echo "ERROR")
+" "$PLAN_FILE" "$STATUS_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_sync_result" in
     OK:*)
@@ -444,9 +444,9 @@ fi
 # R2-B: Every BRIEF decision (D{N}) referenced in PLAN
 if [ -n "$BRIEF_FILE" ] && [ -n "$PLAN_FILE" ]; then
   _dec_result=$(python3 -c "
-import re
-brief = open('$BRIEF_FILE').read()
-plan = open('$PLAN_FILE').read()
+import re, sys
+brief = open(sys.argv[1]).read()
+plan = open(sys.argv[2]).read()
 
 brief_decs = set(re.findall(r'\bD(\d+)\b', brief))
 plan_decs = set(re.findall(r'\bD(\d+)\b', plan))
@@ -458,7 +458,7 @@ elif not unreferenced:
     print('OK:' + str(len(brief_decs)))
 else:
     print('MISSING:' + ','.join('D'+d for d in sorted(unreferenced)))
-" 2>/dev/null || echo "ERROR")
+" "$BRIEF_FILE" "$PLAN_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_dec_result" in
     OK:*)
@@ -492,8 +492,8 @@ fi
 # R2-D: tao.config.json ↔ actual project structure consistency
 if [ -f "$CONFIG_FILE" ]; then
   _struct_issues=$(python3 -c "
-import json, os
-c = json.load(open('$CONFIG_FILE'))
+import json, os, sys
+c = json.load(open(sys.argv[1]))
 paths = c.get('paths', {})
 issues = []
 
@@ -519,7 +519,7 @@ if git.get('dev_branch') == git.get('main_branch'):
 
 for i in issues:
     print(i)
-" 2>/dev/null || true)
+" "$CONFIG_FILE" 2>/dev/null || true)
 
   if [ -z "$_struct_issues" ]; then
     ok "tao.config.json paths match project structure"
@@ -534,9 +534,9 @@ fi
 # R2-E: STATUS ✅ tasks match progress.txt entries
 if [ -n "$STATUS_FILE" ] && [ -n "$PROGRESS_FILE" ] && [ -f "$PROGRESS_FILE" ]; then
   _cross_result=$(python3 -c "
-import re
-status = open('$STATUS_FILE').read()
-progress = open('$PROGRESS_FILE').read()
+import re, sys
+status = open(sys.argv[1]).read()
+progress = open(sys.argv[2]).read()
 
 done_ids = []
 for line in status.splitlines():
@@ -557,7 +557,7 @@ elif not missing:
     print('OK:' + str(len(done_ids)))
 else:
     print('MISSING:' + ','.join(missing))
-" 2>/dev/null || echo "ERROR")
+" "$STATUS_FILE" "$PROGRESS_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_cross_result" in
     OK:*)
@@ -580,8 +580,8 @@ fi
 # R2-F: No conflicting task status — same task ID should not appear twice
 if [ -n "$STATUS_FILE" ]; then
   _dup_result=$(python3 -c "
-import re
-text = open('$STATUS_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 ids = []
 for line in text.splitlines():
     if '|' not in line: continue
@@ -598,7 +598,7 @@ if dups:
     print('DUP:' + ','.join(sorted(dups)))
 else:
     print('OK')
-" 2>/dev/null || echo "ERROR")
+" "$STATUS_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_dup_result" in
     OK)
@@ -615,9 +615,9 @@ fi
 # R2-G: CONTEXT.md status is consistent with actual phase state
 if [ -f "$CONTEXT_FILE" ] && [ -n "$STATUS_FILE" ]; then
   _ctx_check=$(python3 -c "
-import re
-ctx = open('$CONTEXT_FILE').read()
-status = open('$STATUS_FILE').read()
+import re, sys
+ctx = open(sys.argv[1]).read()
+status = open(sys.argv[2]).read()
 
 ctx_status_match = re.search(r'status:\s*(\S+)', ctx)
 ctx_status = ctx_status_match.group(1) if ctx_status_match else 'unknown'
@@ -635,7 +635,7 @@ if done_count > 0 and pending_count == 0 and ctx_status not in ('completed', 'co
 
 for i in issues:
     print(i)
-" 2>/dev/null || true)
+" "$CONTEXT_FILE" "$STATUS_FILE" 2>/dev/null || true)
 
   if [ -z "$_ctx_check" ]; then
     ok "CONTEXT.md status is consistent with phase state"
@@ -701,9 +701,9 @@ fi
 # R3-B: Unreachable / dead task files (task files that exist but NOT in STATUS)
 if [ -n "$STATUS_FILE" ] && [ -n "$TASKS_DIR" ] && [ -d "$TASKS_DIR" ]; then
   _dead_result=$(python3 -c "
-import re, os, glob
+import re, os, glob, sys
 
-status = open('$STATUS_FILE').read()
+status = open(sys.argv[1]).read()
 status_ids = set()
 for line in status.splitlines():
     if '|' not in line: continue
@@ -727,7 +727,7 @@ if orphans:
     print('ORPHAN:' + ','.join(orphans))
 else:
     print('OK')
-" 2>/dev/null || echo "ERROR")
+" "$STATUS_FILE" 2>/dev/null || echo "ERROR")
 
   case "$_dead_result" in
     OK)
@@ -795,8 +795,8 @@ fi
 # R3-E: config lint_commands reference valid tool names
 if [ -f "$CONFIG_FILE" ]; then
   _lint_check=$(python3 -c "
-import json, shutil
-c = json.load(open('$CONFIG_FILE'))
+import json, shutil, sys
+c = json.load(open(sys.argv[1]))
 cmds = c.get('lint_commands', {})
 issues = []
 for ext, cmd in cmds.items():
@@ -805,7 +805,7 @@ for ext, cmd in cmds.items():
         issues.append(ext + ': ' + tool + ' not on PATH')
 for i in issues[:5]:
     print(i)
-" 2>/dev/null || true)
+" "$CONFIG_FILE" 2>/dev/null || true)
 
   if [ -z "$_lint_check" ]; then
     ok "All lint_commands reference tools available on PATH"

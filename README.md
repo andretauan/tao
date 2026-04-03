@@ -27,8 +27,6 @@ You've seen it — or lived it. Someone opens Copilot, types "build me an app", 
 
 That's **vibe coding** — building software on vibes. No structure. No plan. No quality control. Just prompts and hope.
 
-It works for demos. It doesn't work for anything real.
-
 **TAO Code is the opposite.** It's a mindset shift:
 
 > **Don't just prompt. Think first. Plan first. Then let the machine execute — with guardrails.**
@@ -58,9 +56,13 @@ No more prompt-by-prompt babysitting. One command runs the entire phase.
 
 ### 🔒 Bulletproof Quality
 
-Every commit passes through pre-commit linting, compliance checks, and when all phase tasks are complete, a 3-pass forensic audit (structural integrity, cross-file consistency, documentation completeness). Enforcement is layered: L0 git hooks block violations at commit time (linting, force-push, plan/brainstorm validation), L1 agent hooks provide real-time deterministic feedback during sessions (read-before-edit, dangerous command detection, auto-lint), and L2 instruction guidelines cover subjective quality criteria (model routing, ABEX scoring). **~75% of enforcement rules are deterministic (L0 + L1)** — the remaining ~25% relies on agent compliance with instructions.
+Every commit passes through layered enforcement:
 
-The guardrails are code-enforced — bash scripts that block bad commits and inject warnings in real-time. L0 and L1 are not honor-system. Not "please remember to lint." Code that doesn't pass the automated gates, doesn't ship. L2 rules (model routing, quality scoring) depend on agent instruction-following.
+- **L0 — Git hooks** block violations at commit time: linting, commit message validation, branch protection, brainstorm/plan validation, ABEX security scan. These are bash scripts — deterministic, no AI involved.
+- **L1 — Agent hooks** provide real-time feedback during sessions: read-before-edit enforcement (R5), dangerous command detection, auto-lint after edits, context tracking. Also deterministic bash scripts via VS Code's PostToolUse hooks.
+- **L2 — Agent instructions** cover subjective criteria: model routing, ABEX 3-pass quality scoring, skill selection. These depend on agent instruction-following.
+
+**~75% of enforcement rules are deterministic (L0 + L1)** — they run as bash scripts, not "please remember to lint." Code that doesn't pass the automated gates doesn't ship. The remaining ~25% (L2) relies on agent compliance with prompt instructions.
 
 ### 💰 60% Cost Reduction
 
@@ -70,15 +72,15 @@ Smart routing sends each task to the cheapest AI model that can handle it:
 - Complex stuff (architecture, security) → **Opus** (3x cost)
 - Database and git operations → **GPT-4.1** (free)
 
-Without routing: 10 tasks × expensive model = 30x cost. With TAO: **12x cost.** Same work, 60% cheaper.
+Without routing: 10 tasks × Opus = 30x cost. With TAO: 2 Opus (6x) + 6 Sonnet (6x) + 2 free (0x) = **12x cost. 60% savings.**
 
 ### 🛡️ Rate Limit Shield
 
 GitHub Copilot blocks you when you burn through premium requests too fast — even on Pro+. TAO fights this at three levels:
 
 1. **Prevention** — routing keeps ~60-80% of requests on cheaper/free models
-2. **Fallback** — if the primary model is blocked, the loop automatically switches to a free model and keeps running
-3. **Zero-cost ops** — hooks, lint, git operations never consume premium requests
+2. **Fallback** — if the primary model is blocked, Execute-Tao's model chain automatically falls back to GPT-4.1 (free) and keeps running
+3. **Zero-cost ops** — hooks, lint, and git operations are deterministic scripts that never consume premium requests
 
 You stretch your monthly quota from ~2 sessions to ~4+ sessions.
 
@@ -142,7 +144,7 @@ TAO structures every project into three layers. This is the core of the "TAO Cod
 Before any code exists, Wu explores your problem space. It produces three documents:
 - **DISCOVERY.md** — open exploration of the domain, constraints, and possibilities
 - **DECISIONS.md** — structured decisions using the IBIS protocol (position → argument → counter-argument)
-- **BRIEF.md** — compressed synthesis with a maturity gate (must reach 5/7 to proceed)
+- **BRIEF.md** — compressed synthesis with a maturity gate (≥5 of 7 criteria required to proceed)
 
 *Think of it as the architect's sketch before construction begins.*
 
@@ -161,13 +163,13 @@ Tao enters the autonomous loop. It picks the first pending task, reads the relev
 
 *Think of it as the construction crew — following the blueprint, room by room, with quality inspections at every step.*
 
-**Why this matters:** In vibe coding, AI writes code based on your vibes — no plan, no structure, no traceability. In TAO Code, every line of code traces back to a decision that traces back to an exploration. When something breaks, you know *why* it was built that way. When you hand the project to someone else, they understand the reasoning.
+**Why this matters:** In vibe coding, AI writes code based on your vibes — no plan, no structure, no traceability. In TAO Code, every line of code traces back to a decision that traces back to an exploration. When something breaks, you know *why* it was built that way.
 
 ---
 
 ## 🤖 The Agents
 
-Five specialized agents, each locked to a specific AI model — no manual switching, no cost surprises:
+Six specialized agents, each locked to a specific AI model — no manual switching, no cost surprises:
 
 | Agent | Model | Cost | Role |
 |-------|-------|------|------|
@@ -272,8 +274,8 @@ your-project/
 │       ├── tao.config.json        # Central config (models, lint, git, paths)
 │       ├── CONTEXT.md             # Active state — persists between sessions
 │       ├── CHANGELOG.md           # Structured changelog
-│       ├── RULES.md               # Inviolable rules reference
-│       ├── scripts/               # 12 shell scripts (hooks, gates, validators)
+│       ├── RULES.md               # Inviolable rules reference (7 security LOCKs)
+│       ├── scripts/               # Shell scripts (hooks, gates, validators)
 │       └── phases/                # Phase templates (language-specific)
 ```
 
@@ -287,7 +289,7 @@ docs/phases/phase-01/
 ├── brainstorm/
 │   ├── DISCOVERY.md               # Open exploration of the problem space
 │   ├── DECISIONS.md               # IBIS-structured decisions
-│   └── BRIEF.md                   # Compressed synthesis (5/7 maturity gate)
+│   └── BRIEF.md                   # Compressed synthesis (≥5/7 maturity gate)
 └── tasks/
     ├── 01-setup-database.md       # Full spec: objective, files, steps, criteria
     ├── 02-create-api.md
@@ -314,7 +316,7 @@ VS Code injects these rules into every matching file — automatically, before t
 | `tao-api` | Route/controller files (`routes/`, `api/`, etc.) | REST conventions + status codes + error format |
 | `tao-db` | SQL/model/migration files | Schema rules + index strategy + migration safety |
 
-**Layer 2 — Skills** (`.github/skills/` with `SKILL.md` following [agentskills.io](https://agentskills.io)):
+**Layer 2 — Skills** (`.github/skills/` following [agentskills.io](https://agentskills.io)):
 Deep expert knowledge auto-discovered by VS Code. Loaded on demand when context matches:
 
 | Skill | What it does |
@@ -339,6 +341,45 @@ All 14 skills are **auto-only** (`user-invocable: false`). No `/slash` commands 
 **No conflicts:** All skills use the `tao-` prefix. Your own project skills live alongside without interference.
 
 **Add your own:** Create a folder in `.github/skills/your-skill-name/` with a `SKILL.md`. See [agentskills.io](https://agentskills.io) for the format.
+
+---
+
+## 🔐 Enforcement Architecture
+
+TAO enforces quality and safety through **10 hooks** (deterministic shell scripts) + **7 security LOCKs** + agent instructions:
+
+### Hooks (deterministic — no AI)
+
+| Hook | Trigger | What it does |
+|------|---------|--------------|
+| `pre-commit.sh` | Git commit | Lint, branch protection, ABEX scan, validation gates |
+| `pre-push.sh` | Git push | Blocks push to main/master, blocks force push |
+| `commit-msg.sh` | Git commit | Validates conventional commit format (`type(scope): description`) |
+| `lint-hook.sh` | PostToolUse | Runs configured linter after every file edit |
+| `enforcement-hook.sh` | PostToolUse | R0 compliance, R5 read-before-edit, dangerous command detection |
+| `context-hook.sh` | SessionStart | Loads project context and tracks file operations |
+| `abex-hook.sh` | PostToolUse | Automated ABEX security scan after code edits |
+| `brainstorm-hook.sh` | PostToolUse | Triggers brainstorm validation on BRIEF/DECISIONS/DISCOVERY edits |
+| `plan-hook.sh` | PostToolUse | Triggers plan validation on PLAN.md/STATUS.md edits |
+| `install-hooks.sh` | Setup | Installs git hooks into `.git/hooks/` |
+
+### Security LOCKs (7 inviolable rules)
+
+| Lock | Rule |
+|------|------|
+| **LOCK 1 — SCOPE** | Only modify project source files. Never: `CLAUDE.md`, `.github/workflows/`, `vendor/`, `node_modules/` |
+| **LOCK 2 — BRANCH** | Only `dev` branch. Never `git push origin main`, `--force`, `reset --hard` |
+| **LOCK 3 — DESTRUCTIVE** | Never `rm -rf`, `DROP TABLE`, `TRUNCATE`, `DELETE FROM` without WHERE |
+| **LOCK 4 — SCHEMA** | Schema-altering ops → STOP → document → checkpoint |
+| **LOCK 5 — PAUSE** | `.tao-pause` exists → immediate full stop |
+| **LOCK 6 — COMMIT** | Never commit with `--no-verify`. 1 commit = 1 task. |
+| **LOCK 7 — EXTERNAL** | Never make external HTTP requests or install packages without approval |
+
+### ABEX Protocol (Quality Gate)
+
+ABEX operates at two levels:
+1. **Automated** — `abex-gate.sh` performs regex-based security pattern detection (SQL injection, XSS, hardcoded secrets, etc.) via pre-commit hook and PostToolUse hook. Deterministic.
+2. **Agent judgment** — three manual review passes (Security, User Safety, Performance) performed by the agent after each task. Instruction-based (L2).
 
 ---
 
@@ -392,6 +433,7 @@ TAO ships with full support for **English** and **Brazilian Portuguese**:
 
 - All 6 agents in both languages
 - All templates (CLAUDE.md, CONTEXT.md, CHANGELOG.md, phases, tasks) in both languages
+- All 14 skills in both languages
 - Brainstorm templates are shared (language-neutral structure)
 
 This is cultural adaptation, not mechanical translation. The PT-BR agents use Brazilian conventions, terminology, and phrasing that feel native.
@@ -448,7 +490,7 @@ Note: `tao.sh` is for **monitoring only**. Execution is done by the agents insid
 
 ---
 
-## � TAO-DNA — Build Your Own
+## 🧬 TAO-DNA — Build Your Own
 
 Want to build a TAO-compatible system for **Cursor, Cline, Windsurf, Claude Code**, or any other environment?
 
@@ -457,6 +499,7 @@ Want to build a TAO-compatible system for **Cursor, Cline, Windsurf, Claude Code
 It's not how to _use_ TAO. It's how to _think_ TAO.
 
 ---
+
 ## 🛠️ Troubleshooting
 
 ### Hooks not firing
@@ -486,15 +529,17 @@ Enforcement varies by layer:
 | Dangerous terminal command | **L1** | `enforcement-hook.sh` injects LOCK violation warning |
 | `--no-verify` in terminal | **L1** | `enforcement-hook.sh` injects LOCK 6 warning |
 | Auto-lint on every edit | **L1** | `lint-hook.sh` runs lint automatically |
+| ABEX security scan on edit | **L1** | `abex-hook.sh` runs automated pattern detection |
 | Model routing (cost) | **L2** | Agent instruction — not deterministic |
-| ABEX quality scoring | **L2** | Agent instruction — not deterministic |
+| ABEX 3-pass review | **L2** | Agent instruction — not deterministic |
 
 **L0 = blocked deterministically.** L1 = warning injected in real-time. L2 = depends on agent compliance.
 
 - Persistent issues: open an [issue](https://github.com/andretauan/TAO/issues)
 
 ---
-## �🤝 Contributing
+
+## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 

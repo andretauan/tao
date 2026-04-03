@@ -339,8 +339,7 @@ Toda decisão IBIS tem pelo menos 1 tarefa que a implementa:
     "abex_enabled": true
   },
   "doc_sync": {
-    "enabled": false,         // opt-in (addon level)
-    "script": "scripts/doc-sync.sh"
+    "enabled": false
   }
 }
 ```

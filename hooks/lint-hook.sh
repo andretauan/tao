@@ -98,6 +98,11 @@ if [ -z "$LINT_CMD" ]; then
   exit 0
 fi
 
+# ── Validate lint command from config (prevent injection via malicious config) ──
+if [[ "$LINT_CMD" =~ [';|&`$\<>'] ]] || [[ "$LINT_CMD" == *$'\n'* ]]; then
+  exit 0  # Skip: unsafe characters in lint_commands config
+fi
+
 # ── Sanitize FILE_PATH before shell substitution ──
 # Reject paths containing shell metacharacters that could cause injection
 # via the `bash -c "$LINT_CMD"` call below.

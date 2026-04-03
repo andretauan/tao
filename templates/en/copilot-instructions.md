@@ -82,6 +82,10 @@ If `.tao-pause` exists at project root → **IMMEDIATE STOP**
 - Message: `type(phase-XX): TNN — short description`
 - 1 commit = 1 task
 
+### LOCK 7 — EXTERNAL
+- NEVER make external HTTP requests without explicit approval
+- NEVER install packages or access services not defined in the project
+
 ---
 
 ## COMPLIANCE CHECK

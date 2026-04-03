@@ -159,6 +159,8 @@ Automated via `abex-gate.sh` regex scan. Result: **PASS** (all 3 clean) or **FAI
 | **LOCK 3 — DESTRUCTIVE** | NEVER `rm -rf`, `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`, `DELETE FROM` without WHERE clause. |
 | **LOCK 4 — SCHEMA** | Any `CREATE TABLE`, `ALTER TABLE`, `DROP COLUMN` → STOP → document the SQL → register as checkpoint. |
 | **LOCK 5 — PAUSE** | If `.tao-pause` exists in project root → **IMMEDIATE STOP**. Report status and halt all operations. |
+| **LOCK 6 — COMMIT** | NEVER commit without passing quality gates. NEVER commit with `--no-verify`. Message format: `type(phase-XX): TNN — short description`. 1 commit = 1 task. |
+| **LOCK 7 — EXTERNAL** | NEVER make external HTTP requests, install packages, or access services not defined in the project without explicit approval. |
 
 ---
 

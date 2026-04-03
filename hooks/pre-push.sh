@@ -39,7 +39,7 @@ fi
 
 # ─── Check target branch from refspecs (stdin) ───────────────
 BLOCKED=0
-while read -r local_ref local_sha remote_ref remote_sha; do
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
   TARGET_BRANCH=$(echo "$remote_ref" | sed 's|^refs/heads/||')
 
   if [ "$TARGET_BRANCH" = "$MAIN_BRANCH" ] || [ "$TARGET_BRANCH" = "master" ]; then

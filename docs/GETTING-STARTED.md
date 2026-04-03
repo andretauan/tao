@@ -270,8 +270,7 @@ The key sections:
     "abex_enabled": true
   },
   "doc_sync": {
-    "enabled": false,
-    "script": "scripts/doc-sync.sh"
+    "enabled": false
   }
 }
 ```
@@ -295,7 +294,6 @@ The key sections:
 | `compliance.require_changelog` | Agents must update CHANGELOG.md after changes |
 | `compliance.abex_enabled` | Enable 3-pass audit after task completion (security, UX, performance) |
 | `doc_sync.enabled` | Enable documentation sync checks on commit |
-| `doc_sync.script` | Path to doc-sync script (if enabled) |
 
 </details>
 
@@ -710,4 +708,4 @@ cd docs/phases/phase-01
 - **Customize `CLAUDE.md`** — add your project's conventions, architecture decisions, and stack-specific rules
 - **Add skills** — create `.github/skills/` with domain knowledge for your project
 - **Explore the agents** — read the `.agent.md` files to understand each agent's full protocol
-- **Set up doc-sync** — enable `doc_sync` in config if you want documentation drift detection
+- **Enable doc-sync** — set `doc_sync.enabled` to `true` in config for documentation drift detection

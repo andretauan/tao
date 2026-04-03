@@ -217,8 +217,8 @@ echo ""
 echo -e "${BOLD}── D5: STATUS ✅ ↔ progress.txt cross-check ─${NC}"
 if [ -n "$STATUS_FILE" ] && [ -n "$PROGRESS_FILE" ] && [ -f "$PROGRESS_FILE" ]; then
   DONE_TASKS=$(python3 -c "
-import re
-text = open('$STATUS_FILE').read()
+import re, sys
+text = open(sys.argv[1]).read()
 done = []
 for line in text.splitlines():
     if '|' not in line or '✅' not in line: continue
@@ -226,7 +226,7 @@ for line in text.splitlines():
     if cols and re.match(r'^T?\d+$', cols[0]):
         done.append(cols[0].lstrip('T').zfill(2))
 print('\n'.join(done))
-" 2>/dev/null || true)
+" "$STATUS_FILE" 2>/dev/null || true)
 
   if [ -n "$DONE_TASKS" ]; then
     MISSING_LOG=0

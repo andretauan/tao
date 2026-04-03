@@ -41,10 +41,10 @@ Rodar lint nos arquivos alterados usando `.github/tao/tao.config.json` → `lint
 
 ```bash
 git add <arquivos-específicos>   # NUNCA git add -A
-git commit -m "tipo: descrição objetiva"
+git commit -m "tipo(fase-XX): TNN — descrição objetiva"
 ```
 
-**Tipos:** `feat:` | `fix:` | `refactor:` | `docs:` | `hotfix:` | `chore:`
+**Tipos:** `feat` | `fix` | `refactor` | `docs` | `hotfix` | `chore`
 
 ### 3. Push Dev
 

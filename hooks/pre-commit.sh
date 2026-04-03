@@ -149,6 +149,13 @@ while IFS= read -r file; do
     # Replace {file} placeholder with actual file path
     cmd="${lint_cmd//\{file\}/$file}"
 
+    # T08b — Validate lint command structure (prevent injection via malicious config)
+    # Only allow: word chars, spaces, dashes, dots, slashes, {file}, and common flags
+    if [[ "$lint_cmd" =~ [';|&`$\<>'] ]] || [[ "$lint_cmd" == *$'\n'* ]]; then
+      echo -e "${YELLOW}⚠  Skipping lint: unsafe characters in lint_commands config for ${ext}${NC}"
+      continue
+    fi
+
     if ! bash -c "$cmd" > /dev/null 2>&1; then
       echo -e "${RED}✗ Lint failed: ${file}${NC}"
       bash -c "$cmd" 2>&1 | head -5

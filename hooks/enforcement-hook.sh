@@ -45,15 +45,17 @@ try:
     c = json.load(open(sys.argv[1]))
     comp = c.get('compliance', {})
     print('true' if comp.get('require_context_read', True) else 'false')
+    print('true' if comp.get('require_read_before_edit', True) else 'false')
     print('true' if comp.get('require_skill_check', True) else 'false')
 except:
+    print('true')
     print('true')
     print('true')
 " "$CONFIG_FILE" 2>/dev/null) || _compliance=""
   if [ -n "$_compliance" ]; then
     REQUIRE_R0_CHECK=$(echo "$_compliance" | sed -n '1p')
-    REQUIRE_R5_CHECK=$(echo "$_compliance" | sed -n '1p')
-    REQUIRE_R3_CHECK=$(echo "$_compliance" | sed -n '2p')
+    REQUIRE_R5_CHECK=$(echo "$_compliance" | sed -n '2p')
+    REQUIRE_R3_CHECK=$(echo "$_compliance" | sed -n '3p')
   fi
 fi
 
@@ -143,16 +145,20 @@ esac
 MESSAGES=""
 
 # ── R5: Was this file read before editing? ──
-# Normalize: extract just the filename for partial matching (handles abs vs relative)
 FILE_BASENAME="${FILE_PATH##*/}"
 R5_OK="false"
 
 if [ -f "$READS_LOG" ] && [ -s "$READS_LOG" ]; then
-  # Check both full path and basename (agent may read with different path format)
+  # Primary: exact full path match
   if grep -qF "$FILE_PATH" "$READS_LOG" 2>/dev/null; then
     R5_OK="true"
-  elif grep -qF "$FILE_BASENAME" "$READS_LOG" 2>/dev/null; then
-    R5_OK="true"
+  else
+    # Fallback: match any logged path that ends with the same relative tail
+    # This handles abs-vs-relative mismatches without basename collision
+    _rel_path="${FILE_PATH#"$WORKSPACE_DIR"/}"
+    if grep -qF "$_rel_path" "$READS_LOG" 2>/dev/null; then
+      R5_OK="true"
+    fi
   fi
 fi
 

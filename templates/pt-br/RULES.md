@@ -148,8 +148,6 @@ Automatizado via scan regex do `abex-gate.sh`. Resultado: **PASSA** (as 3 limpas
 
 **Automação:** `abex-gate.sh` realiza detecção automática de padrões para a Passada 1 (Segurança). Roda automaticamente via hook pre-commit e hook PostToolUse. Os agentes realizam as 3 passadas manuais para revisão aprofundada. O scan automatizado captura padrões óbvios; a revisão manual captura issues sutis.
 
-**Automação:** `abex-gate.sh` realiza detecção automática de padrões para a Passada 1 (Segurança). Roda automaticamente via hook pre-commit e hook PostToolUse. Os agentes realizam as 3 passadas manuais para revisão aprofundada. O scan automatizado captura padrões óbvios; a revisão manual captura issues sutis.
-
 ---
 
 ## SECURITY LOCKS
@@ -161,6 +159,8 @@ Automatizado via scan regex do `abex-gate.sh`. Resultado: **PASSA** (as 3 limpas
 | **LOCK 3 — DESTRUTIVO** | NUNCA `rm -rf`, `DROP TABLE`, `DROP DATABASE`, `TRUNCATE`, `DELETE FROM` sem cláusula WHERE. |
 | **LOCK 4 — SCHEMA** | Qualquer `CREATE TABLE`, `ALTER TABLE`, `DROP COLUMN` → PARAR → documentar o SQL → registrar como checkpoint. |
 | **LOCK 5 — PAUSA** | Se `.tao-pause` existir na raiz do projeto → **PARADA IMEDIATA**. Reportar status e interromper todas as operações. |
+| **LOCK 6 — COMMIT** | NUNCA commitar sem quality gates passando. NUNCA commitar com `--no-verify`. Formato: `tipo(fase-XX): TNN — descrição curta`. 1 commit = 1 tarefa. |
+| **LOCK 7 — EXTERNO** | NUNCA fazer requisições HTTP externas, instalar pacotes ou acessar serviços não definidos no projeto sem aprovação explícita. |
 
 ---
 

@@ -76,7 +76,7 @@ Three mandatory review passes after each implementation:
 | **2 — User** | "I'm a real visitor" | UX flow, copy quality, accessibility, mobile responsiveness |
 | **3 — Performance** | "I'm a Core Web Vitals auditor" | N+1 queries, DOM size, CLS, LCP, unnecessary re-renders |
 
-ABEX is judgment-based (not a script) — it's a protocol in the agent's instructions, not an automated tool. The agent performs the three passes mentally and reports findings.
+ABEX operates at two levels: (1) automated pattern scanning via `abex-gate.sh` + `abex-hook.sh` for deterministic security detection (L0/L1), and (2) agent judgment — three manual review passes covering Security, User Safety, and Performance (L2). The automated scan catches obvious patterns; the agent performs the three mental passes for thorough review.
 
 ---
 
@@ -186,7 +186,7 @@ Sonnet is **allowed** to:
 - Execute a validated plan
 - Commit, push, format, changelog
 
-#### BRIEF Maturity Gate (7/7)
+#### BRIEF Maturity Gate (7 criteria, ≥5 required)
 
 A BRIEF.md (plan input) is only valid when at least 5 of 7 criteria are met:
 

@@ -148,14 +148,6 @@ fi
 
 # ─── Helper functions ─────────────────────────────────────────
 
-check_pause() {
-  if [ -f "$PAUSE_FILE" ] || [ -f "$PAUSE_FILE_LEGACY" ]; then
-    echo -e "${RED}⏸  ${MSG_PAUSED}${NC}"
-    return 1
-  fi
-  return 0
-}
-
 count_pending() {
   local file="$1"
   local c
@@ -185,7 +177,7 @@ if [[ "${1:-}" == "pause" ]]; then
 fi
 
 if [[ "${1:-}" == "unpause" ]]; then
-  rm -f "$PAUSE_FILE"
+  rm -f "$PAUSE_FILE" "$PAUSE_FILE_LEGACY"
   echo -e "${GREEN}▶  ${MSG_UNPAUSED}${NC}"
   exit 0
 fi
@@ -345,7 +337,9 @@ if [[ "${1:-}" == "dry-run" ]]; then
     [ -z "$num" ] && continue
     padded=$(printf "%02d" "$num")
 
-    if echo "$line" | grep -qiE "opus|architect|arquiteto"; then
+    # Check Executor column (4th column in STATUS table) for Opus/Architect routing
+    _executor=$(echo "$line" | awk -F'|' '{print $5}' | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+    if [[ "$_executor" =~ architect|arquiteto ]]; then
       echo -e "  ${RED}⚠  T${padded}${NC} — ${DIM}Opus (${MSG_SKIPPED})${NC}"
       OPUS_LIST="${OPUS_LIST}T${padded} "
     else

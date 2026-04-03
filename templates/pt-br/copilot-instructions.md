@@ -82,6 +82,10 @@ Se `.tao-pause` existir na raiz → **STOP IMEDIATO**
 - Mensagem: `tipo(fase-XX): TNN — descrição curta`
 - 1 commit = 1 tarefa
 
+### LOCK 7 — EXTERNO
+- NUNCA fazer requisições HTTP externas sem aprovação explícita
+- NUNCA instalar pacotes ou acessar serviços não definidos no projeto
+
 ---
 
 ## COMPLIANCE CHECK

@@ -2,7 +2,7 @@
 
 > **Master architecture document.** An agent that reads this document can replicate the entire system in any project with full accuracy.
 
-*Version: 0.1.0*
+*Version: 1.0.0*
 
 ---
 
@@ -86,8 +86,13 @@ project/
 │       │   ├── lint-hook.sh             ← PostToolUse — lint after file edit
 │       │   ├── enforcement-hook.sh      ← PostToolUse — R0/R5 enforcement
 │       │   ├── context-hook.sh          ← SessionStart — inject context + R2 handoff
+│       │   ├── abex-hook.sh             ← PostToolUse — ABEX security scan after edits
+│       │   ├── brainstorm-hook.sh       ← PostToolUse — brainstorm validation on artifact edits
+│       │   ├── plan-hook.sh             ← PostToolUse — plan validation on PLAN.md/STATUS.md edits
 │       │   ├── install-hooks.sh         ← Git hook installer
-│       │   ├── pre-commit.sh            ← Modular pre-commit pipeline
+│       │   ├── pre-commit.sh            ← Git pre-commit pipeline
+│       │   ├── pre-push.sh              ← Git pre-push — blocks main/master + force push
+│       │   ├── commit-msg.sh            ← Git commit-msg — conventional commit format
 │       │   ├── validate-plan.sh         ← Gate: validates PLAN.md coverage
 │       │   ├── validate-execution.sh    ← Gate: validates task execution
 │       │   ├── new-phase.sh             ← Creates new phase directories
@@ -150,8 +155,7 @@ All project-specific values live in `tao.config.json`. No manual find-and-replac
     "abex_enabled": true
   },
   "doc_sync": {
-    "enabled": false,
-    "script": ".github/tao/scripts/doc-sync.sh"
+    "enabled": false
   }
 }
 ```
@@ -515,6 +519,111 @@ Guardrails operate across all three layers:
 11. Output JSON with consolidated `additionalContext`
 
 **Cost:** 0 premium requests.
+
+### 6.4 abex-hook.sh (PostToolUse)
+
+**Purpose:** Run automated ABEX security scan after every file edit.
+
+**Flow:**
+1. Receive JSON via stdin with `tool_name` and `tool_input`
+2. Filter by tool: `editFiles`, `create_file`, `replace_string_in_file`, `multi_replace_string_in_file`
+3. Extract `filePath` — skip if missing or non-existent
+4. Filter by code file extensions (`.py`, `.ts`, `.js`, `.php`, `.go`, `.rs`, `.rb`, `.sh`, etc.)
+5. Check `compliance.abex_enabled` in `tao.config.json` — skip if `false`
+6. Locate and run `abex-gate.sh` on the edited file
+7. If security issue found: output JSON with `additionalContext` containing `[BLOCK]` findings
+8. If ok: `exit 0` silent
+
+**Cost:** 0 premium requests.
+
+### 6.5 brainstorm-hook.sh (PostToolUse)
+
+**Purpose:** Trigger brainstorm validation when brainstorm artifacts are edited.
+
+**Flow:**
+1. Receive JSON via stdin with `tool_name` and `tool_input`
+2. Filter by tool: `editFiles`, `create_file`, `replace_string_in_file`, `multi_replace_string_in_file`
+3. Extract `filePath` — only trigger on `BRIEF.md`, `DECISIONS.md`, or `DISCOVERY.md` inside a `brainstorm/` directory
+4. Locate and run `validate-brainstorm.sh` on the parent phase directory
+5. If validation fails: output JSON with `additionalContext` containing `[BLOCK]`/`[FAIL]` findings
+6. If ok: `exit 0` silent
+
+**Cost:** 0 premium requests.
+
+### 6.6 plan-hook.sh (PostToolUse)
+
+**Purpose:** Trigger plan validation when plan artifacts are edited.
+
+**Flow:**
+1. Receive JSON via stdin with `tool_name` and `tool_input`
+2. Filter by tool: `editFiles`, `create_file`, `replace_string_in_file`, `multi_replace_string_in_file`
+3. Extract `filePath` — only trigger on `PLAN.md` or `STATUS.md` at phase level (not inside `brainstorm/`)
+4. Locate and run `validate-plan.sh` on the phase directory
+5. If validation fails: output JSON with `additionalContext` containing `[BLOCK]`/`[FAIL]` findings
+6. If ok: `exit 0` silent
+
+**Cost:** 0 premium requests.
+
+### 6.7 pre-commit.sh (Git Hook)
+
+**Purpose:** Git pre-commit pipeline orchestrator — runs multiple validation gates before allowing a commit.
+
+**Checks performed:**
+1. **LOCK 5:** `.tao-pause` exists → block commit
+2. **Lint:** Read `tao.config.json` → `lint_commands` → run syntax check on each staged file by extension
+3. **LOCK 2:** Branch protection — block direct commit to `main`/`master`
+4. **R6:** Context freshness — if code files staged, `CONTEXT.md` must also be staged
+5. **LOCK 3:** Destructive pattern scan — detect `DROP TABLE`, `rm -rf /`, `TRUNCATE`, etc.
+6. **R4:** Timestamp validation — `CHANGELOG.md` must contain `[YYYY-MM-DD HH:MM]`
+7. **ABEX:** Security scan — run `abex-gate.sh` on all staged code files (if `abex_enabled`)
+
+**Exit:** 0 = allow commit, 1 = block commit.
+**Installed by:** `install-hooks.sh` → `.git/hooks/pre-commit`
+
+**Cost:** 0 premium requests.
+
+### 6.8 pre-push.sh (Git Hook)
+
+**Purpose:** Git pre-push protection (LOCK 2) — prevents pushes to protected branches and force pushes.
+
+**Checks performed:**
+1. Detect `--force` / `--force-with-lease` via parent process args → block
+2. Read target branch from refspecs (stdin) → block if target is `main` or `master`
+3. Read `main_branch` from `tao.config.json` for custom main branch names
+
+**Exit:** 0 = allow push, 1 = block push.
+**Installed by:** `install-hooks.sh` → `.git/hooks/pre-push`
+
+**Cost:** 0 premium requests.
+
+### 6.9 commit-msg.sh (Git Hook)
+
+**Purpose:** Validate commit message format (LOCK 6) — enforces conventional commit syntax.
+
+**Format:** `type(scope): description`
+- **Types:** `feat`, `fix`, `refactor`, `docs`, `chore`, `hotfix`, `test`, `perf`, `ci`, `build`, `style`
+- **Scope:** alphanumeric, dashes, underscores, dots (e.g., `phase-01`, `core`, `api`)
+- **Max length:** 72 characters
+- **Skips:** merge commits, reverts, fixup/squash
+
+**Exit:** 0 = allow commit, 1 = block commit.
+**Installed by:** `install-hooks.sh` → `.git/hooks/commit-msg`
+
+**Cost:** 0 premium requests.
+
+### 6.10 install-hooks.sh (Setup Script)
+
+**Purpose:** Install TAO git hooks into `.git/hooks/`. Called by `install.sh` during setup, or manually.
+
+**Hooks installed:**
+1. `pre-commit` → delegates to `pre-commit.sh`
+2. `post-commit` → auto-push to dev branch (if `git.auto_push` enabled in config)
+3. `commit-msg` → delegates to `commit-msg.sh`
+4. `pre-push` → delegates to `pre-push.sh`
+
+**Behavior:** If a non-TAO hook already exists, it is skipped with a warning (no overwrite). Sets `chmod +x` on all installed hooks.
+
+**Usage:** `bash .github/tao/scripts/install-hooks.sh`
 
 ---
 

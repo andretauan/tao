@@ -41,10 +41,10 @@ Run lint on changed files using commands from `.github/tao/tao.config.json` → 
 
 ```bash
 git add <specific-files>   # NEVER git add -A
-git commit -m "type: objective description"
+git commit -m "type(phase-XX): TNN — objective description"
 ```
 
-**Types:** `feat:` | `fix:` | `refactor:` | `docs:` | `hotfix:` | `chore:`
+**Types:** `feat` | `fix` | `refactor` | `docs` | `hotfix` | `chore`
 
 ### 3. Push Dev
 

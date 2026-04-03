@@ -292,8 +292,7 @@ config = {
         'abex_enabled': True
     },
     'doc_sync': {
-        'enabled': False,
-        'script': '.github/tao/scripts/doc-sync.sh'
+        'enabled': False
     }
 }
 with open(sys.argv[7], 'w') as f:
@@ -452,7 +451,11 @@ INITIAL_PHASE_DIR="$TARGET_DIR/$_phases_sub/${_p_prefix}01"
 if [ -d "$INITIAL_PHASE_DIR" ]; then
   skipped "$_phases_sub/${_p_prefix}01/"
 else
-  mkdir -p "$INITIAL_PHASE_DIR/brainstorm" "$INITIAL_PHASE_DIR/tasks"
+  _tasks_dir="tasks"
+  if [ "$LANG_CHOICE" = "pt-br" ]; then
+    _tasks_dir="tarefas"
+  fi
+  mkdir -p "$INITIAL_PHASE_DIR/brainstorm" "$INITIAL_PHASE_DIR/$_tasks_dir"
   # Copy language-specific phase templates
   for tmpl in "$TAO_DIR/phases/$LANG_CHOICE"/*.template; do
     [ -f "$tmpl" ] || continue

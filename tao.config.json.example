@@ -37,7 +37,6 @@
     "abex_enabled": true
   },
   "doc_sync": {
-    "enabled": false,
-    "script": ".github/tao/scripts/doc-sync.sh"
+    "enabled": false
   }
 }
