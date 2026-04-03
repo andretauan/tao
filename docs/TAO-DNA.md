@@ -4,7 +4,7 @@
 >
 > TAO-DNA is not documentation of _how to use TAO_. It's documentation of _how to think TAO_.
 
-*Version: 1.0.0 — 2026-03-28*
+*Version: 1.0.1 — 2026-04-03*
 
 ---
 

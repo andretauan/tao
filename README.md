@@ -13,7 +13,7 @@ An AI-native development framework for VS Code Copilot that replaces prompt-and-
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg)](LICENSE)
 [![Bilingual](https://img.shields.io/badge/i18n-EN%20%7C%20PT--BR-blue.svg)](#-bilingual)
 [![VS Code](https://img.shields.io/badge/VS%20Code-Copilot%20Agent%20Mode-purple.svg)](https://code.visualstudio.com/)
-[![v1.0.0](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/andretauan/tao/releases/tag/v1.0.0)
+[![v1.0.1](https://img.shields.io/badge/version-1.0.1-green.svg)](https://github.com/andretauan/tao/releases/tag/v1.0.1)
 
 [🇧🇷 Leia em Português](README.pt-br.md)
 

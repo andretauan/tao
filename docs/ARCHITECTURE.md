@@ -2,7 +2,7 @@
 
 > **Master architecture document.** An agent that reads this document can replicate the entire system in any project with full accuracy.
 
-*Version: 1.0.0*
+*Version: 1.0.1*
 
 ---
 
