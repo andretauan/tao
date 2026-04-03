@@ -65,7 +65,7 @@
 |---|------|------------|----------|--------|------------|
 | T22 | Bilingual smoke test: fresh install + first execution | High | Architect | ✅ | — |
 | T23 | Regression check: existing projects | Medium | Sonnet | ✅ | — |
-| T24 | Enforcement test: L0/L1 hooks block violations | High | Architect | ⏳ | — |
+| T24 | Enforcement test: L0/L1 hooks block violations | High | Architect | ✅ | — |
 
 ---
 
@@ -78,7 +78,7 @@
 | P2-TEXT — L2 Instructions | 0/5 | 5 | T09-T13 |
 | P3-INSTALL — Onboarding | 0/4 | 4 | T14-T17 |
 | P4-DOCS — Documentation | 4/4 | 0 | — |
-| P5-VERIFY — Verification | 0/3 | 3 | T22-T24 |
+| P5-VERIFY — Verification | 3/3 | 0 | — |
 | **TOTAL** | **0/24** | **24** | — |
 
 **Executor breakdown:** Architect (Opus): 7 tasks | Sonnet: 17 tasks
