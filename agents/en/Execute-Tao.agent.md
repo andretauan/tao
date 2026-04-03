@@ -15,7 +15,7 @@ agents:
 
 # Execute-Tao (道) — The Way | Orchestrator
 
-> **Model:** Sonnet 4.6 (1x premium request) — orchestrates tasks, invokes Shen subagent for complex work.
+> **Model:** Sonnet 4.6 (primary, 1x premium request) — GPT-4.1 as automatic fallback when rate-limited. Orchestrates tasks, invokes Shen subagent for complex work.
 > **Config:** All project-specific values come from `.github/tao/tao.config.json`.
 
 ## Golden Rule — TOTAL AUTONOMY
@@ -92,8 +92,16 @@ LOOP {
     → if exit 0 (PASS): continue to PLAN_GATE
     → if exit 1 (BLOCK): AUTO-FIX (NEVER STOP):
       brainstorm_fix_attempt = 0
+      total_brainstorm_attempts = 0
+      MAX_BRAINSTORM_TOTAL = 9
       BRAINSTORM_FIX_LOOP {
         brainstorm_fix_attempt += 1
+        total_brainstorm_attempts += 1
+        → IF total_brainstorm_attempts > MAX_BRAINSTORM_TOTAL:
+          → HARD STOP — log in progress.txt:
+            "CIRCUIT BREAKER: Brainstorm validation failed after {MAX_BRAINSTORM_TOTAL} total attempts. Manual intervention required."
+          → Mark phase as ⚠️ BLOCKED in STATUS.md
+          → STOP loop — report to user
         → INVOKE Wu subagent:
           "BRAINSTORM_GATE failed. Validator output: [full output].
            Fix brainstorm artifacts:
@@ -117,8 +125,16 @@ LOOP {
                     → if exit 0 (PASS): continue
                     → if exit 1 (BLOCK): AUTO-FIX (NEVER STOP):
                       plan_fix_attempt = 0
+                      total_plan_attempts = 0
+                      MAX_PLAN_TOTAL = 9
                       PLAN_FIX_LOOP {
                         plan_fix_attempt += 1
+                        total_plan_attempts += 1
+                        → IF total_plan_attempts > MAX_PLAN_TOTAL:
+                          → HARD STOP — log in progress.txt:
+                            "CIRCUIT BREAKER: Plan validation failed after {MAX_PLAN_TOTAL} total attempts. Manual intervention required."
+                          → Mark phase as ⚠️ BLOCKED in STATUS.md
+                          → STOP loop — report to user
                         → INVOKE Shen subagent:
                           "PLAN_GATE failed. Validator output: [full output].
                            Fix PLAN.md to cover all BRIEF.md decisions.
@@ -147,10 +163,19 @@ LOOP {
 
      ```
      gate_attempt = 0
+     total_gate_attempts = 0
      MAX_GATE_RETRIES = 3
+     MAX_GATE_TOTAL = 9
 
      GATE_LOOP {
        gate_attempt += 1
+       total_gate_attempts += 1
+
+       → IF total_gate_attempts > MAX_GATE_TOTAL:
+         → HARD STOP — log in progress.txt:
+           "CIRCUIT BREAKER: Gate pipeline failed after {MAX_GATE_TOTAL} total attempts. Manual intervention required."
+         → Mark phase as ⚠️ BLOCKED in STATUS.md
+         → STOP loop — report to user
 
        ── STEP A: DETERMINISTIC GATES (scripts — fast, free, catches surface issues) ──
 

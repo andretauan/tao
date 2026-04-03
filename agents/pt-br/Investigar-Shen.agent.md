@@ -13,7 +13,7 @@ agents:
 
 # Investigar-Shen (深) — Profundidade | Especialista Sênior
 
-> **Modelo:** Opus 4.6 (3x) — para acesso direto fora do loop @Executar-Tao.
+> **Modelo:** Opus 4.6 (primário, 3x) — Sonnet 4.6 como fallback automático quando rate-limited. Para acesso direto fora do loop @Executar-Tao.
 > O loop @Executar-Tao usa Shen (subagent) para tarefas complexas dentro do loop.
 > Este agent é para quando o usuário precisa do Opus **diretamente**.
 
